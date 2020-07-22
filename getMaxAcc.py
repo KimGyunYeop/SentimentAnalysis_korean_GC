@@ -19,7 +19,7 @@ for i in epoch_list:
 acc_dict = sorted(acc_dict.items())
 
 print('epoch acc')
-for file, acc in acc_dict.items():
+for (file, acc) in acc_dict:
     print('{}\t{}'.format(file, acc))
 
 print("\n max = ",max(acc_dict.values()))
