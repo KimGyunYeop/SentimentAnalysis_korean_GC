@@ -22,4 +22,4 @@ print('epoch acc')
 for (file, acc) in acc_dict:
     print('{}\t{}'.format(file, acc))
 
-print("\n max = ",max(acc_dict.values()))
+print("\n max = ",max(acc_dict[:,-1]))
