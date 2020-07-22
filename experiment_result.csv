@@ -1,3 +1,5 @@
-﻿모델이름,성능,step,ckpt,consoloutput,설명,날짜,참조,비고,사용 모델 명
-KOELECTRA_FOR_SEQ_CLS,,,koelectra-base-nsmc-ckpt,KOELECTRA_CLS.out,electraforsequenceclassification finetuning model을 사용하는 classifcation,07월 15일,,logging step을 10000으로하여 불확실,transformers.ElectraForSequenceClassification
-koELECTRA+LSTM,,,koeletra_lstm_cls,KOELETRA_LSTM.out,koELECTRA embedding에 one direcitonal LSTM후 마지막 hidden state의 classification,07월 16일,,,models.LSTM_model
+﻿모델이름,성능,step,ckpt,consoloutput,설명,날짜,참조,비고,사용 모델 명,서버
+KOELECTRA_FOR_SEQ_CLS,,,koelectra-base-nsmc-ckpt,KOELECTRA_CLS.out,electraforsequenceclassification finetuning model을 사용하는 classifcation,07월 15일,,logging step을 10000으로하여 불확실,transformers.ElectraForSequenceClassification,217
+koELECTRA+LSTM,,,koeletra_lstm,KOELETRA_LSTM.out,koELECTRA embedding에 one direcitonal LSTM후 마지막 hidden state의 classification,07월 16일,,,model.LSTM,217
+KoELECTRA + LSTM + ATT,,,koeletra-lstm-att-cls,output_LSTM_ATT.out,KOELECTRA embedding에 one direcitonal LSTM후 Attention layer의 classification,07월 22일,,,model.LSTM_ATT,217
+KoELECTRA + LSTM + DOTATT,,,koeletra-lstm-att-cls,x,KOELECTRA embedding에 one direcitonal LSTM후 DotProduct Attention layer의 classification,07월 22일,,,model.LSTM_ATT_DOT,218
