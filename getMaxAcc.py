@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import argparse
+import numpy as np
 
 args = argparse.ArgumentParser()
 
@@ -18,8 +19,9 @@ for i in epoch_list:
 
 acc_dict = sorted(acc_dict.items())
 
-print('epoch acc')
+print('epoch\t\t\tacc')
 for (file, acc) in acc_dict:
     print('{}\t{}'.format(file, acc))
 
-print("\n max = ",max(acc_dict[:,-1]))
+acc_dict = list(map(list,sorted(acc_dict)))
+print("\nmax = ",max(np.array(acc_dict)[:,-1]))
