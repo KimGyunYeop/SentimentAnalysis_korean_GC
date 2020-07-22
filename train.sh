@@ -1,0 +1,1 @@
+python3 train.py --task nsmc --config_file koelectra-base.json --result_dir koeletra-lstm-att-cls
