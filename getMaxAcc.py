@@ -16,6 +16,8 @@ for i in epoch_list:
     with open(os.path.join(result_path,i),"r") as fp:
         acc_dict[i] = float(fp.readline().split()[-1])
 
+acc_dict = sorted(acc_dict.items())
+
 print('epoch acc')
 for file, acc in acc_dict.items():
     print('{}\t{}'.format(file, acc))
