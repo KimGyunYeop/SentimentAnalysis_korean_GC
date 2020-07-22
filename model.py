@@ -31,6 +31,7 @@ from processor import seq_cls_tasks_num_labels as tasks_num_labels
 from processor import seq_cls_processors as processors
 from processor import seq_cls_output_modes as output_modes
 
+
 class LSTM(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(LSTM, self).__init__()
@@ -129,3 +130,75 @@ class LSTM_ATT(nn.Module):
 
         result = (loss, outputs)
         return result
+
+class LSTM_ATT_DOT(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(LSTM_ATT_DOT, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
+        self.lstm_dropout = nn.Dropout(0.2)
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 2)
+
+        self.att_w = nn.Parameter(torch.randn(1, 768, 1))
+
+    def attention_net(self, lstm_output, final_state):
+        attn_weights = torch.bmm(lstm_output, final_state.unsqueeze(2)).squeeze(2)
+        soft_attn_weights = F.softmax(attn_weights, 1).unsqueeze(2)  # shape = (batch_size, seq_len, 1)
+        new_hidden_state = torch.bmm(lstm_output.transpose(1, 2),
+                                     soft_attn_weights).squeeze(2)
+
+        return new_hidden_state
+
+    def re_attention(self, lstm_output, final_h, input):
+        batch_size, seq_len = input.shape
+
+        final_h = final_h.squeeze()
+
+        # final_h.size() = (batch_size, hidden_size)
+        # output.size() = (batch_size, num_seq, hidden_size)
+        # lstm_output(batch_size, seq_len, lstm_dir_dim)
+        att = torch.bmm(torch.tanh(lstm_output),
+                        self.att_w.repeat(batch_size, 1, 1))
+        att = F.softmax(att, dim=1)  # att(batch_size, seq_len, 1)
+        att = torch.bmm(lstm_output.transpose(1, 2), att).squeeze(2)
+        attn_output = torch.tanh(att)  # attn_output(batch_size, lstm_dir_dim)
+        return attn_output
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        # print(input_ids)
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        # print(outputs)
+        # print(len(input_ids))
+        # print(len(input_ids[0]))
+        # print(len(outputs))
+        # print(outputs[0].shape)
+        outputs, (h, c) = self.lstm(outputs[0])
+        # print("lstm")
+        # print(len(outputs))
+        # print(outputs.shape)
+
+        attn_output = self.attention_net(outputs, h)
+
+        outputs = self.dense(attn_output)
+        outputs = self.dropout(outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
+        # print(loss.shape)
+        # print(loss)
+        # print(len(outputs))
+        # print(outputs.shape)
+
+        result = (loss, outputs)
+        return result
+
+MODEL_LIST = {
+    "LSTM": LSTM,
+    "LSTM_ATT": LSTM_ATT,
+    "LSTM_ATT_DOT": LSTM_ATT_DOT
+}

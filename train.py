@@ -239,10 +239,10 @@ def main(cli_args):
         args.model_name_or_path,
         do_lower_case=args.do_lower_case
     )
-    model = LSTM(args.model_type, args.model_name_or_path, config)
+    model = MODEL_LIST[args.model_mode](args.model_type, args.model_name_or_path, config)
 
     # GPU or CPU
-    args.device = "cuda" if torch.cuda.is_available() and not args.no_cuda else "cpu"
+    args.device = "cuda:{}".format(args.gpu) if torch.cuda.is_available() and not args.no_cuda else "cpu"
     model.to(args.device)
 
     # Load dataset
@@ -290,6 +290,8 @@ if __name__ == '__main__':
     cli_parser.add_argument("--config_dir", type=str, default="config")
     cli_parser.add_argument("--config_file", type=str, required=True)
     cli_parser.add_argument("--result_dir", type=str, required=True)
+    cli_parser.add_argument("--model_mode", type=str, required=True, choices=MODEL_LIST.keys())
+    cli_parser.add_argument("--gpu", type=str, required=True)
 
     cli_args = cli_parser.parse_args()
 
