@@ -14,7 +14,7 @@ epoch_list = os.listdir(result_path)
 acc_dict = dict()
 for i in epoch_list:
     with open(os.path.join(result_path,i),"r") as fp:
-        acc_dict["i"] = float(fp.readline().split()[-1])
+        acc_dict[i] = float(fp.readline().split()[-1])
 
 print(acc_dict)
 print("\n max = ",max(acc_dict.values()))
