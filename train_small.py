@@ -239,10 +239,10 @@ def main(cli_args):
         args.model_name_or_path,
         do_lower_case=args.do_lower_case
     )
-    model = MODEL_LIST[args.model_mode](args.model_type, args.model_name_or_path, config)
+    model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
 
     # GPU or CPU
-    args.device = "cuda:{}".format(args.gpu) if torch.cuda.is_available() and not args.no_cuda else "cpu"
+    args.device = "cuda:{}".format(cli_args.gpu) if torch.cuda.is_available() and not args.no_cuda else "cpu"
     model.to(args.device)
 
     # Load dataset

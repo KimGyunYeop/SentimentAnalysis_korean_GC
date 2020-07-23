@@ -3,3 +3,7 @@ KOELECTRA_FOR_SEQ_CLS,0.926492469,20000,koelectra-base-nsmc-ckpt,KOELECTRA_CLS.o
 koELECTRA+LSTM,0.927562968,4000,koeletra_lstm,KOELETRA_LSTM.out,koELECTRA embedding에 one direcitonal LSTM후 마지막 hidden state의 classification,07월 16일,,,model.LSTM,217
 KoELECTRA + LSTM + ATT,0.92809485,24000,koeletra-lstm-att-cls,output_LSTM_ATT.out,KOELECTRA embedding에 one direcitonal LSTM후 Attention layer의 classification,07월 22일,,,model.LSTM_ATT,217
 KoELECTRA + LSTM + DOTATT,0.927031085,20000,koeletra-lstm-att-cls,x,KOELECTRA embedding에 one direcitonal LSTM후 마지막 hidden과 seq hidden의 DotProduct Attention layer의 classification,07월 22일,,,model.LSTM_ATT_DOT,218
+KoBERT + LSTM + ATT,0.7551,all same,kobert-lstm-att-cls,KoBERT_LSTM_ATT.out,KoBERT embedding에 one direcitonal LSTM후 Attention layer의 classification,07월 22일,,다시해봐야할듯 정확도도 너무 낮고 acc가 모두 같음. 학습이 되는지 의심이 됨.,model.LSTM_ATT,217
+koELECTRA + LSTM + ATTv2,0.9259,48000,koelectra-lstm-att-v2-친,KoELECTRA_LSTM_ATT_V2.out,KoELECTRA embedding에 one direcitonal LSTM후 v2의 Attention layer의 classification,07월 22일,,batch_size = 128,model.LSTM_ATT_v2,218
+KoBERT + LSTM + DOTATT,0.9185,32000,kobert-lstm-dotatt-cls,KoBERT_LSTM_DOCATT.out,KoBERT embedding에 one direcitonal LSTM후 DotProduct Attention layer의 classification,07월 22일,,,model.LSTM_ATT_DOT,218
+koBERT + LSTM + ATTv2,,,kobert-lstm-att-v2-cls,KoBERT_LSTM_ATT_V2.out,KoBERT embedding에 one direcitonal LSTM후 v2의 Attention layer의 classification,07월 23일,,batch_size = 128,model.LSTM_ATT_v2,218
