@@ -64,7 +64,6 @@ class LSTM(nn.Module):
 
         return result
 
-
 class LSTM_ATT(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(LSTM_ATT, self).__init__()
@@ -129,6 +128,56 @@ class LSTM_ATT(nn.Module):
         # print(outputs.shape)
 
         result = (loss, outputs)
+        return result
+
+
+class LSTM_ATT_v2(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(LSTM_ATT_v2, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
+
+        # attention module
+        self.tanh = nn.Tanh()
+        self.softmax = nn.Softmax(dim=-1)
+        self.dense_1 = nn.Linear(768, 100)
+        self.dense_2 = nn.Linear(100, 1)
+
+        # full connected
+        self.fc = nn.Linear(768, 300)
+
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(300, 2)
+
+    def attention_net(self, lstm_outputs):
+        M = self.tanh(self.dense_1(lstm_outputs))
+        wM_output = self.dense_2(M).squeeze()
+        a = self.softmax(wM_output)
+        c = lstm_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
+        att_output = self.tanh(c)
+
+        return att_output
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        # print(input_ids)
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        outputs, (h, c) = self.lstm(outputs[0])
+
+        # attention
+        attention_outputs = self.attention_net(outputs)
+
+        fc_outputs = self.fc(attention_outputs)
+
+        outputs = self.dropout(fc_outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
+
+        result = (loss, outputs)
+
         return result
 
 class LSTM_ATT_DOT(nn.Module):
@@ -200,5 +249,6 @@ class LSTM_ATT_DOT(nn.Module):
 MODEL_LIST = {
     "LSTM": LSTM,
     "LSTM_ATT": LSTM_ATT,
+    "LSTM_ATT_v2": LSTM_ATT_v2,
     "LSTM_ATT_DOT": LSTM_ATT_DOT
 }
