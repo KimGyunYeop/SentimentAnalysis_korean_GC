@@ -125,7 +125,7 @@ def train(args,
                     output_dir = os.path.join(args.output_dir, "checkpoint-{}".format(global_step))
                     if not os.path.exists(output_dir):
                         os.makedirs(output_dir)
-                    torch.save(model.state_dict(), os.path.join(output_dir, "training_model.bin"))
+                    torch.save(model.state_dict(), os.path.join(output_dir, "training_model.pt"))
 
                     torch.save(args, os.path.join(output_dir, "training_args.bin"))
                     logger.info("Saving model checkpoint to {}".format(output_dir))
