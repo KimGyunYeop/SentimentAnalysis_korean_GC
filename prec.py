@@ -32,15 +32,17 @@ from processor import seq_cls_tasks_num_labels as tasks_num_labels
 from processor import seq_cls_processors as processors
 from processor import seq_cls_output_modes as output_modes
 
-from datasets import baseDataset
+from datasets import BaseDataset
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 
 tokenizer = TOKENIZER_CLASSES["koelectra-base"].from_pretrained(
     "monologg/koelectra-base-discriminator",
-    do_lower_case=True
+    do_lower_case=True,
 )
-dataset = baseDataset(datapath="data/nsmc/ratings_train.txt", tokenizer=tokenizer, maxlen=150)
-dataloader = DataLoader(baseDataset, batch_size=1)
 
-for i in enumerate(dataloader):
-    print(i)
+dataset = BaseDataset(datapath="data/nsmc/ratings_train.txt", tokenizer=tokenizer, maxlen=150)
+dataloader = DataLoader(dataset, batch_size=2)
+
+for i, (input_ids, token_type_ids, attention_mask,  label) in enumerate(dataloader):
+    print(input_ids)
+    print(label)
