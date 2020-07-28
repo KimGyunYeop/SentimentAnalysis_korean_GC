@@ -38,6 +38,7 @@ from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 tokenizer = TOKENIZER_CLASSES["koelectra-base"].from_pretrained(
     "monologg/koelectra-base-discriminator",
     do_lower_case=True,
+    maxlen=150
 )
 
 dataset = BaseDataset(datapath="data/nsmc/ratings_train.txt", tokenizer=tokenizer, maxlen=150)

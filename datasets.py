@@ -2,13 +2,20 @@ import torch
 import torch.nn as nn
 from torch.utils.data import Dataset
 import pandas as pd
+import os
 
 class BaseDataset(Dataset):
-    def __init__(self, datapath, tokenizer, maxlen):
+    def __init__(self, args, tokenizer, mode):
         super(BaseDataset,self).__init__()
         self.tokenizer = tokenizer
-        self.maxlen = maxlen
-        self.dataset = pd.read_csv(datapath,encoding="utf8", sep="\t")
+        self.maxlen = args.max_seq_len
+        if mode == "train":
+            data_path = os.path.join(args.data_dir, args.task, args.train_file)
+        elif mode == "dev":
+            data_path = os.path.join(args.data_dir, args.task, args.dev_file)
+        elif mode == "test":
+            data_path = os.path.join(args.data_dir, args.task, args.test_file)
+        self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
 
     def __len__(self):
         return len(self.dataset)
