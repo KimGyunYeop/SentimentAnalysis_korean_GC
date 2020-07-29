@@ -11,7 +11,7 @@ from torch import nn
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from fastprogress.fastprogress import master_bar, progress_bar
 from attrdict import AttrDict
-from datasets import BaseDataset
+from datasets_small import BaseDataset
 import pandas as pd
 
 from model import *
