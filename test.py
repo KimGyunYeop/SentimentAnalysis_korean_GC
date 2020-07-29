@@ -117,6 +117,8 @@ def main(cli_args):
             sorted(glob.glob(os.path.join(args.ckpt_dir, cli_args.result_dir)+"/**/"+"training_model.bin"))
         )
     logger.info("Evaluate the following checkpoints: %s", checkpoints)
+    print(cli_args.result_dir)
+    print(args.ckpt_dir)
 
     init_logger()
 
