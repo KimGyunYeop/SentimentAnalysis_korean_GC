@@ -246,9 +246,9 @@ def main(cli_args):
     model.to(args.device)
 
     # Load dataset
-    train_dataset = load_and_cache_examples(args, tokenizer, mode="train") if args.train_file else None
-    dev_dataset = load_and_cache_examples(args, tokenizer, mode="dev") if args.dev_file else None
-    test_dataset = load_and_cache_examples(args, tokenizer, mode="test") if args.test_file else None
+    train_dataset = BaseDataset(args, tokenizer, mode="train") if args.train_file else None
+    dev_dataset = BaseDataset(args, tokenizer, mode="dev") if args.dev_file else None
+    test_dataset = BaseDataset(args, tokenizer, mode="test") if args.test_file else None
 
     if dev_dataset == None:
         args.evaluate_test_during_training = True  # If there is no dev dataset, only use testset
