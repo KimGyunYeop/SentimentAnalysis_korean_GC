@@ -28,7 +28,7 @@ class BaseDataset(Dataset):
         attention_mask = torch.LongTensor(data["attention_mask"])
         label = self.dataset.at[idx,"rating"]
 
-        return input_ids, token_type_ids, attention_mask, label
+        return input_ids, token_type_ids, attention_mask, label, txt
 
 DATASET_LIST = {
     "LSTM": BaseDataset,

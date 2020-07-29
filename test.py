@@ -68,6 +68,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             }
             if args.model_type not in ["distilkobert", "xlm-roberta"]:
                 inputs["token_type_ids"] = batch[2]  # Distilkobert, XLM-Roberta don't use segment_ids
+
             txt_all.append(batch[4])
 
             outputs = model(**inputs)
