@@ -22,7 +22,8 @@ class BaseDataset(Dataset):
 
     def __getitem__(self, idx):
         txt = self.dataset.at[idx,"review"]
-        data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen)
+        data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
+        print(data)
         input_ids = torch.LongTensor(data["input_ids"])
         token_type_ids = torch.LongTensor(data["token_type_ids"])
         attention_mask = torch.LongTensor(data["attention_mask"])

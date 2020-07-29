@@ -37,11 +37,16 @@ from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 
 tokenizer = TOKENIZER_CLASSES["koelectra-base"].from_pretrained(
     "monologg/koelectra-base-discriminator",
-    do_lower_case=True,
-    maxlen=150
+    do_lower_case=True
 )
+c = argparse.ArgumentParser()
+args = c.parse_args()
+args.data_dir = "data"
+args.task = "nsmc"
+args.train_file = "ratings_train.txt"
+args.max_seq_len = 50
 
-dataset = BaseDataset(datapath="data/nsmc/ratings_train.txt", tokenizer=tokenizer, maxlen=150)
+dataset = BaseDataset(args, tokenizer=tokenizer, mode="train")
 dataloader = DataLoader(dataset, batch_size=2)
 
 for i, (input_ids, token_type_ids, attention_mask,  label) in enumerate(dataloader):
