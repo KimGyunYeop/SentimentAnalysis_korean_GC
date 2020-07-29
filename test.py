@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from fastprogress.fastprogress import master_bar, progress_bar
 from attrdict import AttrDict
 from datasets import BaseDataset
+import pandas as pd
 
 from model import *
 
@@ -99,7 +100,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             logger.info("  {} = {}".format(key, str(results[key])))
             f_w.write("  {} = {}\n".format(key, str(results[key])))
 
-    return results
+    return preds, out_label_ids, results
 
 
 def main(cli_args):
@@ -145,7 +146,12 @@ def main(cli_args):
         model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
         model.load_state_dict(torch.load(checkpoint+"/training_model.bin"))
         model.to(args.device)
-        result = evaluate(args, model, test_dataset, mode="test", global_step=global_step)
+        preds, labels, result = evaluate(args, model, test_dataset, mode="test", global_step=global_step)
+
+        pred_and_labels = pd.DataFrame([])
+        pred_and_labels["pred"] = pred
+        pred_and_labels["label"] = labels
+
             
 
 
