@@ -152,6 +152,8 @@ def main(cli_args):
         pred_and_labels["pred"] = pred
         pred_and_labels["label"] = labels
 
+        pred_and_labels.to_csv(os.path.join(args.ckpt_dir, cli_args.result_dir)+"test_result.csv")
+
             
 
 
