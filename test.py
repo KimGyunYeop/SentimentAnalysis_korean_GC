@@ -58,6 +58,8 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
 
     for batch in progress_bar(eval_dataloader):
         model.eval()
+        txt_all.append(batch[4])
+        batch = batch[:-1]
         batch = tuple(t.to(args.device) for t in batch)
 
         with torch.no_grad():
@@ -69,7 +71,6 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             if args.model_type not in ["distilkobert", "xlm-roberta"]:
                 inputs["token_type_ids"] = batch[2]  # Distilkobert, XLM-Roberta don't use segment_ids
 
-            txt_all.append(batch[4])
 
             outputs = model(**inputs)
             tmp_eval_loss, logits = outputs[:2]
