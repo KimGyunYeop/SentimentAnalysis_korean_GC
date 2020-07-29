@@ -33,7 +33,7 @@ from processor import seq_cls_tasks_num_labels as tasks_num_labels
 from processor import seq_cls_processors as processors
 from processor import seq_cls_output_modes as output_modes
 
-from datasets import DATASET_LIST
+from datasets_small import DATASET_LIST
 
 logger = logging.getLogger(__name__)
 
