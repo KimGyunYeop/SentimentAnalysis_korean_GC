@@ -109,7 +109,7 @@ def main(cli_args):
     
     checkpoints = list(
             os.path.dirname(c) for c in
-            sorted(glob.glob(os.path.join(args.ckpt_dir, cli_args.result_dir)+"/**/"+"training_modelC"))
+            sorted(glob.glob(os.path.join(args.ckpt_dir, cli_args.result_dir)+"/**/"+"training_model.bin"))
         )
     logger.info("Evaluate the following checkpoints: %s", checkpoints)
 
