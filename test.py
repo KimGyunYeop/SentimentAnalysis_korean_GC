@@ -54,6 +54,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
     nb_eval_steps = 0
     preds = None
     out_label_ids = None
+    txt_all = []
 
     for batch in progress_bar(eval_dataloader):
         model.eval()
@@ -67,6 +68,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             }
             if args.model_type not in ["distilkobert", "xlm-roberta"]:
                 inputs["token_type_ids"] = batch[2]  # Distilkobert, XLM-Roberta don't use segment_ids
+            txt_all.append(batch[4])
 
             outputs = model(**inputs)
             tmp_eval_loss, logits = outputs[:2]
@@ -100,7 +102,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             logger.info("  {} = {}".format(key, str(results[key])))
             f_w.write("  {} = {}\n".format(key, str(results[key])))
 
-    return preds, out_label_ids, results
+    return preds, out_label_ids, results, txt_all
 
 
 def main(cli_args):
@@ -146,13 +148,15 @@ def main(cli_args):
         model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
         model.load_state_dict(torch.load(checkpoint+"/training_model.bin"))
         model.to(args.device)
-        preds, labels, result = evaluate(args, model, test_dataset, mode="test", global_step=global_step)
+        preds, labels, result, txt_all = evaluate(args, model, test_dataset, mode="test", global_step=global_step)
 
         pred_and_labels = pd.DataFrame([])
+        pred_and_labels["data"] = txt_all
         pred_and_labels["pred"] = preds
         pred_and_labels["label"] = labels
+        pred_and_labels["result"] = preds==labels
 
-        pred_and_labels.to_csv(os.path.join(args.ckpt_dir, cli_args.result_dir)+"/test_result.csv")
+        pred_and_labels.to_csv(os.path.join(args.ckpt_dir, cli_args.result_dir,checkpoint)+"/test_result.csv")
 
             
 
