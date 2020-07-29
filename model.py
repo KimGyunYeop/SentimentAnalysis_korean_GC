@@ -196,9 +196,7 @@ class LSTM_ATT_DOT(nn.Module):
 
     def attention_net(self, lstm_output, final_state):
         attn_weights = torch.bmm(lstm_output, final_state.permute(1, 2, 0))
-        soft_attn_weights = F.softmax(attn_weights, 1).unsqueeze(2)  # shape = (batch_size, seq_len, 1)
-        print(lstm_output.shape)
-        print(soft_attn_weights.shape)
+        soft_attn_weights = F.softmax(attn_weights, dim=1)  # shape = (batch_size, seq_len, 1)
         new_hidden_state = torch.bmm(lstm_output.transpose(1, 2),
                                      soft_attn_weights).squeeze(2)
 
