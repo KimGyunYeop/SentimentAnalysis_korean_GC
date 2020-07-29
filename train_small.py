@@ -219,6 +219,7 @@ def main(cli_args):
     logger.info("Training/evaluation parameters {}".format(args))
 
     args.ckpt_dir = args.ckpt_dir+"_small"
+    args.logging_steps = 4
     args.output_dir = os.path.join(args.ckpt_dir, cli_args.result_dir)
 
     init_logger()
