@@ -29,3 +29,10 @@ class BaseDataset(Dataset):
         label = self.dataset.at[idx,"rating"]
 
         return input_ids, token_type_ids, attention_mask, label
+
+DATASET_LIST = {
+    "LSTM": BaseDataset,
+    "LSTM_ATT": BaseDataset,
+    "LSTM_ATT_v2": BaseDataset,
+    "LSTM_ATT_DOT": BaseDataset
+}
