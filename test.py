@@ -158,7 +158,7 @@ def main(cli_args):
         pred_and_labels["label"] = labels
         pred_and_labels["result"] = preds==labels
 
-        pred_and_labels.to_csv(os.path.join(checkpoint,"test_result.csv"),sep="\t", encoding = "utf-8")
+        pred_and_labels.to_excel(os.path.join(checkpoint,"test_result.xlsx"), encoding = "cp949")
 
             
 
