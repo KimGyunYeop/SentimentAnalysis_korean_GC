@@ -154,6 +154,8 @@ def main(cli_args):
 
         pred_and_labels = pd.DataFrame([])
         pred_and_labels["data"] = txt_all
+        print(preds)
+        print(labels)
         print(preds==labels)
         pred_and_labels["pred"] = preds
         pred_and_labels["label"] = labels
