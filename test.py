@@ -143,7 +143,9 @@ def main(cli_args):
         logger.info("Testing model checkpoint to {}".format(checkpoint))
         global_step = checkpoint.split("-")[-1]
         model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
+        print("aaaaaaaaaaaaaaa")
         model.load_state_dict(torch.load(checkpoint+"/training_model.bin"))
+        print("aaaaaaaaaaaaaaa")
         model.to(args.device)
         result = evaluate(args, model, test_dataset, mode="test", global_step=global_step)
             
