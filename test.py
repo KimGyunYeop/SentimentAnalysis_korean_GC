@@ -59,7 +59,6 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
     for batch in progress_bar(eval_dataloader):
         model.eval()
         txt_all.append(batch[4][0])
-        print(txt_all)
         batch = batch[:-1]
         batch = tuple(t.to(args.device) for t in batch)
 
