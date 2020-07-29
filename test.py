@@ -109,7 +109,7 @@ def main(cli_args):
     
     checkpoints = list(
             os.path.dirname(c) for c in
-            sorted(glob.glob(os.path.join(args.ckpt_dir, cli_args.result_dir)+"/**/"+"training_modelC"))
+            sorted(glob.glob(os.path.join(args.ckpt_dir, cli_args.result_dir)+"/**/"+"training_model.bin"))
         )
     logger.info("Evaluate the following checkpoints: %s", checkpoints)
 
@@ -143,9 +143,7 @@ def main(cli_args):
         logger.info("Testing model checkpoint to {}".format(checkpoint))
         global_step = checkpoint.split("-")[-1]
         model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
-        print("aaaaaaaaaaaaaaa")
         model.load_state_dict(torch.load(checkpoint+"/training_model.bin"))
-        print("aaaaaaaaaaaaaaa")
         model.to(args.device)
         result = evaluate(args, model, test_dataset, mode="test", global_step=global_step)
             
