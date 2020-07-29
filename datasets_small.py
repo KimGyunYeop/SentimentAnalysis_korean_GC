@@ -15,7 +15,7 @@ class BaseDataset(Dataset):
             data_path = os.path.join(args.data_dir, args.task, args.dev_file)
         elif mode == "test":
             data_path = os.path.join(args.data_dir, args.task, args.test_file)
-        self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")[:1000]
+        self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")[:10000]
 
     def __len__(self):
         return len(self.dataset)
