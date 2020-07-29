@@ -107,7 +107,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
 
 def main(cli_args):
     # Read from config file and make args
-    args = torch.load(os.path.join("ckpt",cli_args.result_dir,"checkpoint-2000","training_args.bin"))
+    args = torch.load(os.path.join("ckpt",cli_args.result_dir,"checkpoint-10","training_args.bin"))
     logger.info("Testing parameters {}".format(args))
     
     checkpoints = list(
