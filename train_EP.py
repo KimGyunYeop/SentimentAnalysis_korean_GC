@@ -222,6 +222,7 @@ def main(cli_args):
     logger.info("Training/evaluation parameters {}".format(args))
 
     args.output_dir = os.path.join(args.ckpt_dir, cli_args.result_dir)
+    args.model_mode = cli_args.model_mode
 
     if os.path.exists(args.output_dir):
         raise ValueError("result path is already exist(path = %s)" % args.output_dir)
