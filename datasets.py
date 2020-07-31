@@ -69,8 +69,9 @@ class KOSACDataset(Dataset):
         polarities = []
         intensities = []
 
-        for num, i in enumerate(dataset):
-            tokens = self.tokenizer._tokenize(i["review"])
+        for i in dataset:
+            print(i)
+            tokens = self.tokenizer._tokenize(i)
             polarity = []
             intensity = []
             polarity.append('None')
