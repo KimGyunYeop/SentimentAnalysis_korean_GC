@@ -42,7 +42,7 @@ class KOSACDataset(Dataset):
         elif mode == "test":
             data_path = os.path.join(args.data_dir, args.task, args.test_file)
         self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
-        self.polarities, self.intensities = self.get_sentiment_data(dataset)
+        self.polarities, self.intensities = self.get_sentiment_data(self.dataset)
 
     def convert_sentiment_to_ids(mode, all_labels):
         pol2idx = ['None', 'POS', 'NEUT', 'COMP', 'NEG']
