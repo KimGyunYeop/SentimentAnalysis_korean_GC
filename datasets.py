@@ -75,7 +75,7 @@ class KOSACDataset(Dataset):
             intensity = []
             polarity.append('None')
             intensity.append('None')
-            for token in tokens[:max_len - 2]:
+            for token in tokens[:self.maxlen - 2]:
                 if token[:2] == '##':
                     tkn = token[2:]
                 else:
@@ -93,7 +93,7 @@ class KOSACDataset(Dataset):
             if max_len - len(polarity) <= 0:
                 count = 0
             else:
-                count = max_len - len(polarity)
+                count = self.maxlen - len(polarity)
 
             polarity = polarity + ['None' for i in range(count)]
             intensity = intensity + ['None' for i in range(count)]
