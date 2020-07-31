@@ -246,9 +246,51 @@ class LSTM_ATT_DOT(nn.Module):
         result = (loss, outputs)
         return result
 
+class KOSAC_LSTM(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(KOSAC_LSTM, self).__init__()
+        # Embedding
+        self.input_embedding = nn.Embedding(config.vocab_size, config.embedding_size)
+        self.token_embedding = nn.Embedding(5, config.embedding_size)
+        self.polarity_embedding = nn.Embedding(5, config.embedding_size)
+        self.intensity_embedding = nn.Embedding(5, config.embedding_size)
+
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
+        self.lstm_dropout = nn.Dropout(0.2)
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 2)
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids,polarity_ids, intensity_ids):
+        # embedding
+        input_emb_result = self.input_embedding(input_ids)
+        token_emb_result = self.token_embedding(token_type_ids)
+        polarity_emb_result = self.polarity_embedding(polarity_ids)
+        intensity_emb_result = self.intensity_embedding(intensity_ids)
+
+        embedding_result = input_emb_result + polarity_emb_result + intensity_emb_result + token_emb_result
+
+        outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=None,inputs_embeds = embedding_result)
+        outputs, (h, c) = self.lstm(outputs[0])
+
+        outputs = self.dense(outputs[:,-1,:])
+        outputs = self.dropout(outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
+
+        result = (loss, outputs)
+
+        return result
+
 MODEL_LIST = {
     "LSTM": LSTM,
     "LSTM_ATT": LSTM_ATT,
     "LSTM_ATT_v2": LSTM_ATT_v2,
-    "LSTM_ATT_DOT": LSTM_ATT_DOT
+    "LSTM_ATT_DOT": LSTM_ATT_DOT,
+    "KOSAC_LSTM": KOSAC_LSTM
 }
