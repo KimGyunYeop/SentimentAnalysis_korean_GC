@@ -62,6 +62,7 @@ class KOSACDataset(Dataset):
             all_ids.append(ids)
 
         return all_ids
+
     def get_sentiment_data(self, dataset):
         tkn2pol = pickle.load(open(os.path.join(self.args.data_dir, self.args.task,'sentiment_data','kosac_polarity.pkl'), 'rb'))
         tkn2int = pickle.load(open(os.path.join(self.args.data_dir, self.args.task,'sentiment_data','kosac_intensity.pkl'), 'rb'))
@@ -69,7 +70,7 @@ class KOSACDataset(Dataset):
         intensities = []
 
         for num, i in enumerate(dataset):
-            tokens = self.tokenizer._tokenize(i[sent_idx])
+            tokens = self.tokenizer._tokenize(i["review"])
             polarity = []
             intensity = []
             polarity.append('None')
