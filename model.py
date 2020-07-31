@@ -270,9 +270,9 @@ class KOSAC_LSTM(nn.Module):
         polarity_emb_result = self.polarity_embedding(polarity_ids)
         intensity_emb_result = self.intensity_embedding(intensity_ids)
 
-        print(input_emb_result)
-        print(polarity_emb_result)
-        print(intensity_emb_result)
+        print(input_emb_result[0,0,:])
+        print(polarity_emb_result[0,0,:])
+        print(intensity_emb_result[0,0,:])
         print("\n\n\n\n")
 
         embedding_result = input_emb_result
