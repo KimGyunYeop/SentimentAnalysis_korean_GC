@@ -254,8 +254,8 @@ class KOSAC_LSTM(nn.Module):
             config=config)
 
         # Embedding
-        self.input_embedding = self.emb.embedding.word_embeddings
-        self.token_embedding = nn.Embedding(5, 768)
+        self.input_embedding = self.emb.embeddings.word_embeddings
+        self.token_embedding = self.emb.embeddings.token_type_embeddings
         self.polarity_embedding = nn.Embedding(5, 768)
         self.intensity_embedding = nn.Embedding(5, 768)
 
