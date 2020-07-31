@@ -97,6 +97,7 @@ def train(args,
             if args.model_type not in ["distilkobert", "xlm-roberta"]:
                 inputs["token_type_ids"] = batch[2]  # Distilkobert, XLM-Roberta don't use segment_ids
             if "KOSAC" in args.model_type:
+                print("aaaaaaa")
                 inputs["polarity_ids"] = batch[5]
                 inputs["intensity_ids"] = batch[6]
             outputs = model(**inputs)
