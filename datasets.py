@@ -34,6 +34,7 @@ class BaseDataset(Dataset):
 class KOSACDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
         super(KOSACDataset,self).__init__()
+        self.args = args
         self.tokenizer = tokenizer
         self.maxlen = args.max_seq_len
         if mode == "train":
@@ -62,8 +63,8 @@ class KOSACDataset(Dataset):
 
         return all_ids
     def get_sentiment_data(self, dataset):
-        tkn2pol = pickle.load(open(os.path.join(args.data_dir, args.task,'kosac_polarity.pkl'), 'rb'))
-        tkn2int = pickle.load(open(os.path.join(args.data_dir, args.task,'kosac_intensity.pkl'), 'rb'))
+        tkn2pol = pickle.load(open(os.path.join(self.args.data_dir, self.args.task,'kosac_polarity.pkl'), 'rb'))
+        tkn2int = pickle.load(open(os.path.join(self.args.data_dir, self.args.task,'kosac_intensity.pkl'), 'rb'))
         polarities = []
         intensities = []
 
