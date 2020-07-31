@@ -72,7 +72,6 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
                 inputs["token_type_ids"] = batch[2]  # Distilkobert, XLM-Roberta don't use segment_ids
 
             if "KOSAC" in args.model_mode:
-                print("aaaaaaa")
                 inputs["polarity_ids"] = batch[4]
                 inputs["intensity_ids"] = batch[5]
 
