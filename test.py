@@ -73,8 +73,8 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
 
             if "KOSAC" in args.model_mode:
                 print("aaaaaaa")
-                inputs["polarity_ids"] = batch[5]
-                inputs["intensity_ids"] = batch[6]
+                inputs["polarity_ids"] = batch[4]
+                inputs["intensity_ids"] = batch[5]
 
 
             outputs = model(**inputs)
