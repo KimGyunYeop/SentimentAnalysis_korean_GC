@@ -255,7 +255,6 @@ class KOSAC_LSTM(nn.Module):
 
         # Embedding
         self.input_embedding = self.emb.embeddings.word_embeddings
-        self.token_embedding = self.emb.embeddings.token_type_embeddings
         self.polarity_embedding = nn.Embedding(5, 768)
         self.intensity_embedding = nn.Embedding(5, 768)
 
@@ -268,14 +267,13 @@ class KOSAC_LSTM(nn.Module):
     def forward(self, input_ids, attention_mask, labels, token_type_ids,polarity_ids, intensity_ids):
         # embedding
         input_emb_result = self.input_embedding(input_ids)
-        token_emb_result = self.token_embedding(token_type_ids)
         polarity_emb_result = self.polarity_embedding(polarity_ids)
         intensity_emb_result = self.intensity_embedding(intensity_ids)
 
-        embedding_result = input_emb_result + polarity_emb_result + intensity_emb_result + token_emb_result
+        embedding_result = input_emb_result + polarity_emb_result + intensity_emb_result
 
         outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=token_type_ids,inputs_embeds = embedding_result)
-        outputs, (h, c) = self.lstm(outputs[0])
+        outputs, _ = self.lstm(outputs[0])
 
         outputs = self.dense(outputs[:,-1,:])
         outputs = self.dropout(outputs)
