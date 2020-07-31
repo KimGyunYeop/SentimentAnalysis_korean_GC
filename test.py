@@ -71,6 +71,11 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             if args.model_type not in ["distilkobert", "xlm-roberta"]:
                 inputs["token_type_ids"] = batch[2]  # Distilkobert, XLM-Roberta don't use segment_ids
 
+            if "KOSAC" in args.model_mode:
+                print("aaaaaaa")
+                inputs["polarity_ids"] = batch[5]
+                inputs["intensity_ids"] = batch[6]
+
 
             outputs = model(**inputs)
             tmp_eval_loss, logits = outputs[:2]
@@ -117,6 +122,7 @@ def main(cli_args):
             sorted(glob.glob(os.path.join(args.ckpt_dir, cli_args.result_dir)+"/**/"+"training_model.bin"))
         )
     logger.info("Evaluate the following checkpoints: %s", checkpoints)
+    args.model_mode = cli_args.model_mode
 
     init_logger()
 
