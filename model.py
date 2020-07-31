@@ -193,6 +193,7 @@ class LSTM_ATT_DOT(nn.Module):
         self.out_proj = nn.Linear(768, 2)
 
         self.att_w = nn.Parameter(torch.randn(1, 768, 1))
+        print(self.emb)
 
     def attention_net(self, lstm_output, final_state):
         attn_weights = torch.bmm(lstm_output, final_state.permute(1, 2, 0))
