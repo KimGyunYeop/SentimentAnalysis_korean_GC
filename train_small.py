@@ -88,6 +88,7 @@ def train(args,
         epoch_iterator = progress_bar(train_dataloader, parent=mb)
         for step, batch in enumerate(epoch_iterator):
             model.train()
+            batch = batch[:-1]
             batch = tuple(t.to(args.device) for t in batch)
             inputs = {
                 "input_ids": batch[0],
@@ -96,6 +97,9 @@ def train(args,
             }
             if args.model_type not in ["distilkobert", "xlm-roberta"]:
                 inputs["token_type_ids"] = batch[2]  # Distilkobert, XLM-Roberta don't use segment_ids
+            if "KOSAC" in args.model_mode:
+                inputs["polarity_ids"] = batch[4]
+                inputs["intensity_ids"] = batch[5]
             outputs = model(**inputs)
             # print(outputs)
             loss = outputs[0]
@@ -221,6 +225,7 @@ def main(cli_args):
     args.ckpt_dir = args.ckpt_dir+"_small"
     args.logging_steps = 40
     args.output_dir = os.path.join(args.ckpt_dir, cli_args.result_dir)
+    args.model_mode = cli_args.model_mode
 
     if os.path.exists(args.output_dir):
         raise ValueError("result path is already exist(path = %s)" % args.output_dir)
