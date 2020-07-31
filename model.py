@@ -193,7 +193,6 @@ class LSTM_ATT_DOT(nn.Module):
         self.out_proj = nn.Linear(768, 2)
 
         self.att_w = nn.Parameter(torch.randn(1, 768, 1))
-        print(self.emb)
 
     def attention_net(self, lstm_output, final_state):
         attn_weights = torch.bmm(lstm_output, final_state.permute(1, 2, 0))
@@ -250,15 +249,16 @@ class LSTM_ATT_DOT(nn.Module):
 class KOSAC_LSTM(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(KOSAC_LSTM, self).__init__()
-        # Embedding
-        self.input_embedding = nn.Embedding(config.vocab_size, config.embedding_size)
-        self.token_embedding = nn.Embedding(5, config.embedding_size)
-        self.polarity_embedding = nn.Embedding(5, config.embedding_size)
-        self.intensity_embedding = nn.Embedding(5, config.embedding_size)
-
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
+
+        # Embedding
+        self.input_embedding = self.emb.embedding.word_embeddings
+        self.token_embedding = nn.Embedding(5, 768)
+        self.polarity_embedding = nn.Embedding(5, 768)
+        self.intensity_embedding = nn.Embedding(5, 768)
+
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
         self.lstm_dropout = nn.Dropout(0.2)
         self.dense = nn.Linear(768, 768)
