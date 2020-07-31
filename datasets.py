@@ -90,7 +90,7 @@ class KOSACDataset(Dataset):
             polarity.append('None')
             intensity.append('None')
 
-            if max_len - len(polarity) <= 0:
+            if self.maxlen - len(polarity) <= 0:
                 count = 0
             else:
                 count = self.maxlen - len(polarity)
