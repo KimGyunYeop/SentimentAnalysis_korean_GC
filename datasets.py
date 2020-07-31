@@ -3,6 +3,7 @@ import torch.nn as nn
 from torch.utils.data import Dataset
 import pandas as pd
 import os
+import pickle
 
 class BaseDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
