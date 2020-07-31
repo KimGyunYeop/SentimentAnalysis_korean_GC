@@ -227,7 +227,7 @@ def main(cli_args):
     logger.info("Training/evaluation parameters {}".format(args))
 
     args.ckpt_dir = args.ckpt_dir+"_small"
-    args.logging_steps = 40
+    args.logging_steps = int(10000 / args.train_batch_size)+1
     args.output_dir = os.path.join(args.ckpt_dir, cli_args.result_dir)
     args.model_mode = cli_args.model_mode
 

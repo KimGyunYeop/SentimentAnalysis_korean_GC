@@ -274,7 +274,7 @@ class KOSAC_LSTM(nn.Module):
 
         embedding_result = input_emb_result + polarity_emb_result + intensity_emb_result + token_emb_result
 
-        outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=None,inputs_embeds = embedding_result)
+        outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=token_type_ids,inputs_embeds = embedding_result)
         outputs, (h, c) = self.lstm(outputs[0])
 
         outputs = self.dense(outputs[:,-1,:])
