@@ -47,8 +47,8 @@ class KOSACDataset(Dataset):
         self.polarities, self.intensities = self.get_sentiment_data(self.dataset)
 
     def convert_sentiment_to_ids(self, mode, all_labels):
-        pol2idx = ['None', 'POS', 'NEUT', 'COMP', 'NEG']
-        int2idx = ['Medium', 'Low', 'None', 'High']
+        pol2idx = ['POS', 'NEG', 'COMP', 'None', 'NEUT']
+        int2idx = ['High', 'Medium', 'None', 'Low']
         all_ids = []
         for labels in all_labels:
             ids = []
