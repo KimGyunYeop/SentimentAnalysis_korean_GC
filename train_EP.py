@@ -98,8 +98,8 @@ def train(args,
                 inputs["token_type_ids"] = batch[2]  # Distilkobert, XLM-Roberta don't use segment_ids
             if "KOSAC" in args.model_mode:
                 print("aaaaaaa")
-                inputs["polarity_ids"] = batch[5]
-                inputs["intensity_ids"] = batch[6]
+                inputs["polarity_ids"] = batch[4]
+                inputs["intensity_ids"] = batch[5]
             outputs = model(**inputs)
             # print(outputs)
             loss = outputs[0]
