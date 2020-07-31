@@ -70,8 +70,7 @@ class KOSACDataset(Dataset):
         intensities = []
 
         for i in range(len(dataset)):
-            print(dataset.at[i,'review'])
-            tokens = self.tokenizer._tokenize(dataset.at[i,'review'])
+            tokens = self.tokenizer._tokenize(str(dataset.at[i,'review']))
             polarity = []
             intensity = []
             polarity.append('None')
