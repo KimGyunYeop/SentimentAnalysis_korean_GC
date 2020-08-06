@@ -414,6 +414,15 @@ class KOSAC_LSTM_ATT_DOT(nn.Module):
 
         self.att_w = nn.Parameter(torch.randn(1, 768, 1))
 
+    def attention_net(self, lstm_outputs):
+        M = self.tanh(self.dense_1(lstm_outputs))
+        wM_output = self.dense_2(M).squeeze()
+        a = self.softmax(wM_output)
+        c = lstm_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
+        att_output = self.tanh(c)
+
+        return att_output
+
     def forward(self, input_ids, attention_mask, labels, token_type_ids,polarity_ids, intensity_ids):
         # embedding
         input_emb_result = self.input_embedding(input_ids)
