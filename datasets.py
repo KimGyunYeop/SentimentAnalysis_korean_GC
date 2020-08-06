@@ -29,7 +29,7 @@ class BaseDataset(Dataset):
         attention_mask = torch.LongTensor(data["attention_mask"])
         label = self.dataset.at[idx,"rating"]
 
-        return input_ids, token_type_ids, attention_mask, label, txt
+        return (input_ids, token_type_ids, attention_mask, label), txt
 
 class KOSACDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
@@ -116,7 +116,7 @@ class KOSACDataset(Dataset):
         intensity_ids = torch.LongTensor(self.intensities[idx])
         label = self.dataset.at[idx,"rating"]
 
-        return input_ids, token_type_ids, attention_mask, label, polarity_ids, intensity_ids,txt
+        return (input_ids, token_type_ids, attention_mask, label, polarity_ids, intensity_ids), txt
 
 DATASET_LIST = {
     "LSTM": BaseDataset,

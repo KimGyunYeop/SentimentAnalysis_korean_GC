@@ -85,7 +85,7 @@ def train(args,
     mb = master_bar(range(int(args.num_train_epochs)))
     for epoch in mb:
         epoch_iterator = progress_bar(train_dataloader, parent=mb)
-        for step, batch in enumerate(epoch_iterator):
+        for step, batch, txt in enumerate(epoch_iterator):
             model.train()
             batch = batch[:-1]
             batch = tuple(t.to(args.device) for t in batch)
@@ -96,11 +96,7 @@ def train(args,
             }
             if args.model_type not in ["distilkobert", "xlm-roberta"]:
                 inputs["token_type_ids"] = batch[2]  # Distilkobert, XLM-Roberta don't use segment_ids
-            print(args.model_mode)
             if "KOSAC" in args.model_mode:
-                print("input")
-                print(batch[4])
-                print(batch[5])
                 inputs["polarity_ids"] = batch[4]
                 inputs["intensity_ids"] = batch[5]
             outputs = model(**inputs)
@@ -171,7 +167,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
     preds = None
     out_label_ids = None
 
-    for batch in progress_bar(eval_dataloader):
+    for batch, txt in progress_bar(eval_dataloader):
         model.eval()
         batch = tuple(t.to(args.device) for t in batch)
 
