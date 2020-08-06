@@ -178,6 +178,9 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             }
             if args.model_type not in ["distilkobert", "xlm-roberta"]:
                 inputs["token_type_ids"] = batch[2]  # Distilkobert, XLM-Roberta don't use segment_ids
+            if "KOSAC" in args.model_mode:
+                inputs["polarity_ids"] = batch[4]
+                inputs["intensity_ids"] = batch[5]
             outputs = model(**inputs)
             tmp_eval_loss, logits = outputs[:2]
 
