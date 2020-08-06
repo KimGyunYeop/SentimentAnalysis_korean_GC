@@ -85,7 +85,7 @@ def train(args,
     mb = master_bar(range(int(args.num_train_epochs)))
     for epoch in mb:
         epoch_iterator = progress_bar(train_dataloader, parent=mb)
-        for step, batch, txt in enumerate(epoch_iterator):
+        for step, (batch, txt) in enumerate(epoch_iterator):
             model.train()
             batch = batch[:-1]
             batch = tuple(t.to(args.device) for t in batch)
@@ -167,7 +167,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
     preds = None
     out_label_ids = None
 
-    for batch, txt in progress_bar(eval_dataloader):
+    for (batch, txt) in progress_bar(eval_dataloader):
         model.eval()
         batch = tuple(t.to(args.device) for t in batch)
 
