@@ -495,7 +495,7 @@ class KOSAC_LSTM_ATT_DOT_ML(nn.Module):
         att_label = F.softmax(torch.abs(polarity_emb_result)+torch.abs(intensity_emb_result))
         loss_fct = nn.CrossEntropyLoss()
         loss_att = nn.CrossEntropyLoss()
-        loss = loss_fct(outputs.view(-1, 2), labels.view(-1)) + loss_att(soft_attn_weights,att_label)
+        loss = (loss_fct(outputs.view(-1, 2), labels.view(-1)) + loss_att(soft_attn_weights,att_label))/2
 
         result = (loss, outputs)
         return result
