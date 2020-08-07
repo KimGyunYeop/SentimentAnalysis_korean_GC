@@ -491,6 +491,8 @@ class KOSAC_LSTM_ATT_DOT_ML(nn.Module):
         outputs = self.dense(attn_output)
         outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
+        print(outputs.view(-1, 2).size())
+        print(labels.view(-1).size())
         att_label = F.softmax((torch.abs(polarity_ids)+torch.abs(intensity_ids)).float(),dim=-1)
         loss_fct = nn.CrossEntropyLoss()
         loss_att = nn.MSELoss()
