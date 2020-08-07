@@ -495,7 +495,7 @@ class KOSAC_LSTM_ATT_DOT_ML(nn.Module):
         loss_fct = nn.CrossEntropyLoss()
         loss_att = nn.MSELoss()
         print(loss_fct(outputs.view(-1, 2), labels.view(-1)) + loss_att(soft_attn_weights.squeeze(),att_label.long()))
-        loss = loss_fct(outputs.view(-1, 2), labels.view(-1)) #+ loss_att(soft_attn_weights.squeeze(),att_label.long()))/2
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1)) + loss_att(soft_attn_weights.squeeze(),att_label.long())
 
         result = (loss, outputs)
         return result
