@@ -123,7 +123,7 @@ def main(cli_args):
 
     acc2step = {v: k for k, v in acc_dict.items()}
 
-    max_acc = max(acc_dict.items)
+    max_acc = max(acc_dict.items())
     best_epoch = acc2step[max_acc]
     print(best_epoch)
 
