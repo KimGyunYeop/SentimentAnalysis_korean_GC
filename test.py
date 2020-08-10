@@ -11,7 +11,7 @@ from torch import nn
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from fastprogress.fastprogress import master_bar, progress_bar
 from attrdict import AttrDict
-from datasets import BaseDataset
+from datasets import DATASET_LIST
 import pandas as pd
 
 from model import *
@@ -158,7 +158,7 @@ def main(cli_args):
     
 
     # Load dataset
-    test_dataset = BaseDataset(args, tokenizer, mode="test") if args.test_file else None
+    test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test") if args.test_file else None
 
     logger.info("Testing model checkpoint to {}".format(max_checkpoint))
     global_step = max_checkpoint.split("-")[-1]
