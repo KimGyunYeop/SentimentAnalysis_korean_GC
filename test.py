@@ -158,7 +158,7 @@ def main(cli_args):
     
 
     # Load dataset
-    test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test") if args.test_file else None
+    test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test_small") if args.test_file else None
 
     logger.info("Testing model checkpoint to {}".format(max_checkpoint))
     global_step = max_checkpoint.split("-")[-1]
@@ -172,7 +172,7 @@ def main(cli_args):
     pred_and_labels["pred"] = preds
     pred_and_labels["label"] = labels
     pred_and_labels["result"] = preds==labels
-    pred_and_labels["tokenizer"] = tokenizer.decode(tokenizer(txt_all))
+    pred_and_labels["tokenizer"] = tokenizer.decode(tokenizer(txt_all)["input_idx"])
 
     pred_and_labels.to_excel(os.path.join(max_checkpoint,"test_result.xlsx"), encoding = "cp949")
 
