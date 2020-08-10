@@ -172,7 +172,7 @@ def main(cli_args):
     pred_and_labels["pred"] = preds
     pred_and_labels["label"] = labels
     pred_and_labels["result"] = preds==labels
-    pred_and_labels["tokenizer"] = tokenizer.decode(tokenizer(txt_all)["input_idx"])
+    pred_and_labels["tokenizer"] = tokenizer.decode(tokenizer(txt_all)["input_ids"])
 
     pred_and_labels.to_excel(os.path.join(max_checkpoint,"test_result.xlsx"), encoding = "cp949")
 
