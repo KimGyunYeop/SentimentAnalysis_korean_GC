@@ -121,7 +121,6 @@ def main(cli_args):
         with open(os.path.join(result_path, i), "r") as fp:
             acc_dict[i] = float(fp.readline().split()[-1])
 
-    acc_dict = sorted(acc_dict.items())
     acc2step = {v: k for k, v in acc_dict.items()}
 
     max_acc = max(acc_dict.items)
