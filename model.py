@@ -765,7 +765,7 @@ class KNU_LSTM_ATT_DOT_ML(nn.Module):
         att_label = F.softmax((torch.abs(polarity_ids)+torch.abs(intensity_ids)).float(),dim=-1)
         loss_fct = nn.CrossEntropyLoss()
         loss_att = nn.MSELoss()
-        loss = loss_fct(outputs.view(-1, 2), labels.view(-1)) + loss_att(soft_attn_weights.squeeze(),att_label.long()).float()
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1)) + loss_att(soft_attn_weights.squeeze(),att_label).float()
         result = (loss, outputs)
         return result
 
