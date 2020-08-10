@@ -89,8 +89,8 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             out_label_ids = inputs["labels"].detach().cpu().numpy()
         else:
             preds = np.append(preds, logits.detach().cpu().numpy(), axis=0)
-            polarity_ids = np.append(polarity_ids, inputs["polarity_ids"].detach().cpu().numpy(), axis=0)
-            intensity_ids = np.append(intensity_ids, inputs["intensity_ids"].detach().cpu().numpy(), axis=0)
+            polarity_ids = np.append(polarity_ids, inputs["polarity_ids"].detach().cpu().numpy())
+            intensity_ids = np.append(intensity_ids, inputs["intensity_ids"].detach().cpu().numpy())
             out_label_ids = np.append(out_label_ids, inputs["labels"].detach().cpu().numpy(), axis=0)
 
     eval_loss = eval_loss / nb_eval_steps
