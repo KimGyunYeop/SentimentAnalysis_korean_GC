@@ -125,8 +125,9 @@ def main(cli_args):
 
     max_acc = max(acc_dict.values())
     best_epoch = acc2step[max_acc]
-    print(best_epoch)
-    max_checkpoint = best_epoch.split(".")[0]
+    max_checkpoint = best_epoch.split(".")[0].split("-")
+    max_checkpoint[0] = "checkpoint"
+    max_checkpoint = "-".join(max_checkpoint)
 
     args = torch.load(os.path.join("ckpt",cli_args.result_dir,max_checkpoint,"training_args.bin"))
     logger.info("Testing parameters {}".format(args))
