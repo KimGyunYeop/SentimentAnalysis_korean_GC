@@ -137,6 +137,83 @@ class KOSACDataset(Dataset):
 
         return (input_ids, token_type_ids, attention_mask, label, polarity_ids, intensity_ids),txt
 
+class KNUDataset(Dataset):
+    def __init__(self, args, tokenizer, mode):
+        super(KNUDataset,self).__init__()
+        self.args = args
+        self.tokenizer = tokenizer
+        self.maxlen = args.max_seq_len
+        if "train" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.train_file)
+        elif "dev" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.dev_file)
+        elif "test" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.test_file)
+
+        self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
+        if "small" in mode:
+            self.dataset = self.dataset[:10000]
+        self.polarities = self.get_sentiment_data(self.dataset)
+
+    def get_sentiment_data(self, dataset):
+        tkn2pol = pd.read_csv(os.path.join("lexicon","KNU_origin.csv"),header=None,sep="\t")
+        key_list = tkn2pol[0].apply(lambda x: x.replace(" ", ""))
+        tkn2pol[0] = key_list
+        tkn2pol = dict(zip(tkn2pol[0],tkn2pol[1]))
+        polarities = []
+
+        for i in range(len(dataset)):
+            txt = str(dataset.at[i,'review'])
+            tokens = self.tokenizer._tokenize(txt)
+            txt = txt.replace(" ", "")
+            char_polarity = []
+            for j in range(len(txt)):
+                if len(char_polarity) > j:
+                    continue
+                for k in range(7,-1,-1):
+                    if k == 0:
+                        char_polarity.extend([0])
+                    if txt[j:j+k] in key_list:
+                        char_polarity.extend(tkn2pol[txt[j:j+k]]*k)
+            polarity = ['None']
+            count = 0
+            for token in tokens[:self.maxlen - 2]:
+                if token[:2] == '##':
+                    tkn = token[2:]
+                else:
+                    tkn = token
+                if tkn == "[UNK]":
+                    polarity.append(0)
+                char_pol_list = char_polarity[count:count+len(tkn)]
+                pol = max(set(char_pol_list), key=char_pol_list.count)
+                polarity.append(pol)
+                count = count+len(tkn)
+
+            if self.maxlen - len(polarity) <= 0:
+                count = 0
+            else:
+                count = self.maxlen - len(polarity)
+
+            polarity = polarity + ['None' for i in range(count)]
+
+            polarities.append(polarity)
+
+        return polarities
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        txt = str(self.dataset.at[idx,"review"])
+        data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
+        input_ids = torch.LongTensor(data["input_ids"])
+        token_type_ids = torch.LongTensor(data["token_type_ids"])
+        attention_mask = torch.LongTensor(data["attention_mask"])
+        polarity_ids = torch.LongTensor(self.polarities[idx])
+        label = self.dataset.at[idx,"rating"]
+
+        return (input_ids, token_type_ids, attention_mask, label, polarity_ids),txt
+
 DATASET_LIST = {
     "LSTM": BaseDataset,
     "LSTM_ATT": BaseDataset,

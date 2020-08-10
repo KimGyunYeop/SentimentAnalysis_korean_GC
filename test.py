@@ -76,6 +76,9 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
                 inputs["polarity_ids"] = batch[4]
                 inputs["intensity_ids"] = batch[5]
 
+            if "KNU" in args.model_mode:
+                inputs["polarity_ids"] = batch[4]
+
             outputs = model(**inputs)
             tmp_eval_loss, logits = outputs[:2]
 
@@ -86,12 +89,16 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             if "KOSAC" in args.model_mode:
                 polarity_ids = inputs["polarity_ids"].detach().cpu().numpy()
                 intensity_ids = inputs["intensity_ids"].detach().cpu().numpy()
+            if "KNU" in args.model_mode:
+                polarity_ids = inputs["polarity_ids"].detach().cpu().numpy()
             out_label_ids = inputs["labels"].detach().cpu().numpy()
         else:
             preds = np.append(preds, logits.detach().cpu().numpy(), axis=0)
             if "KOSAC" in args.model_mode:
                 polarity_ids = np.vstack((polarity_ids, inputs["polarity_ids"].detach().cpu().numpy()))
                 intensity_ids = np.vstack((intensity_ids, inputs["intensity_ids"].detach().cpu().numpy()))
+            if "KNU" in args.model_mode:
+                polarity_ids = np.vstack((polarity_ids, inputs["polarity_ids"].detach().cpu().numpy()))
             out_label_ids = np.append(out_label_ids, inputs["labels"].detach().cpu().numpy(), axis=0)
 
     eval_loss = eval_loss / nb_eval_steps
@@ -116,6 +123,8 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
 
     if "KOSAC" in args.model_mode:
         return preds, out_label_ids, results, txt_all, polarity_ids, intensity_ids
+    elif "KNU" in args.model_mode:
+        return preds, out_label_ids, results, txt_all, polarity_ids
     else:
         return preds, out_label_ids, results, txt_all
 
@@ -177,7 +186,10 @@ def main(cli_args):
 
     if "KOSAC" in args.model_mode:
         preds, labels, result, txt_all, polarity_ids, intensity_ids = evaluate(args, model, test_dataset, mode="test",
-                                                                               global_step=global_step)
+                                                                             global_step=global_step)
+    elif "KNU" in args.model_mode:
+        preds, labels, result, txt_all, polarity_ids = evaluate(args, model, test_dataset, mode="test",
+                                                                             global_step=global_step)
     else:
         preds, labels, result, txt_all= evaluate(args, model, test_dataset, mode="test",
                                                                                global_step=global_step)
@@ -194,6 +206,10 @@ def main(cli_args):
         tok_an = [list(zip(x, test_dataset.convert_ids_to_polarity(y)[:len(x) + 1], test_dataset.convert_ids_to_intensity(z)[:len(x) + 1])) for x, y, z in
                   zip(decode_result, polarity_ids, intensity_ids)]
         pred_and_labels["tokenizer_analysis(token,polarity,intensitiy)"] = tok_an
+    if "KNU" in args.model_mode:
+        tok_an = [list(zip(x, y[:len(x) + 1])) for x, y in
+                  zip(decode_result, polarity_ids)]
+        pred_and_labels["tokenizer_analysis(token,polarity)"] = tok_an
 
     pred_and_labels.to_excel(os.path.join("ckpt", cli_args.result_dir, "test_result_" + max_checkpoint + ".xlsx"),
                              encoding="cp949")

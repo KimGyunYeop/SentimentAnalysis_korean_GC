@@ -12,6 +12,8 @@ from fastprogress.fastprogress import master_bar, progress_bar
 from attrdict import AttrDict
 
 from model import *
+import pickle
+import pandas as pd
 
 from transformers import (
     AdamW,
@@ -32,13 +34,17 @@ from processor import seq_cls_tasks_num_labels as tasks_num_labels
 from processor import seq_cls_processors as processors
 from processor import seq_cls_output_modes as output_modes
 
-from datasets import BaseDataset
+from datasets import BaseDataset,KNUDataset
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 
 tokenizer = TOKENIZER_CLASSES["koelectra-base"].from_pretrained(
-    "monologg/koelectra-base-discriminator",
-    do_lower_case=True
+    "monologg/koelectra-base-discriminator"
 )
+
+print(tokenizer._tokenize("김태우가 멋있게 나와서 10점만점에 10쩜 평점보단 재밌음"))
+print(tokenizer("김태우가 멋있게 나와서 10점만점에 10쩜 평점보단 재밌음")["input_ids"])
+print(tokenizer.convert_ids_to_tokens(tokenizer("김태우가 멋있게 나와서 10점만점에 10쩜 평점보단 재밌음")["input_ids"]))
+
 c = argparse.ArgumentParser()
 args = c.parse_args()
 args.data_dir = "data"
@@ -46,9 +52,8 @@ args.task = "nsmc"
 args.train_file = "ratings_train.txt"
 args.max_seq_len = 50
 
-dataset = BaseDataset(args, tokenizer=tokenizer, mode="train")
-dataloader = DataLoader(dataset, batch_size=2)
+dataset = KNUDataset(args, tokenizer=tokenizer, mode="train_small")
+dataloader = DataLoader(dataset, batch_size=1)
 
-for i, (input_ids, token_type_ids, attention_mask,  label) in enumerate(dataloader):
-    print(input_ids)
-    print(label)
+for i, batch in enumerate(dataloader):
+    print(batch)

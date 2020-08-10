@@ -91,13 +91,14 @@ def train(args,
             inputs = {
                 "input_ids": batch[0],
                 "attention_mask": batch[1],
+                "token_type_ids" : batch[2],
                 "labels": batch[3]
             }
-            if args.model_type not in ["distilkobert", "xlm-roberta"]:
-                inputs["token_type_ids"] = batch[2]  # Distilkobert, XLM-Roberta don't use segment_ids
             if "KOSAC" in args.model_mode:
                 inputs["polarity_ids"] = batch[4]
                 inputs["intensity_ids"] = batch[5]
+            if "KNU" in args.model_mode:
+                inputs["polarity_ids"] = batch[4]
             outputs = model(**inputs)
             # print(outputs)
             loss = outputs[0]
@@ -181,6 +182,8 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             if "KOSAC" in args.model_mode:
                 inputs["polarity_ids"] = batch[4]
                 inputs["intensity_ids"] = batch[5]
+            if "KNU" in args.model_mode:
+                inputs["polarity_ids"] = batch[4]
             outputs = model(**inputs)
             tmp_eval_loss, logits = outputs[:2]
 
@@ -246,10 +249,12 @@ def main(cli_args):
             id2label={str(i): label for i, label in enumerate(labels)},
             label2id={label: i for i, label in enumerate(labels)},
         )
+
     tokenizer = TOKENIZER_CLASSES[args.model_type].from_pretrained(
         args.model_name_or_path,
         do_lower_case=args.do_lower_case
     )
+
     model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
 
     # GPU or CPU
