@@ -53,6 +53,8 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
     eval_loss = 0.0
     nb_eval_steps = 0
     preds = None
+    polarity_ids = None
+    intensity_ids = None
     out_label_ids = None
     txt_all = []
 
@@ -82,9 +84,13 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
         nb_eval_steps += 1
         if preds is None:
             preds = logits.detach().cpu().numpy()
+            polarity_ids = inputs["polarity_ids"].detach().cpu().numpy()
+            intensity_ids = inputs["intensity_ids"].detach().cpu().numpy()
             out_label_ids = inputs["labels"].detach().cpu().numpy()
         else:
             preds = np.append(preds, logits.detach().cpu().numpy(), axis=0)
+            polarity_ids = np.append(polarity_ids, inputs["polarity_ids"].detach().cpu().numpy(), axis=0)
+            intensity_ids = np.append(intensity_ids, inputs["intensity_ids"].detach().cpu().numpy(), axis=0)
             out_label_ids = np.append(out_label_ids, inputs["labels"].detach().cpu().numpy(), axis=0)
 
     eval_loss = eval_loss / nb_eval_steps
@@ -107,7 +113,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             logger.info("  {} = {}".format(key, str(results[key])))
             f_w.write("  {} = {}\n".format(key, str(results[key])))
 
-    return preds, out_label_ids, results, txt_all
+    return preds, out_label_ids, results, txt_all, polarity_ids, intensity_ids
 
 
 def main(cli_args):
@@ -165,7 +171,7 @@ def main(cli_args):
     model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
     model.load_state_dict(torch.load(os.path.join("ckpt",cli_args.result_dir,max_checkpoint,"training_model.bin")))
     model.to(args.device)
-    preds, labels, result, txt_all = evaluate(args, model, test_dataset, mode="test", global_step=global_step)
+    preds, labels, result, txt_all, polarity_ids, intensity_ids = evaluate(args, model, test_dataset, mode="test", global_step=global_step)
 
     pred_and_labels = pd.DataFrame([])
     pred_and_labels["data"] = txt_all
@@ -173,7 +179,10 @@ def main(cli_args):
     pred_and_labels["label"] = labels
     pred_and_labels["result"] = preds==labels
     pred_and_labels["tokenizer"] = pred_and_labels["data"].apply(lambda x: tokenizer.convert_ids_to_tokens(tokenizer(x)["input_ids"]))
-
+    pred_and_labels["polarity_ids"] = polarity_ids
+    pred_and_labels["intensity_ids"] = intensity_ids
+    pred_and_labels["tokenizer_analysis"] = pred_and_labels[["tokenizer","polarity_ids","intensity_ids"]].apply(lambda x: zip(x["tokeinzer"],x["polarity_ids"],x["intensity_ids"]))
+    pred_and_labels.drop(columns=["polarity_ids","intensity_ids"])
 
     pred_and_labels.to_excel(os.path.join("ckpt",cli_args.result_dir,"test_result_"+max_checkpoint+".xlsx"), encoding = "cp949")
 
