@@ -172,7 +172,8 @@ def main(cli_args):
     pred_and_labels["pred"] = preds
     pred_and_labels["label"] = labels
     pred_and_labels["result"] = preds==labels
-    pred_and_labels["tokenizer"] = pred_and_labels["data"].apply(lambda x: tokenizer.decode(tokenizer(x)["input_ids"]))
+    pred_and_labels["tokenizer"] = pred_and_labels["data"].apply(lambda x: tokenizer.convert_ids_to_tokens(tokenizer(x)["input_ids"]))
+
 
     pred_and_labels.to_excel(os.path.join("ckpt",cli_args.result_dir,"test_result_"+max_checkpoint+".xlsx"), encoding = "cp949")
 
