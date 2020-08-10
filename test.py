@@ -126,15 +126,11 @@ def main(cli_args):
     max_acc = max(acc_dict.values())
     best_epoch = acc2step[max_acc]
     print(best_epoch)
+    max_checkpoint = best_epoch.split(".")[0]
 
-    args = torch.load(os.path.join("ckpt",cli_args.result_dir,"checkpoint-10","training_args.bin"))
+    args = torch.load(os.path.join("ckpt",cli_args.result_dir,max_checkpoint,"training_args.bin"))
     logger.info("Testing parameters {}".format(args))
-    
-    checkpoints = list(
-            os.path.dirname(c) for c in
-            sorted(glob.glob(os.path.join(args.ckpt_dir, cli_args.result_dir)+"/**/"+"training_model.bin"))
-        )
-    logger.info("Evaluate the following checkpoints: %s", checkpoints)
+
     args.model_mode = cli_args.model_mode
 
     init_logger()
@@ -163,22 +159,21 @@ def main(cli_args):
     # Load dataset
     test_dataset = BaseDataset(args, tokenizer, mode="test") if args.test_file else None
 
-    for checkpoint in checkpoints:
-        logger.info("Testing model checkpoint to {}".format(checkpoint))
-        global_step = checkpoint.split("-")[-1]
-        model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
-        model.load_state_dict(torch.load(checkpoint+"/training_model.bin"))
-        model.to(args.device)
-        preds, labels, result, txt_all = evaluate(args, model, test_dataset, mode="test", global_step=global_step)
+    logger.info("Testing model checkpoint to {}".format(max_checkpoint))
+    global_step = max_checkpoint.split("-")[-1]
+    model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
+    model.load_state_dict(torch.load(max_checkpoint+"/training_model.bin"))
+    model.to(args.device)
+    preds, labels, result, txt_all = evaluate(args, model, test_dataset, mode="test", global_step=global_step)
 
-        pred_and_labels = pd.DataFrame([])
-        pred_and_labels["data"] = txt_all
-        pred_and_labels["pred"] = preds
-        pred_and_labels["label"] = labels
-        pred_and_labels["result"] = preds==labels
-        pred_and_labels["tokenizer"] = tokenizer.decode(tokenizer(txt_all))
+    pred_and_labels = pd.DataFrame([])
+    pred_and_labels["data"] = txt_all
+    pred_and_labels["pred"] = preds
+    pred_and_labels["label"] = labels
+    pred_and_labels["result"] = preds==labels
+    pred_and_labels["tokenizer"] = tokenizer.decode(tokenizer(txt_all))
 
-        pred_and_labels.to_excel(os.path.join(checkpoint,"test_result.xlsx"), encoding = "cp949")
+    pred_and_labels.to_excel(os.path.join(max_checkpoint,"test_result.xlsx"), encoding = "cp949")
 
 if __name__ == '__main__':
     cli_parser = argparse.ArgumentParser()
