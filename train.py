@@ -255,10 +255,16 @@ def main(cli_args):
     args.device = "cuda:{}".format(cli_args.gpu) if torch.cuda.is_available() and not args.no_cuda else "cpu"
     model.to(args.device)
 
-    # Load dataset
-    train_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="train") if args.train_file else None
-    dev_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="dev") if args.dev_file else None
-    test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test") if args.test_file else None
+    if args.small == False:
+        # Load dataset
+        train_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="train") if args.train_file else None
+        dev_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="dev") if args.dev_file else None
+        test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test") if args.test_file else None
+    else:
+        # Load dataset
+        train_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="train_small") if args.train_file else None
+        dev_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="dev_small") if args.dev_file else None
+        test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test_small") if args.test_file else None
 
     if dev_dataset == None:
         args.evaluate_test_during_training = True  # If there is no dev dataset, only use testset
@@ -302,6 +308,7 @@ if __name__ == '__main__':
     cli_parser.add_argument("--result_dir", type=str, required=True)
     cli_parser.add_argument("--model_mode", type=str, required=True, choices=MODEL_LIST.keys())
     cli_parser.add_argument("--gpu", type=str, required=True)
+    cli_parser.add_argument("--small", type=bool, default=False)
 
     cli_args = cli_parser.parse_args()
 
