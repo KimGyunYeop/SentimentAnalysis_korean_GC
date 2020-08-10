@@ -83,13 +83,15 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
         nb_eval_steps += 1
         if preds is None:
             preds = logits.detach().cpu().numpy()
-            polarity_ids = inputs["polarity_ids"].detach().cpu().numpy()
-            intensity_ids = inputs["intensity_ids"].detach().cpu().numpy()
+            if "KOSAC" in args.model_mode:
+                polarity_ids = inputs["polarity_ids"].detach().cpu().numpy()
+                intensity_ids = inputs["intensity_ids"].detach().cpu().numpy()
             out_label_ids = inputs["labels"].detach().cpu().numpy()
         else:
             preds = np.append(preds, logits.detach().cpu().numpy(), axis=0)
-            polarity_ids = np.vstack((polarity_ids, inputs["polarity_ids"].detach().cpu().numpy()))
-            intensity_ids = np.vstack((intensity_ids, inputs["intensity_ids"].detach().cpu().numpy()))
+            if "KOSAC" in args.model_mode:
+                polarity_ids = np.vstack((polarity_ids, inputs["polarity_ids"].detach().cpu().numpy()))
+                intensity_ids = np.vstack((intensity_ids, inputs["intensity_ids"].detach().cpu().numpy()))
             out_label_ids = np.append(out_label_ids, inputs["labels"].detach().cpu().numpy(), axis=0)
 
     eval_loss = eval_loss / nb_eval_steps
@@ -112,7 +114,10 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             logger.info("  {} = {}".format(key, str(results[key])))
             f_w.write("  {} = {}\n".format(key, str(results[key])))
 
-    return preds, out_label_ids, results, txt_all, polarity_ids, intensity_ids
+    if "KOSAC" in args.model_mode:
+        return preds, out_label_ids, results, txt_all, polarity_ids, intensity_ids
+    else:
+        return preds, out_label_ids, results, txt_all
 
 
 def main(cli_args):
@@ -169,8 +174,13 @@ def main(cli_args):
     model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
     model.load_state_dict(torch.load(os.path.join("ckpt", cli_args.result_dir, max_checkpoint, "training_model.bin")))
     model.to(args.device)
-    preds, labels, result, txt_all, polarity_ids, intensity_ids = evaluate(args, model, test_dataset, mode="test",
-                                                                           global_step=global_step)
+
+    if "KOSAC" in args.model_mode:
+        preds, labels, result, txt_all, polarity_ids, intensity_ids = evaluate(args, model, test_dataset, mode="test",
+                                                                               global_step=global_step)
+    else:
+        preds, labels, result, txt_all= evaluate(args, model, test_dataset, mode="test",
+                                                                               global_step=global_step)
     pred_and_labels = pd.DataFrame([])
     pred_and_labels["data"] = txt_all
     pred_and_labels["pred"] = preds
@@ -180,9 +190,11 @@ def main(cli_args):
         pred_and_labels["data"].apply(lambda x: tokenizer.convert_ids_to_tokens(tokenizer(x)["input_ids"])))
     pred_and_labels["tokenizer"] = decode_result
 
-    tok_an = [list(zip(x, test_dataset.convert_ids_to_polarity(y)[:len(x) + 1], test_dataset.convert_ids_to_intensity(z)[:len(x) + 1])) for x, y, z in
-              zip(decode_result, polarity_ids, intensity_ids)]
-    pred_and_labels["tokenizer_analysis(token,polarity,intensitiy)"] = tok_an
+    if "KOSAC" in args.model_mode:
+        tok_an = [list(zip(x, test_dataset.convert_ids_to_polarity(y)[:len(x) + 1], test_dataset.convert_ids_to_intensity(z)[:len(x) + 1])) for x, y, z in
+                  zip(decode_result, polarity_ids, intensity_ids)]
+        pred_and_labels["tokenizer_analysis(token,polarity,intensitiy)"] = tok_an
+
     pred_and_labels.to_excel(os.path.join("ckpt", cli_args.result_dir, "test_result_" + max_checkpoint + ".xlsx"),
                              encoding="cp949")
 
