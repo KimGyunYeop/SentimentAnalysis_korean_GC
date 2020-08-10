@@ -56,10 +56,9 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
     out_label_ids = None
     txt_all = []
 
-    for batch in progress_bar(eval_dataloader):
+    for (batch, txt) in progress_bar(eval_dataloader):
         model.eval()
-        txt_all = txt_all + list(batch[-1])
-        batch = batch[:-1]
+        txt_all = txt_all + list(txt)
         batch = tuple(t.to(args.device) for t in batch)
 
         with torch.no_grad():
@@ -162,11 +161,9 @@ def main(cli_args):
         pred_and_labels["pred"] = preds
         pred_and_labels["label"] = labels
         pred_and_labels["result"] = preds==labels
+        pred_and_labels["tokenizer"] = tokenizer.decode(tokenizer(txt_all))
 
         pred_and_labels.to_excel(os.path.join(checkpoint,"test_result.xlsx"), encoding = "cp949")
-
-            
-
 
 if __name__ == '__main__':
     cli_parser = argparse.ArgumentParser()
