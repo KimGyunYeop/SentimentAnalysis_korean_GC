@@ -68,6 +68,20 @@ class KOSACDataset(Dataset):
 
         return all_ids
 
+    def convert_ids_to_intensity(self, ids):
+        int2idx = ['Medium', 'Low', 'None', 'High']
+        dict_int2idx = {x:y for x,y in enumerate(int2idx)}
+        new_ids = [dict_int2idx[x] for x in ids]
+
+        return new_ids
+
+    def convert_ids_to_polarity(self, ids):
+        pol2idx = ['None', 'POS', 'NEUT', 'COMP', 'NEG']
+        dict_pol2idx = {x:y for x,y in enumerate(pol2idx)}
+        new_ids = [dict_pol2idx[x] for x in ids]
+
+        return new_ids
+
     def get_sentiment_data(self, dataset):
         tkn2pol = pickle.load(open(os.path.join(self.args.data_dir, self.args.task,'sentiment_data','kosac_polarity.pkl'), 'rb'))
         tkn2int = pickle.load(open(os.path.join(self.args.data_dir, self.args.task,'sentiment_data','kosac_intensity.pkl'), 'rb'))

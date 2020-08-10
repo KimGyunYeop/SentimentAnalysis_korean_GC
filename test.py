@@ -180,7 +180,7 @@ def main(cli_args):
         pred_and_labels["data"].apply(lambda x: tokenizer.convert_ids_to_tokens(tokenizer(x)["input_ids"])))
     pred_and_labels["tokenizer"] = decode_result
 
-    tok_an = [list(zip(x, y[:len(x) + 1], z[:len(x) + 1])) for x, y, z in
+    tok_an = [list(zip(x, test_dataset.convert_ids_to_polarity(y)[:len(x) + 1], test_dataset.convert_ids_to_intensity(z)[:len(x) + 1])) for x, y, z in
               zip(decode_result, polarity_ids, intensity_ids)]
     pred_and_labels["tokenizer_analysis(token,polarity,intensitiy)"] = tok_an
     pred_and_labels.to_excel(os.path.join("ckpt", cli_args.result_dir, "test_result_" + max_checkpoint + ".xlsx"),
