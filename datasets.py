@@ -10,13 +10,15 @@ class BaseDataset(Dataset):
         super(BaseDataset,self).__init__()
         self.tokenizer = tokenizer
         self.maxlen = args.max_seq_len
-        if mode == "train":
+        if "train" in mode:
             data_path = os.path.join(args.data_dir, args.task, args.train_file)
-        elif mode == "dev":
+        elif "dev" in mode:
             data_path = os.path.join(args.data_dir, args.task, args.dev_file)
-        elif mode == "test":
+        elif "test" in mode:
             data_path = os.path.join(args.data_dir, args.task, args.test_file)
         self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
+        if "small" in mode:
+            self.dataset = self.dataset[:10000]
 
     def __len__(self):
         return len(self.dataset)
@@ -37,13 +39,16 @@ class KOSACDataset(Dataset):
         self.args = args
         self.tokenizer = tokenizer
         self.maxlen = args.max_seq_len
-        if mode == "train":
+        if "train" in mode:
             data_path = os.path.join(args.data_dir, args.task, args.train_file)
-        elif mode == "dev":
+        elif "dev" in mode:
             data_path = os.path.join(args.data_dir, args.task, args.dev_file)
-        elif mode == "test":
+        elif "test" in mode:
             data_path = os.path.join(args.data_dir, args.task, args.test_file)
+
         self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
+        if "small" in mode:
+            self.dataset = self.dataset[:10000]
         self.polarities, self.intensities = self.get_sentiment_data(self.dataset)
 
     def convert_sentiment_to_ids(self, mode, all_labels):

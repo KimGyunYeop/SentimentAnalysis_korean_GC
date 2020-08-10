@@ -12,6 +12,7 @@ from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from fastprogress.fastprogress import master_bar, progress_bar
 from attrdict import AttrDict
 
+from datasets import DATASET_LIST
 from model import *
 
 from transformers import (
@@ -86,7 +87,6 @@ def train(args,
         epoch_iterator = progress_bar(train_dataloader, parent=mb)
         for step, batch in enumerate(epoch_iterator):
             model.train()
-            batch = batch[:-1]
             batch = tuple(t.to(args.device) for t in batch)
             inputs = {
                 "input_ids": batch[0],
@@ -95,6 +95,9 @@ def train(args,
             }
             if args.model_type not in ["distilkobert", "xlm-roberta"]:
                 inputs["token_type_ids"] = batch[2]  # Distilkobert, XLM-Roberta don't use segment_ids
+            if "KOSAC" in args.model_mode:
+                inputs["polarity_ids"] = batch[4]
+                inputs["intensity_ids"] = batch[5]
             outputs = model(**inputs)
             # print(outputs)
             loss = outputs[0]
@@ -175,6 +178,9 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             }
             if args.model_type not in ["distilkobert", "xlm-roberta"]:
                 inputs["token_type_ids"] = batch[2]  # Distilkobert, XLM-Roberta don't use segment_ids
+            if "KOSAC" in args.model_mode:
+                inputs["polarity_ids"] = batch[4]
+                inputs["intensity_ids"] = batch[5]
             outputs = model(**inputs)
             tmp_eval_loss, logits = outputs[:2]
 
@@ -217,6 +223,7 @@ def main(cli_args):
     logger.info("Training/evaluation parameters {}".format(args))
 
     args.output_dir = os.path.join(args.ckpt_dir, cli_args.result_dir)
+    args.model_mode = cli_args.model_mode
 
     if os.path.exists(args.output_dir):
         raise ValueError("result path is already exist(path = %s)" % args.output_dir)
@@ -249,9 +256,9 @@ def main(cli_args):
     model.to(args.device)
 
     # Load dataset
-    train_dataset = load_and_cache_examples(args, tokenizer, mode="train") if args.train_file else None
-    dev_dataset = load_and_cache_examples(args, tokenizer, mode="dev") if args.dev_file else None
-    test_dataset = load_and_cache_examples(args, tokenizer, mode="test") if args.test_file else None
+    train_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="train") if args.train_file else None
+    dev_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="dev") if args.dev_file else None
+    test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test") if args.test_file else None
 
     if dev_dataset == None:
         args.evaluate_test_during_training = True  # If there is no dev dataset, only use testset

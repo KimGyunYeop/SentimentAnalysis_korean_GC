@@ -33,7 +33,7 @@ from processor import seq_cls_tasks_num_labels as tasks_num_labels
 from processor import seq_cls_processors as processors
 from processor import seq_cls_output_modes as output_modes
 
-from datasets_small import DATASET_LIST
+from datasets import DATASET_LIST
 
 logger = logging.getLogger(__name__)
 
@@ -260,9 +260,9 @@ def main(cli_args):
     model.to(args.device)
 
     # Load dataset
-    train_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="train") if args.train_file else None
+    train_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="train_small") if args.train_file else None
     dev_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="dev") if args.dev_file else None
-    test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test") if args.test_file else None
+    test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test_small") if args.test_file else None
 
     if dev_dataset == None:
         args.evaluate_test_during_training = True  # If there is no dev dataset, only use testset
