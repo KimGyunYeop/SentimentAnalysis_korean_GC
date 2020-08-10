@@ -112,6 +112,22 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
 
 def main(cli_args):
     # Read from config file and make args
+
+    result_path = os.path.join("ckpt", cli_args.result_dir, "test")
+    epoch_list = os.listdir(result_path)
+
+    acc_dict = dict()
+    for i in epoch_list:
+        with open(os.path.join(result_path, i), "r") as fp:
+            acc_dict[i] = float(fp.readline().split()[-1])
+
+    acc_dict = sorted(acc_dict.items())
+    acc2step = {v: k for k, v in acc_dict.items()}
+
+    max_acc = max(acc_dict.items)
+    best_epoch = acc2step[max_acc]
+    print(best_epoch)
+
     args = torch.load(os.path.join("ckpt",cli_args.result_dir,"checkpoint-10","training_args.bin"))
     logger.info("Testing parameters {}".format(args))
     
