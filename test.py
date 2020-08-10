@@ -76,7 +76,6 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
                 inputs["polarity_ids"] = batch[4]
                 inputs["intensity_ids"] = batch[5]
 
-
             outputs = model(**inputs)
             tmp_eval_loss, logits = outputs[:2]
 
@@ -89,8 +88,8 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             out_label_ids = inputs["labels"].detach().cpu().numpy()
         else:
             preds = np.append(preds, logits.detach().cpu().numpy(), axis=0)
-            polarity_ids = np.append(polarity_ids, inputs["polarity_ids"].detach().cpu().numpy())
-            intensity_ids = np.append(intensity_ids, inputs["intensity_ids"].detach().cpu().numpy())
+            polarity_ids = np.vstack((polarity_ids, inputs["polarity_ids"].detach().cpu().numpy()))
+            intensity_ids = np.vstack((intensity_ids, inputs["intensity_ids"].detach().cpu().numpy()))
             out_label_ids = np.append(out_label_ids, inputs["labels"].detach().cpu().numpy(), axis=0)
 
     eval_loss = eval_loss / nb_eval_steps
@@ -135,7 +134,7 @@ def main(cli_args):
     max_checkpoint[0] = "checkpoint"
     max_checkpoint = "-".join(max_checkpoint)
 
-    args = torch.load(os.path.join("ckpt",cli_args.result_dir,max_checkpoint,"training_args.bin"))
+    args = torch.load(os.path.join("ckpt", cli_args.result_dir, max_checkpoint, "training_args.bin"))
     logger.info("Testing parameters {}".format(args))
 
     args.model_mode = cli_args.model_mode
@@ -161,7 +160,6 @@ def main(cli_args):
         do_lower_case=args.do_lower_case
     )
     args.device = "cuda:{}".format(cli_args.gpu) if torch.cuda.is_available() and not args.no_cuda else "cpu"
-    
 
     # Load dataset
     test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test") if args.test_file else None
@@ -169,22 +167,24 @@ def main(cli_args):
     logger.info("Testing model checkpoint to {}".format(max_checkpoint))
     global_step = max_checkpoint.split("-")[-1]
     model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
-    model.load_state_dict(torch.load(os.path.join("ckpt",cli_args.result_dir,max_checkpoint,"training_model.bin")))
+    model.load_state_dict(torch.load(os.path.join("ckpt", cli_args.result_dir, max_checkpoint, "training_model.bin")))
     model.to(args.device)
-    preds, labels, result, txt_all, polarity_ids, intensity_ids = evaluate(args, model, test_dataset, mode="test", global_step=global_step)
-
+    preds, labels, result, txt_all, polarity_ids, intensity_ids = evaluate(args, model, test_dataset, mode="test",
+                                                                           global_step=global_step)
     pred_and_labels = pd.DataFrame([])
     pred_and_labels["data"] = txt_all
     pred_and_labels["pred"] = preds
     pred_and_labels["label"] = labels
-    pred_and_labels["result"] = preds==labels
-    pred_and_labels["tokenizer"] = pred_and_labels["data"].apply(lambda x: tokenizer.convert_ids_to_tokens(tokenizer(x)["input_ids"]))
-    pred_and_labels["polarity_ids"] = polarity_ids
-    pred_and_labels["intensity_ids"] = intensity_ids
-    pred_and_labels["tokenizer_analysis"] = pred_and_labels[["tokenizer","polarity_ids","intensity_ids"]].apply(lambda x: zip(x["tokeinzer"],x["polarity_ids"],x["intensity_ids"]))
-    pred_and_labels.drop(columns=["polarity_ids","intensity_ids"])
+    pred_and_labels["result"] = preds == labels
+    decode_result = list(
+        pred_and_labels["data"].apply(lambda x: tokenizer.convert_ids_to_tokens(tokenizer(x)["input_ids"])))
+    pred_and_labels["tokenizer"] = decode_result
 
-    pred_and_labels.to_excel(os.path.join("ckpt",cli_args.result_dir,"test_result_"+max_checkpoint+".xlsx"), encoding = "cp949")
+    tok_an = [list(zip(x, y[:len(x) + 1], z[:len(x) + 1])) for x, y, z in
+              zip(decode_result, polarity_ids, intensity_ids)]
+    pred_and_labels["tokenizer_analysis(token,polarity,intensitiy)"] = tok_an
+    pred_and_labels.to_excel(os.path.join("ckpt", cli_args.result_dir, "test_result_" + max_checkpoint + ".xlsx"),
+                             encoding="cp949")
 
 
 if __name__ == '__main__':
