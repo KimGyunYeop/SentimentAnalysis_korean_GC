@@ -485,11 +485,8 @@ class KOSAC_LSTM_GTR(nn.Module):
         # embedding
         polarity_emb_result = self.polarity_embedding(polarity_ids)
         intensity_emb_result = self.intensity_embedding(intensity_ids)
-        print(polarity_emb_result.shape)
-        print(outputs.shape)
         FG_outputs = self.tanh(outputs + polarity_emb_result / 100 + intensity_emb_result / 100)
         outputs = outputs * FG_outputs
-        print(outputs.shape)
 
         attn_output = self.attention_net(outputs, polarity_emb_result, intensity_emb_result)
 
