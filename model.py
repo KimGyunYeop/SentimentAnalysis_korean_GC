@@ -433,8 +433,6 @@ class KOSAC_LSTM_ATT_DOT(nn.Module):
         input_emb_result = self.input_embedding(input_ids)
         polarity_emb_result = self.polarity_embedding(polarity_ids)
         intensity_emb_result = self.intensity_embedding(intensity_ids)
-        print(input_emb_result)
-        print(polarity_emb_result)
         embedding_result = input_emb_result + polarity_emb_result + intensity_emb_result
 
         outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=token_type_ids,inputs_embeds = embedding_result)
