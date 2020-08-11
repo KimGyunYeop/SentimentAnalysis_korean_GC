@@ -227,7 +227,7 @@ def main(cli_args):
     logger.info("cliargs parameters {}".format(cli_args))
 
     if cli_args.small == True:
-        args.output_dir = args.output_dir + "_small"
+        args.ckpt_dir = args.ckpt_dir + "_small"
 
     args.output_dir = os.path.join(args.ckpt_dir, cli_args.result_dir)
     args.model_mode = cli_args.model_mode
