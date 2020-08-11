@@ -449,7 +449,7 @@ class KOSAC_LSTM_ATT_DOT(nn.Module):
         result = (loss, outputs)
         return result
 
-class KOSAC_LSTM_ATT_DOT_ML(nn.Module):
+class KOSAC_LSTM_GTR(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(KOSAC_LSTM_ATT_DOT_ML, self).__init__()
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
@@ -457,46 +457,47 @@ class KOSAC_LSTM_ATT_DOT_ML(nn.Module):
             config=config)
 
         # Embedding
-        self.input_embedding = self.emb.embeddings.word_embeddings
         self.polarity_embedding = nn.Embedding(5, 768)
         self.intensity_embedding = nn.Embedding(5, 768)
 
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
         self.lstm_dropout = nn.Dropout(0.2)
-        self.dense = nn.Linear(768, 768)
+        self.dense = nn.Linear(768, 1)
+        self.fc = nn.Linear(768, 300)
         self.dropout = nn.Dropout(0.2)
-        self.out_proj = nn.Linear(768, 2)
+        self.out_proj = nn.Linear(300, 2)
+        self.tanh = nn.Tanh()
 
-        self.att_w = nn.Parameter(torch.randn(1, 768, 1))
+    def attention_net(self, lstm_output, polarity, intensity):
+        result = lstm_output + polarity + intensity
+        attn_weights = self.dense(result).squeeze()
+        soft_attn_weights = F.softmax(attn_weights, dim=-1)
+        c = lstm_outputs.transpose(1, 2).bmm(soft_attn_weights.unsqueeze(-1)).squeeze()
+        new_hidden_state = self.tanh(c)
 
-    def attention_net(self, lstm_output, final_state):
-        attn_weights = torch.bmm(lstm_output, final_state.permute(1, 2, 0))
-        soft_attn_weights = F.softmax(attn_weights, dim=1)  # shape = (batch_size, seq_len, 1)
-        new_hidden_state = torch.bmm(lstm_output.transpose(1, 2),
-                                     soft_attn_weights).squeeze(2)
-
-        return new_hidden_state, soft_attn_weights
+        return new_hidden_state
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids,polarity_ids, intensity_ids):
+
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        outputs, (h, c) = self.lstm(outputs[0])
+        #filter gate
         # embedding
-        input_emb_result = self.input_embedding(input_ids)
         polarity_emb_result = self.polarity_embedding(polarity_ids)
         intensity_emb_result = self.intensity_embedding(intensity_ids)
+        print(polarity_emb_result.shape)
+        print(outputs.shape)
+        FG_outputs = self.tanh(outputs + polarity_emb_result / 100 + intensity_emb_result / 100)
+        outputs = outputs * FG_outputs
+        print(outputs.shape)
 
-        embedding_result = input_emb_result + polarity_emb_result / 100 + intensity_emb_result / 100
+        attn_output = self.attention_net(outputs, polarity_emb_result, intensity_emb_result)
 
-        outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=token_type_ids,inputs_embeds = embedding_result)
-        outputs, (h, c) = self.lstm(outputs[0])
-        attn_output, soft_attn_weights = self.attention_net(outputs, h)
-
-
-        outputs = self.dense(attn_output)
-        outputs = self.dropout(outputs)
+        fc_outputs = self.fc(attn_output)
+        outputs = self.dropout(fc_outputs)
         outputs = self.out_proj(outputs)
-        att_label = F.softmax((torch.abs(polarity_ids)+torch.abs(intensity_ids)).float(),dim=-1)
         loss_fct = nn.CrossEntropyLoss()
-        loss_att = nn.MSELoss()
-        loss = loss_fct(outputs.view(-1, 2), labels.view(-1)) + loss_att(soft_attn_weights.squeeze().float(),att_label.float()).float()
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1)) #+ loss_att(soft_attn_weights.squeeze().float(),att_label.float()).float()
         result = (loss, outputs)
         return result
 
@@ -718,57 +719,6 @@ class KNU_LSTM_ATT_DOT(nn.Module):
         result = (loss, outputs)
         return result
 
-class KNU_LSTM_ATT_DOT_ML(nn.Module):
-    def __init__(self, model_type, model_name_or_path, config):
-        super(KNU_LSTM_ATT_DOT_ML, self).__init__()
-        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
-            model_name_or_path,
-            config=config)
-
-        # Embedding
-        self.input_embedding = self.emb.embeddings.word_embeddings
-        self.polarity_embedding = nn.Embedding(5, 768)
-        self.intensity_embedding = nn.Embedding(5, 768)
-
-        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
-        self.lstm_dropout = nn.Dropout(0.2)
-        self.dense = nn.Linear(768, 768)
-        self.dropout = nn.Dropout(0.2)
-        self.out_proj = nn.Linear(768, 2)
-
-        self.att_w = nn.Parameter(torch.randn(1, 768, 1))
-
-    def attention_net(self, lstm_output, final_state):
-        attn_weights = torch.bmm(lstm_output, final_state.permute(1, 2, 0))
-        soft_attn_weights = F.softmax(attn_weights, dim=1)  # shape = (batch_size, seq_len, 1)
-        new_hidden_state = torch.bmm(lstm_output.transpose(1, 2),
-                                     soft_attn_weights).squeeze(2)
-
-        return new_hidden_state, soft_attn_weights
-
-    def forward(self, input_ids, attention_mask, labels, token_type_ids,polarity_ids, intensity_ids):
-        # embedding
-        input_emb_result = self.input_embedding(input_ids)
-        polarity_emb_result = self.polarity_embedding(polarity_ids)
-        intensity_emb_result = self.intensity_embedding(intensity_ids)
-
-        embedding_result = input_emb_result + polarity_emb_result / 100 + intensity_emb_result / 100
-
-        outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=token_type_ids,inputs_embeds = embedding_result)
-        outputs, (h, c) = self.lstm(outputs[0])
-        attn_output, soft_attn_weights = self.attention_net(outputs, h)
-
-
-        outputs = self.dense(attn_output)
-        outputs = self.dropout(outputs)
-        outputs = self.out_proj(outputs)
-        att_label = F.softmax((torch.abs(polarity_ids)+torch.abs(intensity_ids)).float(),dim=-1)
-        loss_fct = nn.CrossEntropyLoss()
-        loss_att = nn.MSELoss()
-        loss = loss_fct(outputs.view(-1, 2), labels.view(-1)) + loss_att(soft_attn_weights.squeeze(),att_label).float()
-        result = (loss, outputs)
-        return result
-
 
 MODEL_LIST = {
     "LSTM": LSTM,
@@ -780,11 +730,10 @@ MODEL_LIST = {
     "LSTM_ATT_KOSAC": KOSAC_LSTM_ATT,
     "LSTM_ATT_v2_KOSAC": KOSAC_LSTM_ATT_v2,
     "LSTM_ATT_DOT_KOSAC": KOSAC_LSTM_ATT_DOT,
-    "KOSAC_LSTM_ATT_DOT_ML": KOSAC_LSTM_ATT_DOT_ML,
+    "KOSAC_LSTM_GTR": KOSAC_LSTM_GTR,
 
     "LSTM_KNU": KNU_LSTM,
     "LSTM_ATT_KNU": KNU_LSTM_ATT,
     "LSTM_ATT_v2_KNU": KNU_LSTM_ATT_v2,
-    "LSTM_ATT_DOT_KNU": KNU_LSTM_ATT_DOT,
-    "KNU_LSTM_ATT_DOT_ML": KNU_LSTM_ATT_DOT_ML
+    "LSTM_ATT_DOT_KNU": KNU_LSTM_ATT_DOT
 }

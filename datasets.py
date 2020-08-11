@@ -224,5 +224,5 @@ DATASET_LIST = {
     "LSTM_ATT_KOSAC": KOSACDataset,
     "LSTM_ATT_v2_KOSAC": KOSACDataset,
     "LSTM_ATT_DOT_KOSAC": KOSACDataset,
-    "KOSAC_LSTM_ATT_DOT_ML": KOSACDataset
+    "KOSAC_LSTM_GTR": KOSACDataset
 }
