@@ -472,7 +472,7 @@ class KOSAC_LSTM_GTR(nn.Module):
 
     def attention_net(self, lstm_output, polarity, intensity):
         result = lstm_output + polarity + intensity
-        attn_weights = self.dense(result).squeeze()
+        attn_weights = self.tanh(self.dense(result).squeeze())
         soft_attn_weights = F.softmax(attn_weights, dim=-1)
         c = lstm_output.transpose(1, 2).bmm(soft_attn_weights.unsqueeze(-1)).squeeze()
         new_hidden_state = self.tanh(c)
