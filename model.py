@@ -456,10 +456,7 @@ class KOSAC_LSTM_GTR(nn.Module):
 
         # Embedding
         self.polarity_embedding = nn.Embedding(5, 768)
-        self.polarity_embedding.weight.data.uniform_(-7e-1, 7e-1)
         self.intensity_embedding = nn.Embedding(5, 768)
-        self.intensity_embedding.weight.data.uniform_(-7e-1, 7e-1)
-
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
         self.lstm_dropout = nn.Dropout(0.2)
         self.dense = nn.Linear(768, 1)
@@ -486,10 +483,10 @@ class KOSAC_LSTM_GTR(nn.Module):
         polarity_emb_result = self.polarity_embedding(polarity_ids)
         intensity_emb_result = self.intensity_embedding(intensity_ids)
 
-        FG_outputs = self.tanh(outputs + polarity_emb_result + intensity_emb_result)
+        FG_outputs = self.tanh(outputs + polarity_emb_result/100 + intensity_emb_result/100)
         outputs = outputs * FG_outputs
 
-        attn_output = self.attention_net(outputs, polarity_emb_result, intensity_emb_result)
+        attn_output = self.attention_net(outputs, polarity_emb_result/100, intensity_emb_result/100)
 
         fc_outputs = self.fc(attn_output)
         outputs = self.dropout(fc_outputs)
