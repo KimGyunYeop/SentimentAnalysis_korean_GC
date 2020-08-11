@@ -458,7 +458,9 @@ class KOSAC_LSTM_GTR(nn.Module):
 
         # Embedding
         self.polarity_embedding = nn.Embedding(5, 768)
+        self.polarity_embedding.weight.data.uniform_(-1, 1)
         self.intensity_embedding = nn.Embedding(5, 768)
+        self.intensity_embedding.weight.data.uniform_(-1, 1)
 
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
         self.lstm_dropout = nn.Dropout(0.2)
@@ -480,7 +482,7 @@ class KOSAC_LSTM_GTR(nn.Module):
     def forward(self, input_ids, attention_mask, labels, token_type_ids,polarity_ids, intensity_ids):
 
         outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        outputs, (h, c) = self.lstm(outputs[0])
+        outputs, _ = self.lstm(outputs[0])
         #filter gate
         # embedding
         polarity_emb_result = self.polarity_embedding(polarity_ids)
