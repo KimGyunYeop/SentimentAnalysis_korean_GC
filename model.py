@@ -472,7 +472,7 @@ class KOSAC_LSTM_GTR(nn.Module):
         result = lstm_output + polarity + intensity
         attn_weights = self.dense(result).squeeze()
         soft_attn_weights = F.softmax(attn_weights, dim=-1)
-        c = lstm_outputs.transpose(1, 2).bmm(soft_attn_weights.unsqueeze(-1)).squeeze()
+        c = lstm_output.transpose(1, 2).bmm(soft_attn_weights.unsqueeze(-1)).squeeze()
         new_hidden_state = self.tanh(c)
 
         return new_hidden_state
@@ -497,7 +497,7 @@ class KOSAC_LSTM_GTR(nn.Module):
         outputs = self.dropout(fc_outputs)
         outputs = self.out_proj(outputs)
         loss_fct = nn.CrossEntropyLoss()
-        loss = loss_fct(outputs.view(-1, 2), labels.view(-1)) #+ loss_att(soft_attn_weights.squeeze().float(),att_label.float()).float()
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
         result = (loss, outputs)
         return result
 
