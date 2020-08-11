@@ -408,9 +408,9 @@ class KOSAC_LSTM_ATT_DOT(nn.Module):
         # Embedding
         self.input_embedding = self.emb.embeddings.word_embeddings
         self.polarity_embedding = nn.Embedding(5, 768)
-        self.polarity_embedding.weight.data.uniform_(-1, 1)
+        self.polarity_embedding.weight.data.uniform_(-7e-1, 7e-1)
         self.intensity_embedding = nn.Embedding(5, 768)
-        self.intensity_embedding.weight.data.uniform_(-1, 1)
+        self.intensity_embedding.weight.data.uniform_(-7e-1, 7e-1)
 
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
         self.lstm_dropout = nn.Dropout(0.2)
@@ -433,12 +433,12 @@ class KOSAC_LSTM_ATT_DOT(nn.Module):
         input_emb_result = self.input_embedding(input_ids)
         polarity_emb_result = self.polarity_embedding(polarity_ids)
         intensity_emb_result = self.intensity_embedding(intensity_ids)
-
-        embedding_result = input_emb_result
+        print(input_emb_result)
+        print(polarity_emb_result)
+        embedding_result = input_emb_result + polarity_emb_result + intensity_emb_result
 
         outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=token_type_ids,inputs_embeds = embedding_result)
-        outputs = outputs[0] + polarity_emb_result / 100 + intensity_emb_result / 100
-        outputs, (h, c) = self.lstm(outputs)
+        outputs, (h, c) = self.lstm(outputs[0])
         attn_output = self.attention_net(outputs, h)
 
         outputs = self.dense(attn_output)
