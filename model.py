@@ -451,7 +451,7 @@ class KOSAC_LSTM_ATT_DOT(nn.Module):
 
 class KOSAC_LSTM_GTR(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
-        super(KOSAC_LSTM_ATT_DOT_ML, self).__init__()
+        super(KOSAC_LSTM_GTR, self).__init__()
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
