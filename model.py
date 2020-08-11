@@ -408,7 +408,9 @@ class KOSAC_LSTM_ATT_DOT(nn.Module):
         # Embedding
         self.input_embedding = self.emb.embeddings.word_embeddings
         self.polarity_embedding = nn.Embedding(5, 768)
+        self.polarity_embedding.weight.data.uniform_(-7e-1, 7e-1)
         self.intensity_embedding = nn.Embedding(5, 768)
+        self.intensity_embedding.weight.data.uniform_(-7e-1, 7e-1)
 
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
         self.lstm_dropout = nn.Dropout(0.2)
