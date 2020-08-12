@@ -769,37 +769,6 @@ class KNU_LSTM_ATT_DOT_ML(nn.Module):
         result = (loss, outputs)
         return result
 
-class CHAR_KOELECTRA(nn.Module):
-    def __init__(self, model_type, model_name_or_path, config):
-        super(CHAR_KOELECTRA, self).__init__()
-        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
-            model_name_or_path,
-            config=config)
-        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
-        self.lstm_dropout = nn.Dropout(0.2)
-        self.dense = nn.Linear(768, 768)
-        self.dropout = nn.Dropout(0.2)
-        self.out_proj = nn.Linear(768, 2)
-
-    def forward(self, input_ids, attention_mask, labels, token_type_ids, char_token_data, word_token_data):
-        # print(input_ids)
-        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        outputs, (h, c) = self.lstm(outputs[0])
-
-        outputs = self.dense(outputs[:,-1,:])
-        outputs = self.dropout(outputs)
-        outputs = self.out_proj(outputs)
-
-        loss_fct = nn.CrossEntropyLoss()
-        loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
-        # print(loss.shape)
-        # print(loss)
-        # print(len(outputs))
-        # print(outputs.shape)
-
-        result = (loss, outputs)
-
-        return result
 
 MODEL_LIST = {
     "LSTM": LSTM,

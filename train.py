@@ -230,6 +230,9 @@ def main(cli_args):
     logger.info("Training/evaluation parameters {}".format(args))
     logger.info("cliargs parameters {}".format(cli_args))
 
+    if cli_args.small == True:
+        args.ckpt_dir = args.ckpt_dir + "_small"
+
     args.output_dir = os.path.join(args.ckpt_dir, cli_args.result_dir)
     args.model_mode = cli_args.model_mode
 
@@ -272,6 +275,7 @@ def main(cli_args):
         test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test") if args.test_file else None
     else:
         # Load dataset
+        args.logging_steps = 100
         train_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="train_small") if args.train_file else None
         dev_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="dev_small") if args.dev_file else None
         test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test_small") if args.test_file else None
