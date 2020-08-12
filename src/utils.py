@@ -45,6 +45,8 @@ CONFIG_CLASSES = {
     "koelectra-small": ElectraConfig,
     "koelectra-base-v2": ElectraConfig,
     "koelectra-small-v2": ElectraConfig,
+    "kocharelectra-v2": ElectraConfig,
+    "kocharelectra-base": ElectraConfig,
     "xlm-roberta": XLMRobertaConfig
 }
 
@@ -56,6 +58,7 @@ TOKENIZER_CLASSES = {
     "koelectra-small": ElectraTokenizer,
     "koelectra-base-v2": ElectraTokenizer,
     "koelectra-small-v2": ElectraTokenizer,
+    "kocharelectra-base": ElectraTokenizer,
     "xlm-roberta": XLMRobertaTokenizer
 }
 
@@ -89,6 +92,7 @@ MODEL_ORIGINER = {
     "koelectra-small": ElectraModel,
     "koelectra-base-v2": ElectraModel,
     "koelectra-small-v2": ElectraModel,
+    "kocharelectra-v2": ElectraModel,
     "xlm-roberta": XLMRobertaModel
 }
 

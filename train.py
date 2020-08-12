@@ -184,6 +184,10 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
                 inputs["intensity_ids"] = batch[5]
             if "KNU" in args.model_mode:
                 inputs["polarity_ids"] = batch[4]
+            if "char" in args.model_mode:
+                inputs["char_token_data"] = batch[-3]
+                inputs["word_token_data"] = batch[-2]
+
             outputs = model(**inputs)
             tmp_eval_loss, logits = outputs[:2]
 

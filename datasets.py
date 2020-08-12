@@ -4,6 +4,7 @@ from torch.utils.data import Dataset
 import pandas as pd
 import os
 import pickle
+from konlpy.tag import Twitter
 
 class BaseDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
@@ -32,6 +33,37 @@ class BaseDataset(Dataset):
         label = self.dataset.at[idx,"rating"]
 
         return (input_ids, token_type_ids, attention_mask, label),txt
+
+class CharLevelBaseDataset(Dataset):
+    def __init__(self, args, char_tokenizer, mode):
+        super(CharLevelBaseDataset,self).__init__()
+        self.char_tokenizer = char_tokenizer
+        self.word_tokenizer = Twitter()
+        self.maxlen = args.max_seq_len
+        if "train" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.train_file)
+        elif "dev" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.dev_file)
+        elif "test" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.test_file)
+        self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
+        if "small" in mode:
+            self.dataset = self.dataset[:10000]
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        txt = str(self.dataset.at[idx,"review"])
+        data = self.char_tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
+        char_token_data = self.char_tokenizer.tokenize(txt)
+        word_token_data = self.word_tokenizer.morphs(txt)
+        input_ids = torch.LongTensor(data["input_ids"])
+        token_type_ids = torch.LongTensor(data["token_type_ids"])
+        attention_mask = torch.LongTensor(data["attention_mask"])
+        label = self.dataset.at[idx,"rating"]
+
+        return (input_ids, token_type_ids, attention_mask, char_token_data, word_token_data, label),txt
 
 class KOSACDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
@@ -160,12 +192,12 @@ class KNUDataset(Dataset):
         key_list = tkn2pol[0].apply(lambda x: x.replace(" ", ""))
         tkn2pol[0] = key_list
         tkn2pol = dict(zip(tkn2pol[0],tkn2pol[1]))
+        key_list = list(key_list)
         polarities = []
-
         for i in range(len(dataset)):
-            txt = str(dataset.at[i,'review'])
-            tokens = self.tokenizer._tokenize(txt)
-            txt = txt.replace(" ", "")
+            txt_original = str(dataset.at[i,'review'])
+            tokens = self.tokenizer._tokenize(txt_original)
+            txt = txt_original.replace(" ", "")
             char_polarity = []
             for j in range(len(txt)):
                 if len(char_polarity) > j:
@@ -174,18 +206,40 @@ class KNUDataset(Dataset):
                     if k == 0:
                         char_polarity.extend([0])
                     if txt[j:j+k] in key_list:
-                        char_polarity.extend(tkn2pol[txt[j:j+k]]*k)
-            polarity = ['None']
+                        char_polarity.extend([tkn2pol[txt[j:j+k]]]*k)
+                        break
+            polarity = ['0']
+            print(tokens)
+            print(char_polarity)
+            after_unk = 0
             count = 0
+            print(self.tokenizer.convert_tokens_to_string(tokens))
             for token in tokens[:self.maxlen - 2]:
                 if token[:2] == '##':
                     tkn = token[2:]
                 else:
                     tkn = token
                 if tkn == "[UNK]":
+                    print("aaaaaaaaaaa")
                     polarity.append(0)
+                    after_unk=1
+                    continue
+                if after_unk==1:
+                    after_unk=0
+                    while True:
+                        print(txt)
+                        print(txt[count])
+                        print(count)
+                        print(tkn[0])
+                        if txt[count] == tkn[0]:
+                            break
+                        count += count
+
                 char_pol_list = char_polarity[count:count+len(tkn)]
-                pol = max(set(char_pol_list), key=char_pol_list.count)
+                print(tkn)
+                print(char_pol_list)
+                pol = max(char_pol_list, key=char_pol_list.count)
+                print(pol)
                 polarity.append(pol)
                 count = count+len(tkn)
 
@@ -194,9 +248,10 @@ class KNUDataset(Dataset):
             else:
                 count = self.maxlen - len(polarity)
 
-            polarity = polarity + ['None' for i in range(count)]
+            polarity = polarity + [0 for _ in range(count)]
 
             polarities.append(polarity)
+            print(polarities)
 
         return polarities
 
@@ -224,5 +279,7 @@ DATASET_LIST = {
     "LSTM_ATT_KOSAC": KOSACDataset,
     "LSTM_ATT_v2_KOSAC": KOSACDataset,
     "LSTM_ATT_DOT_KOSAC": KOSACDataset,
-    "KOSAC_LSTM_ATT_DOT_ML": KOSACDataset
+    "KOSAC_LSTM_ATT_DOT_ML": KOSACDataset,
+
+    "CHAR_KOELECTRA":CharLevelBaseDataset
 }

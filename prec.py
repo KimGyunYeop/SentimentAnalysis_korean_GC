@@ -40,12 +40,14 @@ from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 tokenizer = TOKENIZER_CLASSES["koelectra-base"].from_pretrained(
     "monologg/koelectra-base-discriminator"
 )
-
-print(tokenizer._tokenize("김태우가 멋있게 나와서 10점만점에 10쩜 평점보단 재밌음"))
+token = tokenizer.encode("김태우가 멋있게 나와서 ,, 항 10점만점에 10쩜 평점보단 재밌음 ─━항──━ㆀ")
+print(tokenizer._tokenize("김태우가 멋있게 나와서 ,, 항 10점만점에 10쩜 평점보단 재밌음 ─━항──━ㆀ"))
 print(tokenizer("김태우가 멋있게 나와서 10점만점에 10쩜 평점보단 재밌음")["input_ids"])
 print(tokenizer.convert_ids_to_tokens(tokenizer("김태우가 멋있게 나와서 10점만점에 10쩜 평점보단 재밌음")["input_ids"]))
+print(tokenizer.get_special_tokens_mask(token))
 
-c = argparse.ArgumentParser()
+
+'''c = argparse.ArgumentParser()
 args = c.parse_args()
 args.data_dir = "data"
 args.task = "nsmc"
@@ -56,4 +58,11 @@ dataset = KNUDataset(args, tokenizer=tokenizer, mode="train_small")
 dataloader = DataLoader(dataset, batch_size=1)
 
 for i, batch in enumerate(dataloader):
-    print(batch)
+    print(batch)'''
+
+
+from konlpy.tag import Twitter
+txt = "공부를 하면할수록 모르는게 많다는 것을 알게 됩니다."
+twitter = Twitter()
+print(twitter.morphs("나는 걸어가고 있는 중입니다."))
+#[c1, c2, [c3,c4,c5]]
