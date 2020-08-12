@@ -10,7 +10,8 @@ from seqeval.metrics import precision_score, recall_score, f1_score, classificat
 
 from src import (
     KoBertTokenizer,
-    HanBertTokenizer
+    HanBertTokenizer,
+    KoCharElectraTokenizer
 )
 from transformers import (
     BertConfig,
@@ -58,7 +59,7 @@ TOKENIZER_CLASSES = {
     "koelectra-small": ElectraTokenizer,
     "koelectra-base-v2": ElectraTokenizer,
     "koelectra-small-v2": ElectraTokenizer,
-    "kocharelectra-base": ElectraTokenizer,
+    "kocharelectra-base": KoCharElectraTokenizer,
     "xlm-roberta": XLMRobertaTokenizer
 }
 

@@ -5,6 +5,8 @@ import pandas as pd
 import os
 import pickle
 
+from konlpy.tag import Twitter
+
 class BaseDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
         super(BaseDataset,self).__init__()
@@ -32,6 +34,39 @@ class BaseDataset(Dataset):
         label = self.dataset.at[idx,"rating"]
 
         return (input_ids, token_type_ids, attention_mask, label),txt
+
+class CharBaseDataset(Dataset):
+    def __init__(self, args, tokenizer, mode):
+        super(CharBaseDataset,self).__init__()
+        self.tokenizer = tokenizer
+        self.word_tokenizer = Twitter()
+        self.maxlen = args.max_seq_len
+        if "train" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.train_file)
+        elif "dev" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.dev_file)
+        elif "test" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.test_file)
+        self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
+        if "small" in mode:
+            self.dataset = self.dataset[:10000]
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        txt = str(self.dataset.at[idx,"review"])
+        data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
+        char_token = self.tokenizer._tokenize(txt)
+        print("a")
+        print(char_token)
+        word_token = self.word_tokenizer.morphs(txt)
+        input_ids = torch.LongTensor(data["input_ids"])
+        token_type_ids = torch.LongTensor(data["token_type_ids"])
+        attention_mask = torch.LongTensor(data["attention_mask"])
+        label = self.dataset.at[idx,"rating"]
+
+        return (input_ids, token_type_ids, attention_mask, char_token, word_token, label),txt
 
 class KOSACDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
@@ -224,5 +259,7 @@ DATASET_LIST = {
     "LSTM_ATT_KOSAC": KOSACDataset,
     "LSTM_ATT_v2_KOSAC": KOSACDataset,
     "LSTM_ATT_DOT_KOSAC": KOSACDataset,
-    "KOSAC_LSTM_ATT_DOT_ML": KOSACDataset
+    "KOSAC_LSTM_ATT_DOT_ML": KOSACDataset,
+
+    "CHAR_KOELECTRA": CharBaseDataset
 }

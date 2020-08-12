@@ -92,13 +92,16 @@ def train(args,
                 "input_ids": batch[0],
                 "attention_mask": batch[1],
                 "token_type_ids" : batch[2],
-                "labels": batch[3]
+                "labels": batch[-1]
             }
             if "KOSAC" in args.model_mode:
                 inputs["polarity_ids"] = batch[4]
                 inputs["intensity_ids"] = batch[5]
             if "KNU" in args.model_mode:
                 inputs["polarity_ids"] = batch[4]
+            if "CHAR" in args.model_mode:
+                inputs["char_token_data"] = batch[-3]
+                inputs["word_token_data"] = batch[-2]
             outputs = model(**inputs)
             # print(outputs)
             loss = outputs[0]
@@ -175,16 +178,15 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             inputs = {
                 "input_ids": batch[0],
                 "attention_mask": batch[1],
-                "labels": batch[3]
+                "token_type_ids":batch[2],
+                "labels": batch[-1]
             }
-            if args.model_type not in ["distilkobert", "xlm-roberta"]:
-                inputs["token_type_ids"] = batch[2]  # Distilkobert, XLM-Roberta don't use segment_ids
             if "KOSAC" in args.model_mode:
                 inputs["polarity_ids"] = batch[4]
                 inputs["intensity_ids"] = batch[5]
             if "KNU" in args.model_mode:
                 inputs["polarity_ids"] = batch[4]
-            if "char" in args.model_mode:
+            if "CHAR" in args.model_mode:
                 inputs["char_token_data"] = batch[-3]
                 inputs["word_token_data"] = batch[-2]
 
