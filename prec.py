@@ -52,7 +52,8 @@ dataset = CharBaseDataset(args, tokenizer=tokenizer, mode="train_small")
 dataloader = DataLoader(dataset, batch_size=1)
 
 for i, batch in enumerate(dataloader):
-    print(batch)
+    print(batch[0])
+    print(batch[1])
 
 
 from konlpy.tag import Twitter

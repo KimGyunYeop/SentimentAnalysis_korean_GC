@@ -79,6 +79,11 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             if "KNU" in args.model_mode:
                 inputs["polarity_ids"] = batch[4]
 
+            if "CHAR" in args.model_mode:
+                inputs["char_token_data"] = txt[1]
+                inputs["word_token_data"] = txt[2]
+                txt = txt[0]
+
             outputs = model(**inputs)
             tmp_eval_loss, logits = outputs[:2]
 

@@ -58,15 +58,13 @@ class CharBaseDataset(Dataset):
         txt = str(self.dataset.at[idx,"review"])
         data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
         char_token = self.tokenizer._tokenize(txt)
-        print("a")
-        print(char_token)
         word_token = self.word_tokenizer.morphs(txt)
         input_ids = torch.LongTensor(data["input_ids"])
         token_type_ids = torch.LongTensor(data["token_type_ids"])
         attention_mask = torch.LongTensor(data["attention_mask"])
         label = self.dataset.at[idx,"rating"]
 
-        return (input_ids, token_type_ids, attention_mask, char_token, word_token, label),txt
+        return (input_ids, token_type_ids, attention_mask, label),[txt, char_token, word_token]
 
 class KOSACDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
