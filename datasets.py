@@ -175,6 +175,8 @@ class KNUDataset(Dataset):
                         char_polarity.extend([0])
                     if txt[j:j+k] in key_list:
                         char_polarity.extend(tkn2pol[txt[j:j+k]]*k)
+                        continue
+            print(char_polarity)
             polarity = ['None']
             count = 0
             for token in tokens[:self.maxlen - 2]:

@@ -461,9 +461,10 @@ class KOSAC_LSTM_GTR(nn.Module):
         self.lstm_dropout = nn.Dropout(0.2)
 
         #parameter
-        self.dense_polarity = nn.Parameter(torch.randn(768, 768, 1))
-        self.dense_intensity = nn.Parameter(torch.randn(768, 768, 1))
-        self.dense_intensity = nn.Parameter(torch.randn(1, 768, 1))
+        self.dense_output = nn.Parameter(torch.randn(768 * 2, 768 * 2, 1))
+        self.dense_polarity = nn.Parameter(torch.randn(768 * 2, 768, 1))
+        self.dense_intensity = nn.Parameter(torch.randn(768 * 2, 768, 1))
+        self.dense_intensity = nn.Parameter(torch.randn(1, 768 * 2, 1))
 
         self.att_w = nn.Parameter(torch.randn(1, 768, 1))
         self.dense = nn.Linear(768, 1)
@@ -485,7 +486,6 @@ class KOSAC_LSTM_GTR(nn.Module):
 
         outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
         outputs, _ = self.lstm(outputs[0])
-        print(outputs.shape)
         #filter gate
         # embedding
         polarity_emb_result = self.polarity_embedding(polarity_ids)
