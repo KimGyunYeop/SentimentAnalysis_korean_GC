@@ -261,5 +261,6 @@ DATASET_LIST = {
 
     "CHAR_KOELECTRA": CharBaseDataset,
 
-    "EMB2_LSTM": BaseDataset
+    "EMB2_LSTM": BaseDataset,
+    "EMB1_LSTM2" : BaseDataset
 }
