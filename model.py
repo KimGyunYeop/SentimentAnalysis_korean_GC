@@ -792,7 +792,6 @@ class EMB2_LSTM(nn.Module):
         posoutputs = self.dense(posoutputs[:,-1,:])
         posoutputs = self.dropout(posoutputs)
         posoutputs = self.out_proj(posoutputs)
-        print(posoutputs.shape)
 
 
         negoutputs = self.negemb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
@@ -802,14 +801,15 @@ class EMB2_LSTM(nn.Module):
         negoutputs = self.dropout(negoutputs)
         negoutputs = self.out_proj(negoutputs)
 
+        output = torch.cat((negoutputs, posoutputs), dim=1)
         loss_fct = nn.CrossEntropyLoss()
-        loss = loss_fct(posoutputs.view(-1, 2), labels.view(-1))
+        loss = loss_fct(output.view(-1, 2), labels.view(-1))
         # print(loss.shape)
         # print(loss)
         # print(len(outputs))
         # print(outputs.shape)
 
-        result = (loss, posoutputs)
+        result = (loss, output)
 
         return result
 
