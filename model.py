@@ -813,6 +813,52 @@ class EMB2_LSTM(nn.Module):
 
         return result
 
+class EMB1_LSTM2(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(EMB1_LSTM2, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.poslstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
+        self.posdense = nn.Linear(768, 768)
+        self.posout_proj = nn.Linear(768, 1)
+
+        self.dropout = nn.Dropout(0.2)
+
+        self.neglstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
+        self.negdense = nn.Linear(768, 768)
+        self.negout_proj = nn.Linear(768, 1)
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        # print(input_ids)
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+
+        posoutputs, (h, c) = self.poslstm(outputs[0])
+
+        posoutputs = self.posdense(posoutputs[:,-1,:])
+        posoutputs = self.dropout(posoutputs)
+        posoutputs = self.posout_proj(posoutputs)
+
+
+        negoutputs, (h, c) = self.neglstm(outputs[0])
+
+        negoutputs = self.negdense(negoutputs[:,-1,:])
+        negoutputs = self.negdropout(negoutputs)
+        negoutputs = self.negout_proj(negoutputs)
+
+
+        output = torch.cat((negoutputs, posoutputs), dim=1)
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(output.view(-1, 2), labels.view(-1))
+        # print(loss.shape)
+        # print(loss)
+        # print(len(outputs))
+        # print(outputs.shape)
+
+        result = (loss, output)
+
+        return result
+
 MODEL_LIST = {
     "LSTM": LSTM,
     "LSTM_ATT": LSTM_ATT,
