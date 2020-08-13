@@ -843,7 +843,7 @@ class EMB1_LSTM2(nn.Module):
         negoutputs, (h, c) = self.neglstm(outputs[0])
 
         negoutputs = self.negdense(negoutputs[:,-1,:])
-        negoutputs = self.negdropout(negoutputs)
+        negoutputs = self.dropout(negoutputs)
         negoutputs = self.negout_proj(negoutputs)
 
 
