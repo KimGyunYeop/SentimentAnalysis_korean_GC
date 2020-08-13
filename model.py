@@ -769,6 +769,49 @@ class KNU_LSTM_ATT_DOT_ML(nn.Module):
         result = (loss, outputs)
         return result
 
+class EMB2_LSTM(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(EMB2_LSTM, self).__init__()
+        self.posemb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.negemb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
+        self.lstm_dropout = nn.Dropout(0.2)
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 1)
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        # print(input_ids)
+        posoutputs = self.posemb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        posoutputs, (h, c) = self.lstm(posoutputs[0])
+
+        posoutputs = self.dense(posoutputs[:,-1,:])
+        posoutputs = self.dropout(posoutputs)
+        posoutputs = self.out_proj(posoutputs)
+        print(posoutputs.shape)
+
+
+        negoutputs = self.negemb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        negoutputs, (h, c) = self.lstm(negoutputs[0])
+
+        negoutputs = self.dense(negoutputs[:,-1,:])
+        negoutputs = self.dropout(negoutputs)
+        negoutputs = self.out_proj(negoutputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(posoutputs.view(-1, 2), labels.view(-1))
+        # print(loss.shape)
+        # print(loss)
+        # print(len(outputs))
+        # print(outputs.shape)
+
+        result = (loss, posoutputs)
+
+        return result
 
 MODEL_LIST = {
     "LSTM": LSTM,
@@ -788,5 +831,7 @@ MODEL_LIST = {
     "LSTM_ATT_DOT_KNU": KNU_LSTM_ATT_DOT,
     "KOSAC_LSTM_ATT_DOT_ML": KNU_LSTM_ATT_DOT_ML,
 
-    "CHAR_KOELECTRA": KNU_LSTM_ATT_DOT_ML
+    "CHAR_KOELECTRA": KNU_LSTM_ATT_DOT_ML,
+
+    "EMB2_LSTM" : EMB2_LSTM
 }

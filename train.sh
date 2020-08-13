@@ -1,1 +1,1 @@
-python3 train.py --task nsmc --config_file kocharelectra-base.json --result_dir char_test --model_mode CHAR_KOELECTRA --gpu 0
+python3 train.py --task nsmc --config_file koelectra-base.json --result_dir EMB2_LSTM --model_mode EMB2_LSTM --gpu 0

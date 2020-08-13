@@ -259,5 +259,7 @@ DATASET_LIST = {
     "LSTM_ATT_DOT_KOSAC": KOSACDataset,
     "KOSAC_LSTM_ATT_DOT_ML": KOSACDataset,
 
-    "CHAR_KOELECTRA": CharBaseDataset
+    "CHAR_KOELECTRA": CharBaseDataset,
+
+    "EMB2_LSTM": BaseDataset
 }
