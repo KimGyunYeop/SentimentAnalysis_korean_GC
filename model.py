@@ -435,7 +435,7 @@ class KOSAC_LSTM_ATT_DOT(nn.Module):
         embedding_result = input_emb_result + polarity_emb_result / 100 + intensity_emb_result / 100
 
         outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=token_type_ids,inputs_embeds = embedding_result)
-        outputs, (h, c) = self.lstm(outputs[0][:,1:-1,:])
+        outputs, (h, c) = self.lstm(outputs[0])
         attn_output = self.attention_net(outputs, h)
 
         outputs = self.dense(attn_output)
