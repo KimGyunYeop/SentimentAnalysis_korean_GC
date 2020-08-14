@@ -92,7 +92,7 @@ def train(args,
                 "input_ids": batch[0],
                 "attention_mask": batch[1],
                 "token_type_ids" : batch[2],
-                "labels": batch[-1]
+                "labels": batch[3]
             }
             if "KOSAC" in args.model_mode:
                 inputs["polarity_ids"] = batch[4]

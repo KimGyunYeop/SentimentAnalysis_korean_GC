@@ -443,9 +443,6 @@ class KOSAC_LSTM_ATT_DOT(nn.Module):
         outputs = self.out_proj(outputs)
 
         loss_fct = nn.CrossEntropyLoss()
-        print(outputs.shape)
-        print(outputs.view(-1, 2).shape)
-        print(labels.view(-1).shape)
         loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
 
         result = (loss, outputs)
