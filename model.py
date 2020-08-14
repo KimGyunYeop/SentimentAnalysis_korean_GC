@@ -427,7 +427,6 @@ class KOSAC_LSTM_ATT_DOT(nn.Module):
         return new_hidden_state
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids,polarity_ids, intensity_ids):
-        print(input_ids.shape)
         # embedding
         input_emb_result = self.input_embedding(input_ids)
         polarity_emb_result = self.polarity_embedding(polarity_ids)
@@ -436,7 +435,7 @@ class KOSAC_LSTM_ATT_DOT(nn.Module):
         embedding_result = input_emb_result + polarity_emb_result / 100 + intensity_emb_result / 100
 
         outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=token_type_ids,inputs_embeds = embedding_result)
-        outputs, (h, c) = self.lstm(outputs[0][1:-1])
+        outputs, (h, c) = self.lstm(outputs[0][:,1:-1,:])
         attn_output = self.attention_net(outputs, h)
 
         outputs = self.dense(attn_output)
@@ -444,8 +443,6 @@ class KOSAC_LSTM_ATT_DOT(nn.Module):
         outputs = self.out_proj(outputs)
 
         loss_fct = nn.CrossEntropyLoss()
-        print(outputs.shape)
-        print(labels.view(-1).shape)
         loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
 
         result = (loss, outputs)
