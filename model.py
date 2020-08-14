@@ -427,6 +427,7 @@ class KOSAC_LSTM_ATT_DOT(nn.Module):
         return new_hidden_state
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids,polarity_ids, intensity_ids):
+        print(input_ids.shape)
         # embedding
         input_emb_result = self.input_embedding(input_ids)
         polarity_emb_result = self.polarity_embedding(polarity_ids)
