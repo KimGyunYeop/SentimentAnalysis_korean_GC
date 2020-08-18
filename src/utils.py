@@ -93,7 +93,7 @@ MODEL_ORIGINER = {
     "koelectra-small": ElectraModel,
     "koelectra-base-v2": ElectraModel,
     "koelectra-small-v2": ElectraModel,
-    "kocharelectra-v2": ElectraModel,
+    "kocharelectra-base": ElectraModel,
     "xlm-roberta": XLMRobertaModel
 }
 

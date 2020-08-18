@@ -40,7 +40,7 @@ class CharBaseDataset(Dataset):
         super(CharBaseDataset,self).__init__()
         self.tokenizer = tokenizer
         self.word_tokenizer = Twitter()
-        self.maxlen = args.max_seq_len
+        self.maxlen = 128
         if "train" in mode:
             data_path = os.path.join(args.data_dir, args.task, args.train_file)
         elif "dev" in mode:
