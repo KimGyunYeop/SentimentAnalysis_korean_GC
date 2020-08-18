@@ -74,10 +74,10 @@ class BASEELECTRA_COS(nn.Module):
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # print(input_ids)
         outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        outputs = outputs[0]
+        embs = outputs[0]
         batch_size, seq_len, w2v_dim = outputs.shape
 
-        outputs = self.dense(outputs[:,0,:])
+        outputs = self.dense(embs[:,0,:])
         outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
 
@@ -85,10 +85,10 @@ class BASEELECTRA_COS(nn.Module):
         loss1 = loss_fct(outputs.view(-1, 2), labels.view(-1))
 
 
-        x1 = outputs[:,0,:].squeeze()
+        x1 = embs[:,0,:].squeeze()
         x1 = x1.repeat(1, batch_size)
         x1 = x1.view(batch_size, batch_size, w2v_dim)
-        x2 = outputs[:,0,:].squeeze()
+        x2 = embs[:,0,:].squeeze()
         x2 = x2.unsqueeze(0)
         x2 = x2.repeat(batch_size, 1, 1)
         label = torch.randint(0, 2, (batch_size,))
