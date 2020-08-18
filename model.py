@@ -31,6 +31,78 @@ from processor import seq_cls_tasks_num_labels as tasks_num_labels
 from processor import seq_cls_processors as processors
 from processor import seq_cls_output_modes as output_modes
 
+class BASEELECTRA(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(BASEELECTRA, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 2)
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        # print(input_ids)
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+
+        outputs = self.dense(outputs)
+        outputs = self.dropout(outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
+        # print(loss.shape)
+        # print(loss)
+        # print(len(outputs))
+        # print(outputs.shape)
+
+        result = (loss, outputs)
+
+        return result
+
+
+class BASEELECTRA_COS(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(BASEELECTRA_COS, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 2)
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        # print(input_ids)
+        batch_size, seq_len, w2v_dim = input_ids.shape
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+
+        outputs = self.dense(outputs)
+        outputs = self.dropout(outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss1 = loss_fct(outputs.view(-1, 2), labels.view(-1))
+
+
+        x1 = outputs.squeeze()
+        x1 = x1.repeat(1, batch_size)
+        x1 = x1.view(batch_size, batch_size, w2v_dim)
+        x2 = outputs.squeeze()
+        x2 = x2.unsqueeze(0)
+        x2 = x2.repeat(batch_size, 1, 1)
+        label = torch.randint(0, 2, (batch_size,))
+        # y = torch.randint(0,2,(batch_size, batch_size)) *2 -1
+        y = labels.unsqueeze(0).repeat(batch_size, 1)
+        for i, t in enumerate(y):
+            y[i] = (t == t[i]).double() * 2 - 1
+        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=-1)
+        loss2 = loss_fn(x1.view(-1, w2v_dim),
+                       x2.view(-1, w2v_dim),
+                       y.view(-1))
+
+        result = (loss1+loss2, outputs)
+
+        return result
 
 class LSTM(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
@@ -955,6 +1027,9 @@ class CHAR_LSTM(nn.Module):
         return result
 
 MODEL_LIST = {
+    "BASEELECTRA": BASEELECTRA,
+    "BASEELECTRA_COS": BASEELECTRA_COS,
+
     "LSTM": LSTM,
     "LSTM_ATT": LSTM_ATT,
     "LSTM_ATT_v2": LSTM_ATT_v2,

@@ -248,6 +248,9 @@ class KNUDataset(Dataset):
         return (input_ids, token_type_ids, attention_mask, label, polarity_ids),txt
 
 DATASET_LIST = {
+    "BASEELECTRA": BaseDataset,
+    "BASEELECTRA_COS": BaseDataset,
+
     "LSTM": BaseDataset,
     "LSTM_ATT": BaseDataset,
     "LSTM_ATT_v2": BaseDataset,
