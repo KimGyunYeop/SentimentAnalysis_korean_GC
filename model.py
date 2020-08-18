@@ -77,7 +77,7 @@ class BASEELECTRA_COS(nn.Module):
         outputs = outputs[0]
         batch_size, seq_len, w2v_dim = outputs.shape
 
-        outputs = self.dense(outputs[0][:,0,:])
+        outputs = self.dense(outputs[:,0,:])
         outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
 
