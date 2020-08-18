@@ -75,7 +75,7 @@ class BASEELECTRA_COS(nn.Module):
         # print(input_ids)
         outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
         embs = outputs[0]
-        batch_size, seq_len, w2v_dim = outputs.shape
+        batch_size, seq_len, w2v_dim = embs.shape
 
         outputs = self.dense(embs[:,0,:])
         outputs = self.dropout(outputs)
