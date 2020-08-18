@@ -43,10 +43,9 @@ class BASEELECTRA(nn.Module):
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # print(input_ids)
-        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        print(outputs)
+        outputs,_ = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
 
-        outputs = self.dense(outputs)
+        outputs = self.dense(outputs[:,0,:])
         outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
 
@@ -77,7 +76,7 @@ class BASEELECTRA_COS(nn.Module):
         batch_size, seq_len, w2v_dim = input_ids.shape
         outputs,_ = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
 
-        outputs = self.dense(outputs)
+        outputs = self.dense(outputs[:,0,:])
         outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
 
