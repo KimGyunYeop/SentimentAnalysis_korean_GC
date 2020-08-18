@@ -50,14 +50,18 @@ args.max_seq_len = 50
 
 dataset = CharBaseDataset(args, tokenizer=tokenizer, mode="train_small")
 dataloader = DataLoader(dataset, batch_size=1)
-
+'''
 for i, batch in enumerate(dataloader):
     print(batch[0])
     print(batch[1])
+'''
 
-
-from konlpy.tag import Twitter
+from konlpy.tag import Okt
 txt = "공부를 하면할수록 모르는게 많다는 것을 알게 됩니다."
-twitter = Twitter()
-print(twitter.morphs("나는 걸어가고 있는 중입니다."))
+twitter = Okt()
+
+df = pd.read_csv(os.path.join(args.data_dir,args.task,args.train_file),sep="\t")
+df['review'].astype('str')
+for line in df["review"]:
+    print(twitter.morphs(str(line)))
 #[c1, c2, [c3,c4,c5]]

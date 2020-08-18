@@ -232,6 +232,63 @@ class LSTM_ATT_DOT(nn.Module):
         result = (loss, outputs)
         return result
 
+
+class LSTM_ATT2(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(LSTM_ATT2, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
+        self.lstm_dropout = nn.Dropout(0.2)
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 2)
+
+        self.att_w1 = nn.Parameter(torch.randn(1, 768, 10))
+        self.att_w2 = nn.Parameter(torch.randn(1, 10, 1))
+
+    def attention_net(self, lstm_output, final_state):
+        attn_weights = torch.bmm(lstm_output, final_state.permute(1, 2, 0))
+        soft_attn_weights = F.softmax(attn_weights, dim=1)  # shape = (batch_size, seq_len, 1)
+        new_hidden_state = torch.bmm(lstm_output.transpose(1, 2),
+                                     soft_attn_weights).squeeze(2)
+
+        return new_hidden_state
+
+    def re_attention(self, lstm_output, final_h, input):
+        batch_size, seq_len = input.shape
+
+        final_h = final_h.squeeze()
+
+        # final_h.size() = (batch_size, hidden_size)
+        # output.size() = (batch_size, num_seq, hidden_size)
+        # lstm_output(batch_size, seq_len, lstm_dir_dim)
+        att = torch.bmm(torch.tanh(lstm_output),
+                        self.att_w1.repeat(batch_size, 1, 1))
+        att = torch.bmm(torch.tanh(att),
+                        self.att_w2.repeat(batch_size, 1, 1))
+        att = F.softmax(att, dim=1)  # att(batch_size, seq_len, 1)
+        att = torch.bmm(lstm_output.transpose(1, 2), att).squeeze(2)
+        attn_output = torch.tanh(att)  # attn_output(batch_size, lstm_dir_dim)
+        return attn_output
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        outputs, (h, c) = self.lstm(outputs[0])
+        attn_output = self.re_attention(outputs, h)
+
+        outputs = self.dense(attn_output)
+        outputs = self.dropout(outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
+
+        result = (loss, outputs)
+        return result
+
+
 #--KOSAC--
 
 class KOSAC_LSTM(nn.Module):
@@ -864,15 +921,22 @@ class CHAR_LSTM(nn.Module):
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
+        self.char_emb_lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
         self.lstm_dropout = nn.Dropout(0.2)
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
+        self.char_emb = None
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids, char_token_data, word_token_data):
         # print(input_ids)
         outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        for line_index, line in enumerate(word_token_data):
+            count = 0
+            for word_tok in line:
+                word_emb = self.char_emb_lstm(outputs[line_index,count:count+len(word_tok),:])
+
         outputs, (h, c) = self.lstm(outputs[0])
 
         outputs = self.dense(outputs[:,-1,:])
@@ -895,6 +959,7 @@ MODEL_LIST = {
     "LSTM_ATT": LSTM_ATT,
     "LSTM_ATT_v2": LSTM_ATT_v2,
     "LSTM_ATT_DOT": LSTM_ATT_DOT,
+    "LSTM_ATT2" : LSTM_ATT2,
 
     "LSTM_KOSAC": KOSAC_LSTM,
     "LSTM_ATT_KOSAC": KOSAC_LSTM_ATT,
