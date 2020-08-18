@@ -276,7 +276,7 @@ class LSTM_ATT2(nn.Module):
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
         outputs, (h, c) = self.lstm(outputs[0])
-        attn_output = self.re_attention(outputs, h)
+        attn_output = self.re_attention(outputs, h, input_ids)
 
         outputs = self.dense(attn_output)
         outputs = self.dropout(outputs)
