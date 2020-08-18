@@ -43,7 +43,8 @@ class BASEELECTRA(nn.Module):
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # print(input_ids)
-        outputs,_ = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        print(outputs)
 
         outputs = self.dense(outputs)
         outputs = self.dropout(outputs)
