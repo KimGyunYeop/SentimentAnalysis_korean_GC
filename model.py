@@ -85,10 +85,10 @@ class BASEELECTRA_COS(nn.Module):
         loss1 = loss_fct(outputs.view(-1, 2), labels.view(-1))
 
 
-        x1 = outputs.squeeze()
+        x1 = outputs[:,0,:].squeeze()
         x1 = x1.repeat(1, batch_size)
         x1 = x1.view(batch_size, batch_size, w2v_dim)
-        x2 = outputs.squeeze()
+        x2 = outputs[:,0,:].squeeze()
         x2 = x2.unsqueeze(0)
         x2 = x2.repeat(batch_size, 1, 1)
         label = torch.randint(0, 2, (batch_size,))
