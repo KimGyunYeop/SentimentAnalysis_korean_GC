@@ -870,7 +870,7 @@ class CHAR_LSTM(nn.Module):
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
 
-    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+    def forward(self, input_ids, attention_mask, labels, token_type_ids, char_token_data, word_token_data):
         # print(input_ids)
         outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
         outputs, (h, c) = self.lstm(outputs[0])
