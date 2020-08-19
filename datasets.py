@@ -237,7 +237,6 @@ class KNUDataset(Dataset):
         attention_mask = torch.LongTensor(data["attention_mask"])
         polarity_ids = torch.LongTensor(self.polarities[idx])
         label = self.dataset.at[idx,"rating"]
-        print(attention_mask)
 
         return (input_ids, token_type_ids, attention_mask, label, polarity_ids),txt
 
