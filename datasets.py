@@ -190,22 +190,11 @@ class KNUDataset(Dataset):
         self.polarities = self.get_sentiment_data(self.dataset)
 
     def find_sub_list(self, sl, l):
-        sl_string = " ".join(sl)
-        l_string = " ".join(l)
-        results = []
-        if sl_string in l_string:
-            tmp = l_string.split(sl_string)
-            for data in tmp:
-                index = len(data.split(" "))
-                results.append((index,index+len(sl) - 1))
-
-
-        '''
         results = []
         sll = len(sl)
         for ind in (i for i, e in enumerate(l) if e == sl[0]):
             if l[ind:ind + sll] == sl:
-                results.append((ind, ind + sll - 1))'''
+                results.append((ind, ind + sll - 1))
 
         return results
 
