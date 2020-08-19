@@ -100,7 +100,7 @@ class BASEELECTRA_COS(nn.Module):
                        x2.view(-1, w2v_dim),
                        y.view(-1))
 
-        result = (loss1+loss2, outputs)
+        result = ((loss1,loss2), outputs)
 
         return result
 
@@ -137,20 +137,20 @@ class BASEELECTRA_COS2(nn.Module):
         y = labels.unsqueeze(0).repeat(batch_size, 1)
         for i, t in enumerate(y):
             y[i] = (t == t[i]).double() * 2 - 1
-        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=-1)
+        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=0)
         loss2 = loss_fn(x1.view(-1, w2v_dim),
                        x2.view(-1, w2v_dim),
                        y.view(-1))
 
-        star = torch.zeros(batch_size, 2)
+        star = torch.zeros(batch_size, 2).cuda()
         star[range(batch_size), labels] = 1
         star = self.star_emb(star)
 
         loss3 = loss_fn(embs[:, 0, :].squeeze(),
                         star,
-                        torch.ones(batch_size))
+                        torch.ones(batch_size).cuda())
 
-        result = (loss1+loss2+loss3, outputs)
+        result = ((loss1,loss2,loss3), outputs)
 
         return result
 
@@ -1077,6 +1077,7 @@ class CHAR_LSTM(nn.Module):
 MODEL_LIST = {
     "BASEELECTRA": BASEELECTRA,
     "BASEELECTRA_COS": BASEELECTRA_COS,
+    "BASEELECTRA_COS2": BASEELECTRA_COS2,
 
     "LSTM": LSTM,
     "LSTM_ATT": LSTM_ATT,

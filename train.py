@@ -82,6 +82,7 @@ def train(args,
     mb = master_bar(range(int(args.num_train_epochs)))
     for epoch in mb:
         epoch_iterator = progress_bar(train_dataloader, parent=mb)
+        ep_loss = []
         for step, (batch, txt) in enumerate(epoch_iterator):
             model.train()
             batch = tuple(t.to(args.device) for t in batch)
@@ -106,6 +107,11 @@ def train(args,
             # print(loss)
             if args.gradient_accumulation_steps > 1:
                 loss = loss / args.gradient_accumulation_steps
+
+            if type(loss) == tuple:
+                print(list(map(lambda x:x.item(),loss)))
+                ep_loss.append(list(map(lambda x:x.item(),loss)))
+                loss = sum(loss)
 
             loss.backward()
             tr_loss += loss.item()
@@ -167,6 +173,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
     nb_eval_steps = 0
     preds = None
     out_label_ids = None
+    ep_loss= []
 
     for (batch, txt) in progress_bar(eval_dataloader):
         model.eval()
@@ -190,6 +197,11 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
                 txt = txt[0]
             outputs = model(**inputs)
             tmp_eval_loss, logits = outputs[:2]
+
+            if type(tmp_eval_loss) == tuple:
+                print(list(map(lambda x:x.item(),tmp_eval_loss)))
+                ep_loss.append(list(map(lambda x:x.item(),tmp_eval_loss)))
+                tmp_eval_loss = sum(tmp_eval_loss)
 
             eval_loss += tmp_eval_loss.mean().item()
         nb_eval_steps += 1
@@ -277,7 +289,7 @@ def main(cli_args):
         dev_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="dev_small") if args.dev_file else None
         test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test_small") if args.test_file else None
 
-        args.logging_steps = int(len(train_dataset) / args.train_batch_size)
+        args.logging_steps = int(len(train_dataset) / args.train_batch_size)+1
 
     if dev_dataset == None:
         args.evaluate_test_during_training = True  # If there is no dev dataset, only use testset
