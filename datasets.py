@@ -4,6 +4,7 @@ from torch.utils.data import Dataset
 import pandas as pd
 import os
 import pickle
+import numpy as np
 
 from konlpy.tag import Twitter
 
