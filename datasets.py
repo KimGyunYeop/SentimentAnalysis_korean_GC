@@ -208,7 +208,6 @@ class KNUDataset(Dataset):
         polarities = []
 
         for i in tqdm(range(len(dataset))):
-            print("---------------")
             txt = str(dataset.at[i,'review'])
             tokens = self.tokenizer._tokenize(txt)[:self.maxlen-2]
             polarity = [0]*(self.maxlen-2)
@@ -222,8 +221,6 @@ class KNUDataset(Dataset):
                         print(polarity)
                         print(len(polarity))
                     polarity[start:end+1] = [key2pol[key]]*(end-start+1)
-
-            print(len(polarity))
             polarity=[0]+polarity+[0]
             polarities.append(polarity)
 
