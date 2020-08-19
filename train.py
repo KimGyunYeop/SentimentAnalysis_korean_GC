@@ -109,7 +109,7 @@ def train(args,
                 loss = loss / args.gradient_accumulation_steps
 
             if type(loss) == tuple:
-                print(list(map(lambda x:x.item(),loss)))
+                #print(list(map(lambda x:x.item(),loss)))
                 ep_loss.append(list(map(lambda x:x.item(),loss)))
                 loss = sum(loss)
 
@@ -199,7 +199,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             tmp_eval_loss, logits = outputs[:2]
 
             if type(tmp_eval_loss) == tuple:
-                print(list(map(lambda x:x.item(),tmp_eval_loss)))
+                #print(list(map(lambda x:x.item(),tmp_eval_loss)))
                 ep_loss.append(list(map(lambda x:x.item(),tmp_eval_loss)))
                 tmp_eval_loss = sum(tmp_eval_loss)
 
