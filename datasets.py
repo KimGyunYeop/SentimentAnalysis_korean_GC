@@ -237,6 +237,7 @@ class KNUDataset(Dataset):
 DATASET_LIST = {
     "BASEELECTRA": BaseDataset,
     "BASEELECTRA_COS": BaseDataset,
+    "BASEELECTRA_COS2": BaseDataset,
 
     "LSTM": BaseDataset,
     "LSTM_ATT": BaseDataset,
