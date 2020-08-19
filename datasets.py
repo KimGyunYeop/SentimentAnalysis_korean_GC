@@ -204,8 +204,8 @@ class KNUDataset(Dataset):
         key_list = {tuple(self.tokenizer._tokenize(str(word))):pol for word,pol in zip(tkn2pol[0],tkn2pol[1])}
         key_list_trim = {tuple(self.tokenizer._tokenize(str(word).replace(" ",""))):pol for word,pol in zip(tkn2pol[0],tkn2pol[1])}
         print(len(key_list))
-        print(key_list.items()+key_list_trim.items())
-        print(len(key_list.items() + key_list_trim.items()))
+        print(key_list.update(key_list_trim))
+        print(len(key_list.update(key_list_trim)))
         print(tkn2pol)
         polarities = []
 
