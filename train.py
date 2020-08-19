@@ -277,7 +277,7 @@ def main(cli_args):
         dev_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="dev_small") if args.dev_file else None
         test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test_small") if args.test_file else None
 
-        args.logging_steps = int(len(train_dataset) / args.train_batch_size)
+        args.logging_steps = int(len(train_dataset) / args.train_batch_size)+1
 
     if dev_dataset == None:
         args.evaluate_test_during_training = True  # If there is no dev dataset, only use testset
