@@ -186,7 +186,7 @@ class KNUDataset(Dataset):
 
         self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
         if "small" in mode:
-            self.dataset = self.dataset[:200]
+            self.dataset = self.dataset[:10000]
         self.polarities = self.get_sentiment_data(self.dataset)
 
     def find_sub_list(self, sl, l):
@@ -214,7 +214,8 @@ class KNUDataset(Dataset):
             for key in sorted_key:
                 one_polarity_list = self.find_sub_list(list(key),tokens)
                 for start,end in one_polarity_list:
-                    polarity[start:end+1] = [key2pol[key]]*(end-start+1)
+                    number= key2pol[key] + 2
+                    polarity[start:end+1] = [number]*(end-start+1)
             polarity=[0]+polarity+[0]
             polarities.append(polarity)
 
