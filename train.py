@@ -256,8 +256,6 @@ def main(cli_args):
             id2label={str(i): label for i, label in enumerate(labels)},
             label2id={label: i for i, label in enumerate(labels)},
         )
-
-    print(config.vocab_size)
     tokenizer = TOKENIZER_CLASSES[args.model_type].from_pretrained(
         args.model_name_or_path,
         do_lower_case=args.do_lower_case
