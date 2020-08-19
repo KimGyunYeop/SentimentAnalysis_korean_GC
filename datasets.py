@@ -202,7 +202,6 @@ class KNUDataset(Dataset):
     def get_sentiment_data(self, dataset):
         try:
             polarities = []
-            print("review2polarities_"+ self.mode +".pkl")
             a_file = open("review2polarities_"+ self.mode +".pkl", "rb")
             output = pickle.load(a_file)
             for i in tqdm(range(len(dataset))):
@@ -234,7 +233,7 @@ class KNUDataset(Dataset):
 
                 review2polarities[txt] = polarity
 
-            a_file = open("review2polarities.pkl", "wb")
+            a_file = open("review2polarities_"+ self.mode +".pkl", "wb")
             pickle.dump(review2polarities, a_file)
             a_file.close()
 
