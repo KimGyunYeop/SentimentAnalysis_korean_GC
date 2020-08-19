@@ -148,7 +148,7 @@ class BASEELECTRA_COS2(nn.Module):
 
         loss3 = loss_fn(embs[:, 0, :].squeeze(),
                         star,
-                        torch.ones(batch_size))
+                        torch.ones(batch_size).cuda())
 
         result = (loss1+loss2+loss3, outputs)
 
