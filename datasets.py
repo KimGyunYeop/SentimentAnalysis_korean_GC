@@ -245,6 +245,7 @@ class KNUDataset(Dataset):
             for key in sorted_key:
                 one_polarity_list = self.find_sub_list(tokens, list(key))
                 for start,end in one_polarity_list:
+                    print("-----------")
                     print(one_polarity_list)
                     print(key)
                     print(polarity)
