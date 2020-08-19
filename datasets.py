@@ -243,7 +243,7 @@ class KNUDataset(Dataset):
             tokens = self.tokenizer._tokenize(txt)
             polarity = [0]*self.maxlen
             for key in sorted_key:
-                one_polarity_list = self.find_sub_list(tokens, list(key))
+                one_polarity_list = self.find_sub_list(list(key),tokens)
                 for start,end in one_polarity_list:
                     print("-----------")
                     print(one_polarity_list)
