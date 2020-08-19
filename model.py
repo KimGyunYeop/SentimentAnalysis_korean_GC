@@ -150,7 +150,7 @@ class BASEELECTRA_COS2(nn.Module):
                         star,
                         torch.ones(batch_size).cuda())
 
-        result = ((loss1,loss2,loss3), outputs)
+        result = ((loss1,0.5*loss2,0.5*loss3), outputs)
 
         return result
 
