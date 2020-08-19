@@ -65,7 +65,7 @@ class CharBaseDataset(Dataset):
         attention_mask = torch.LongTensor(data["attention_mask"])
         label = self.dataset.at[idx,"rating"]
 
-        return (input_ids, token_type_ids, attention_mask, label),[txt, char_token, word_token]
+        return (input_ids, attention_mask,token_type_ids, label),[txt, char_token, word_token]
 
 class KOSACDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
@@ -169,7 +169,7 @@ class KOSACDataset(Dataset):
         intensity_ids = torch.LongTensor(self.intensities[idx])
         label = self.dataset.at[idx,"rating"]
 
-        return (input_ids, token_type_ids, attention_mask, label, polarity_ids, intensity_ids),txt
+        return (input_ids, attention_mask,token_type_ids, label, polarity_ids, intensity_ids),txt
 
 class KNUDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
