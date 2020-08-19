@@ -831,6 +831,8 @@ class KNU_LSTM_ATT_DOT(nn.Module):
         input_emb_result = self.input_embedding(input_ids)
         polarity_emb_result = self.polarity_embedding(polarity_ids)
         print(input_emb_result.shape)
+        print(attention_mask.shape)
+        print(token_type_ids.shape)
         embedding_result = input_emb_result #+ polarity_emb_result / 100
         outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=token_type_ids,inputs_embeds = embedding_result)
         outputs, (h, c) = self.lstm(outputs[0])
