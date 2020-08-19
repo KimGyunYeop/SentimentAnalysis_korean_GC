@@ -207,8 +207,6 @@ class KNUDataset(Dataset):
         key2pol.update(key2pol_trim)
         print(len(key2pol))
         sorted_key = sorted(key2pol.keys() ,key=len)
-        for i in sorted_key:
-            print(len(i))
         polarities = []
 
         for i in range(len(dataset)):
