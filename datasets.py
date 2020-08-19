@@ -196,6 +196,7 @@ class KNUDataset(Dataset):
         for i in key_list:
             if maxlen <len(key_list):
                 maxlen=len(key_list)
+        print(maxlen)
         key_list_trim = ["+".join(self.tokenizer._tokenize(str(word).replace(" ",""))) for word in tkn2pol[0]]
         print(len(key_list))
         tkn2pol[0] = key_list
