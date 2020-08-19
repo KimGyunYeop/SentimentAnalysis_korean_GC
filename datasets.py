@@ -199,25 +199,39 @@ class KNUDataset(Dataset):
         return results
 
     def get_sentiment_data(self, dataset):
-        tkn2pol = pd.read_csv(os.path.join("lexicon","KNU_origin.csv"),header=None,sep="\t")
-        tkn2pol_trim = pd.read_csv(os.path.join("lexicon", "KNU_origin.csv"), header=None, sep="\t")
-        key2pol = {tuple(self.tokenizer._tokenize(str(word))):pol for word,pol in zip(tkn2pol[0],tkn2pol[1])}
-        key2pol_trim = {tuple(self.tokenizer._tokenize(str(word).replace(" ",""))):pol for word,pol in zip(tkn2pol_trim[0],tkn2pol_trim[1])}
-        key2pol.update(key2pol_trim)
-        sorted_key = sorted(key2pol.keys() ,key=len)
-        polarities = []
+        try:
+            a_file = open("review2polarities.pkl", "rb")
+            output = pickle.load(a_file)
+            polarities = output.values()
+            print(polarities)
+            a_file.close()
+        except:
+            tkn2pol = pd.read_csv(os.path.join("lexicon","KNU_origin.csv"),header=None,sep="\t")
+            tkn2pol_trim = pd.read_csv(os.path.join("lexicon", "KNU_origin.csv"), header=None, sep="\t")
+            key2pol = {tuple(self.tokenizer._tokenize(str(word))):pol for word,pol in zip(tkn2pol[0],tkn2pol[1])}
+            key2pol_trim = {tuple(self.tokenizer._tokenize(str(word).replace(" ",""))):pol for word,pol in zip(tkn2pol_trim[0],tkn2pol_trim[1])}
+            key2pol.update(key2pol_trim)
+            sorted_key = sorted(key2pol.keys() ,key=len)
+            polarities = []
+            review2polarities = {}
 
-        for i in tqdm(range(len(dataset))):
-            txt = str(dataset.at[i,'review'])
-            tokens = self.tokenizer._tokenize(txt)[:self.maxlen-2]
-            polarity = [0]*(self.maxlen-2)
-            for key in sorted_key:
-                one_polarity_list = self.find_sub_list(list(key),tokens)
-                for start,end in one_polarity_list:
-                    number= key2pol[key] + 2
-                    polarity[start:end+1] = [number]*(end-start+1)
-            polarity=[0]+polarity+[0]
-            polarities.append(polarity)
+            for i in tqdm(range(len(dataset))):
+                txt = str(dataset.at[i,'review'])
+                tokens = self.tokenizer._tokenize(txt)[:self.maxlen-2]
+                polarity = [0]*(self.maxlen-2)
+                for key in sorted_key:
+                    one_polarity_list = self.find_sub_list(list(key),tokens)
+                    for start,end in one_polarity_list:
+                        number= key2pol[key] + 2
+                        polarity[start:end+1] = [number]*(end-start+1)
+                polarity=[0]+polarity+[0]
+                polarities.append(polarity)
+
+                review2polarities[txt] = polarity
+
+            a_file = open("review2polarities.pkl", "wb")
+            pickle.dump(review2polarities, a_file)
+            a_file.close()
 
         return polarities
 
