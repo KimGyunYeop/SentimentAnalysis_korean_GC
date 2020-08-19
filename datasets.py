@@ -264,6 +264,12 @@ DATASET_LIST = {
     "LSTM_ATT_DOT_KOSAC": KOSACDataset,
     "KOSAC_LSTM_ATT_DOT_ML": KOSACDataset,
 
+    "LSTM_KNU": KNUDataset,
+    "LSTM_ATT_KNU": KNUDataset,
+    "LSTM_ATT_v2_KNU": KNUDataset,
+    "LSTM_ATT_DOT_KNU": KNUDataset,
+    "KOSAC_LSTM_ATT_DOT_ML": KNUDataset,
+
     "CHAR_KOELECTRA": CharBaseDataset,
 
     "EMB2_LSTM": BaseDataset,
