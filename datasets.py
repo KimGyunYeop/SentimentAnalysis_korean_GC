@@ -203,9 +203,7 @@ class KNUDataset(Dataset):
         tkn2pol_trim = pd.read_csv(os.path.join("lexicon", "KNU_origin.csv"), header=None, sep="\t")
         key2pol = {tuple(self.tokenizer._tokenize(str(word))):pol for word,pol in zip(tkn2pol[0],tkn2pol[1])}
         key2pol_trim = {tuple(self.tokenizer._tokenize(str(word).replace(" ",""))):pol for word,pol in zip(tkn2pol_trim[0],tkn2pol_trim[1])}
-        print(len(key2pol))
         key2pol.update(key2pol_trim)
-        print(len(key2pol))
         sorted_key = sorted(key2pol.keys() ,key=len)
         polarities = []
 
