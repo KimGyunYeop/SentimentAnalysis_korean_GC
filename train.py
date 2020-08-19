@@ -109,7 +109,7 @@ def train(args,
                 loss = loss / args.gradient_accumulation_steps
 
             if type(loss) == tuple:
-                print(list(map(lambda x:x.item(),loss)))
+                #print(list(map(lambda x:x.item(),loss)))
                 ep_loss.append(list(map(lambda x:x.item(),loss)))
                 loss = sum(loss)
 
@@ -150,6 +150,7 @@ def train(args,
                 break
 
         mb.write("Epoch {} done".format(epoch + 1))
+        mb.write("Epoch loss = {} ".format(np.mean(np.array(ep_loss),axis=0)))
 
         if args.max_steps > 0 and global_step > args.max_steps:
             break
@@ -199,7 +200,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             tmp_eval_loss, logits = outputs[:2]
 
             if type(tmp_eval_loss) == tuple:
-                print(list(map(lambda x:x.item(),tmp_eval_loss)))
+                #print(list(map(lambda x:x.item(),tmp_eval_loss)))
                 ep_loss.append(list(map(lambda x:x.item(),tmp_eval_loss)))
                 tmp_eval_loss = sum(tmp_eval_loss)
 
@@ -231,6 +232,8 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
         for key in sorted(results.keys()):
             logger.info("  {} = {}".format(key, str(results[key])))
             f_w.write("  {} = {}\n".format(key, str(results[key])))
+            logger.info("Epoch loss = {} ".format(np.mean(np.array(ep_loss), axis=0)))
+            f_w.write("Epoch loss = {} ".format(np.mean(np.array(ep_loss), axis=0)))
 
     return results
 
