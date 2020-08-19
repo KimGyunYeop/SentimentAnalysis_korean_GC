@@ -142,7 +142,7 @@ class BASEELECTRA_COS2(nn.Module):
                        x2.view(-1, w2v_dim),
                        y.view(-1))
 
-        star = torch.zeros(batch_size, 2).cuda()
+        star = torch.zeros(batch_size, 2).device('cuda')
         star[range(batch_size), labels] = 1
         star = self.star_emb(star)
 
