@@ -186,7 +186,7 @@ class KNUDataset(Dataset):
 
         self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
         if "small" in mode:
-            self.dataset = self.dataset[:10000]
+            self.dataset = self.dataset[:100]
         self.polarities = self.get_sentiment_data(self.dataset)
 
     def find_sub_list(self, sl, l):
@@ -200,9 +200,12 @@ class KNUDataset(Dataset):
 
     def get_sentiment_data(self, dataset):
         try:
+            polarities = []
             a_file = open("review2polarities.pkl", "rb")
             output = pickle.load(a_file)
-            polarities = output.values()
+            for i in tqdm(range(len(dataset))):
+                txt = str(dataset.at[i, 'review'])
+                polarities.append(output[txt])
             print(polarities)
             a_file.close()
         except:
