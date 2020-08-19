@@ -189,7 +189,7 @@ class KNUDataset(Dataset):
             self.dataset = self.dataset[:10000]
         self.polarities = self.get_sentiment_data(self.dataset)
 
-    def find_sub_list(sl, l):
+    def find_sub_list(self, sl, l):
         results = []
         sll = len(sl)
         for ind in (i for i, e in enumerate(l) if e == sl[0]):
@@ -202,14 +202,13 @@ class KNUDataset(Dataset):
         tkn2pol = pd.read_csv(os.path.join("lexicon","KNU_origin.csv"),header=None,sep="\t")
         tkn2pol_trim = pd.read_csv(os.path.join("lexicon", "KNU_origin.csv"), header=None, sep="\t")
         key_list = {tuple(self.tokenizer._tokenize(str(word))):pol for word,pol in zip(tkn2pol[0],tkn2pol[1])}
-        key_list_trim = {tuple(self.tokenizer._tokenize(str(word).replace(" ",""))):pol for word,pol in zip(tkn2pol[0],tkn2pol[1])}
+        key_list_trim = {tuple(self.tokenizer._tokenize(str(word).replace(" ",""))):pol for word,pol in zip(tkn2pol_trim[0],tkn2pol_trim[1])}
         print(len(key_list))
         key_list.update(key_list_trim)
+        key_list = sorted(key_list.items())
         print(key_list)
-        print(len(key_list))
-        print(tkn2pol)
         polarities = []
-
+        '''
         for i in range(len(dataset)):
             txt = str(dataset.at[i,'review'])
             tokens = self.tokenizer._tokenize(txt)
@@ -235,7 +234,12 @@ class KNUDataset(Dataset):
                 char_pol_list = char_polarity[count:count+len(tkn)]
                 pol = max(set(char_pol_list), key=char_pol_list.count)
                 polarity.append(pol)
-                count = count+len(tkn)
+                count = count+len(tkn)'''
+
+        for i in range(len(dataset)):
+            txt = str(dataset.at[i,'review'])
+            tokens = self.tokenizer._tokenize(txt)
+            find_sub_list (tokens, )
 
             if self.maxlen - len(polarity) <= 0:
                 count = 0
