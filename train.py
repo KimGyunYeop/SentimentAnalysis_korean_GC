@@ -1,25 +1,26 @@
 import argparse
+import glob
 import json
 import logging
-import os
-import glob
-
 import numpy as np
+import os
 import torch
 import torch.nn.functional as F
+from attrdict import AttrDict
+from fastprogress.fastprogress import master_bar, progress_bar
 from torch import nn
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
-from fastprogress.fastprogress import master_bar, progress_bar
-from attrdict import AttrDict
-
-from datasets import DATASET_LIST
-from model import *
-
 from transformers import (
     AdamW,
     get_linear_schedule_with_warmup
 )
 
+from datasets import DATASET_LIST
+from model import *
+from processor import seq_cls_load_and_cache_examples as load_and_cache_examples
+from processor import seq_cls_output_modes as output_modes
+from processor import seq_cls_processors as processors
+from processor import seq_cls_tasks_num_labels as tasks_num_labels
 from src import (
     CONFIG_CLASSES,
     TOKENIZER_CLASSES,
@@ -29,10 +30,6 @@ from src import (
     set_seed,
     compute_metrics
 )
-from processor import seq_cls_load_and_cache_examples as load_and_cache_examples
-from processor import seq_cls_tasks_num_labels as tasks_num_labels
-from processor import seq_cls_processors as processors
-from processor import seq_cls_output_modes as output_modes
 
 logger = logging.getLogger(__name__)
 
