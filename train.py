@@ -109,9 +109,9 @@ def train(args,
                 loss = loss / args.gradient_accumulation_steps
 
             if type(loss) == tuple:
-                ep_loss.append([list(map(lambda x:x.item(),loss))])
+                print(list(map(lambda x:x.item(),loss)))
+                ep_loss.append(list(map(lambda x:x.item(),loss)))
                 loss = sum(loss)
-            print(ep_loss)
 
             loss.backward()
             tr_loss += loss.item()
