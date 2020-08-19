@@ -807,7 +807,7 @@ class KNU_LSTM_ATT_DOT(nn.Module):
 
         # Embedding
         self.input_embedding = self.emb.embeddings.word_embeddings
-        self.polarity_embedding = nn.Embedding(6, 768)
+        self.polarity_embedding = nn.Embedding(5, 768)
 
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
         self.lstm_dropout = nn.Dropout(0.2)
@@ -826,6 +826,7 @@ class KNU_LSTM_ATT_DOT(nn.Module):
         return new_hidden_state
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids, polarity_ids):
+        print(polarity_ids.tolist())
         # embedding
         input_emb_result = self.input_embedding(input_ids)
         polarity_emb_result = self.polarity_embedding(polarity_ids)
