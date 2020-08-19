@@ -190,11 +190,11 @@ class KNUDataset(Dataset):
 
     def get_sentiment_data(self, dataset):
         tkn2pol = pd.read_csv(os.path.join("lexicon","KNU_origin.csv"),header=None,sep="\t")
-        print(tkn2pol[0])
         key_list = [self.tokenizer._tokenize(tkn2pol[0][index]) for index in range(len(tkn2pol[0]))]
         print(key_list)
         tkn2pol[0] = key_list
         tkn2pol = dict(zip(tkn2pol[0],tkn2pol[1]))
+        print(tkn2pol)
         polarities = []
 
         for i in range(len(dataset)):
