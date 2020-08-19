@@ -5,8 +5,8 @@ import pandas as pd
 import os
 import pickle
 import numpy as np
-
 from konlpy.tag import Twitter
+import tqdm
 
 class BaseDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
@@ -207,7 +207,7 @@ class KNUDataset(Dataset):
         sorted_key = sorted(key2pol.keys() ,key=len)
         polarities = []
 
-        for i in range(len(dataset)):
+        for i in tqdm(range(len(dataset))):
             txt = str(dataset.at[i,'review'])
             tokens = self.tokenizer._tokenize(txt)[:self.maxlen-2]
             polarity = [0]*(self.maxlen-2)
