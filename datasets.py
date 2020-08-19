@@ -223,7 +223,7 @@ class KNUDataset(Dataset):
                         print(len(polarity))
                     polarity[start:end+1] = [key2pol[key]]*(end-start+1)
 
-            print(polarity)
+            print(len(polarity))
             polarity=[0]+polarity+[0]
             polarities.append(polarity)
 
