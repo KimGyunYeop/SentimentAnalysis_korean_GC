@@ -207,7 +207,7 @@ class KNUDataset(Dataset):
         key_list.update(key_list_trim)
         print(len(key_list))
         key_list = sorted(key_list.items() ,key=len, reverse=True)
-        print(dic(key_list))
+        print(dict(key_list))
         polarities = []
         '''
         for i in range(len(dataset)):
