@@ -241,7 +241,7 @@ class KNUDataset(Dataset):
         for i in range(len(dataset)):
             txt = str(dataset.at[i,'review'])
             tokens = self.tokenizer._tokenize(txt)[:self.maxlen-2]
-            polarity = [0]*self.maxlen-2
+            polarity = [0]*(self.maxlen-2)
             for key in sorted_key:
                 one_polarity_list = self.find_sub_list(list(key),tokens)
                 for start,end in one_polarity_list:
