@@ -249,8 +249,7 @@ class KNUDataset(Dataset):
                     print(one_polarity_list)
                     print(key)
                     print(polarity)
-                    print([key2pol[key]]*(end-start+1))
-                    polarity[start:end+1] = [key2pol[key]]*(end-start)
+                    polarity[start:end+1] = [key2pol[key]]*(end-start+1)
                     print(polarity)
 
 
