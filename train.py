@@ -173,6 +173,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
     nb_eval_steps = 0
     preds = None
     out_label_ids = None
+    ep_loss= []
 
     for (batch, txt) in progress_bar(eval_dataloader):
         model.eval()
@@ -196,6 +197,11 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
                 txt = txt[0]
             outputs = model(**inputs)
             tmp_eval_loss, logits = outputs[:2]
+
+            if type(tmp_eval_loss) == tuple:
+                print(list(map(lambda x:x.item(),tmp_eval_loss)))
+                ep_loss.append(list(map(lambda x:x.item(),tmp_eval_loss)))
+                tmp_eval_loss = sum(tmp_eval_loss)
 
             eval_loss += tmp_eval_loss.mean().item()
         nb_eval_steps += 1
