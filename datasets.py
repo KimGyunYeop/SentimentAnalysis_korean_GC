@@ -214,12 +214,6 @@ class KNUDataset(Dataset):
             for key in sorted_key:
                 one_polarity_list = self.find_sub_list(list(key),tokens)
                 for start,end in one_polarity_list:
-                    if(len(polarity)>48):
-                        print(tokens)
-                        print(key)
-                        print(one_polarity_list)
-                        print(polarity)
-                        print(len(polarity))
                     polarity[start:end+1] = [key2pol[key]]*(end-start+1)
             polarity=[0]+polarity+[0]
             polarities.append(polarity)
