@@ -197,7 +197,7 @@ class KNUDataset(Dataset):
             tmp = l_string.split(sl_string)
             for data in tmp:
                 index = len(data.split(" ")) + 1
-                results.append((index,index+len(ls)))
+                results.append((index,index+len(sl)))
 
 
         '''
