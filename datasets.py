@@ -186,7 +186,7 @@ class KNUDataset(Dataset):
 
         self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
         if "small" in mode:
-            self.dataset = self.dataset[:200]
+            self.dataset = self.dataset[:10000]
         self.polarities = self.get_sentiment_data(self.dataset)
 
     def find_sub_list(self, sl, l):
