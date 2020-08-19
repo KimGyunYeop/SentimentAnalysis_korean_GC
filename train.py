@@ -82,6 +82,7 @@ def train(args,
     mb = master_bar(range(int(args.num_train_epochs)))
     for epoch in mb:
         epoch_iterator = progress_bar(train_dataloader, parent=mb)
+        ep_loss = []
         for step, (batch, txt) in enumerate(epoch_iterator):
             model.train()
             batch = tuple(t.to(args.device) for t in batch)
@@ -106,6 +107,11 @@ def train(args,
             # print(loss)
             if args.gradient_accumulation_steps > 1:
                 loss = loss / args.gradient_accumulation_steps
+
+            if type(loss) == tuple:
+                ep_loss.append([list(map(lambda x:x.item(),loss))])
+                loss = sum(loss)
+            print(ep_loss)
 
             loss.backward()
             tr_loss += loss.item()

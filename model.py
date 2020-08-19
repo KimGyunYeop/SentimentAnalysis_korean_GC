@@ -100,7 +100,7 @@ class BASEELECTRA_COS(nn.Module):
                        x2.view(-1, w2v_dim),
                        y.view(-1))
 
-        result = (loss1+loss2, outputs)
+        result = ((loss1,loss2), outputs)
 
         return result
 
@@ -150,7 +150,7 @@ class BASEELECTRA_COS2(nn.Module):
                         star,
                         torch.ones(batch_size).cuda())
 
-        result = (loss1+loss2+loss3, outputs)
+        result = ((loss1,loss2,loss3), outputs)
 
         return result
 
