@@ -201,12 +201,12 @@ class KNUDataset(Dataset):
         tkn2pol = pd.read_csv(os.path.join("lexicon","KNU_origin.csv"),header=None,sep="\t")
         tkn2pol_trim = pd.read_csv(os.path.join("lexicon", "KNU_origin.csv"), header=None, sep="\t")
         key_list = [self.tokenizer._tokenize(str(word)) for word in tkn2pol[0]]
-        maxlen = 0
-        print(len(key_list))
-        key_list_trim = ["+".join(self.tokenizer._tokenize(str(word).replace(" ",""))) for word in tkn2pol[0]]
+        key_list_trim = [self.tokenizer._tokenize(str(word).replace(" ","")) for word in tkn2pol[0]]
         print(len(key_list))
         tkn2pol[0] = key_list
         tkn2pol_trim[0] = key_list_trim
+        print(len(tkn2pol+tkn2pol_trim))
+        np.unique(np.array(tkn2pol + tkn2pol_trim).astype(str))
         print(tkn2pol)
         polarities = []
 
