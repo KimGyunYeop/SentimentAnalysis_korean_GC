@@ -177,6 +177,7 @@ class KNUDataset(Dataset):
         self.args = args
         self.tokenizer = tokenizer
         self.maxlen = args.max_seq_len
+        self.mode = mode
         if "train" in mode:
             data_path = os.path.join(args.data_dir, args.task, args.train_file)
         elif "dev" in mode:
@@ -201,7 +202,7 @@ class KNUDataset(Dataset):
     def get_sentiment_data(self, dataset):
         try:
             polarities = []
-            a_file = open("review2polarities.pkl", "rb")
+            a_file = open("review2polarities_"+self.mode+".pkl", "rb")
             output = pickle.load(a_file)
             for i in tqdm(range(len(dataset))):
                 txt = str(dataset.at[i, 'review'])
