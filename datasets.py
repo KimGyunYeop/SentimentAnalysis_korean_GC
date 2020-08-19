@@ -220,12 +220,15 @@ class KNUDataset(Dataset):
 
         for i in tqdm(range(len(dataset))):
             txt = str(dataset.at[i,'review'])
+            print("-------------")
             tokens = self.tokenizer._tokenize(txt)[:self.maxlen-2]
             print(len(tokens))
             polarity = [0]*(self.maxlen-2)
             for key in sorted_key:
                 one_polarity_list = self.find_sub_list(list(key),tokens)
                 for start,end in one_polarity_list:
+                    print(one_polarity_list)
+                    print(key)
                     polarity[start:end+1] = [key2pol[key]]*(end-start+1)
 
             polarity=[0]+polarity+[0]
