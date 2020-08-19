@@ -248,7 +248,6 @@ class KNUDataset(Dataset):
                     print(polarity)
                     polarity[start:end+1] = key2pol[key]
                     print(polarity)
-                print(key2pol[key])
 
 
             if self.maxlen - len(polarity) <= 0:
