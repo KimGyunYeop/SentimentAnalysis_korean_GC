@@ -807,7 +807,7 @@ class KNU_LSTM_ATT_DOT(nn.Module):
 
         # Embedding
         self.input_embedding = self.emb.embeddings.word_embeddings
-        self.polarity_embedding = nn.Embedding(5, 768)
+        self.polarity_embedding = nn.Embedding(6, 768)
 
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
         self.lstm_dropout = nn.Dropout(0.2)
@@ -829,7 +829,7 @@ class KNU_LSTM_ATT_DOT(nn.Module):
         # embedding
         input_emb_result = self.input_embedding(input_ids)
         polarity_emb_result = self.polarity_embedding(polarity_ids)
-        #print(input_emb_result.tolist())
+        #print(input_emb_result)
         print(polarity_emb_result)
 
         embedding_result = input_emb_result #+ polarity_emb_result / 100
