@@ -188,15 +188,21 @@ class KNUDataset(Dataset):
             self.dataset = self.dataset[:10000]
         self.polarities = self.get_sentiment_data(self.dataset)
 
+    def find_sub_list(sl, l):
+        results = []
+        sll = len(sl)
+        for ind in (i for i, e in enumerate(l) if e == sl[0]):
+            if l[ind:ind + sll] == sl:
+                results.append((ind, ind + sll - 1))
+
+        return results
+
     def get_sentiment_data(self, dataset):
         tkn2pol = pd.read_csv(os.path.join("lexicon","KNU_origin.csv"),header=None,sep="\t")
         tkn2pol_trim = pd.read_csv(os.path.join("lexicon", "KNU_origin.csv"), header=None, sep="\t")
-        key_list = ["+".join(self.tokenizer._tokenize(str(word))) for word in tkn2pol[0]]
+        key_list = [self.tokenizer._tokenize(str(word)) for word in tkn2pol[0]]
         maxlen = 0
-        for i in key_list:
-            if maxlen <len(i):
-                maxlen=len(i)
-        print(maxlen)
+        print(len(key_list))
         key_list_trim = ["+".join(self.tokenizer._tokenize(str(word).replace(" ",""))) for word in tkn2pol[0]]
         print(len(key_list))
         tkn2pol[0] = key_list
