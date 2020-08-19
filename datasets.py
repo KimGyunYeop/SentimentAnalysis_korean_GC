@@ -217,7 +217,6 @@ class KNUDataset(Dataset):
                     number= float(key2pol[key]/2)
                     polarity[start:end+1] = [number]*(end-start+1)
             polarity=[0]+polarity+[0]
-            print(polarity)
             polarities.append(polarity)
 
         return polarities
