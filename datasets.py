@@ -210,33 +210,6 @@ class KNUDataset(Dataset):
         for i in sorted_key:
             print(len(i))
         polarities = []
-        '''
-        for i in range(len(dataset)):
-            txt = str(dataset.at[i,'review'])
-            tokens = self.tokenizer._tokenize(txt)
-            txt = txt.replace(" ", "")
-            char_polarity = []
-            for j in range(len(txt)):
-                if len(char_polarity) > j:
-                    continue
-                for k in range(7,-1,-1):
-                    if k == 0:
-                        char_polarity.extend([0])
-                    if txt[j:j+k] in key_list:
-                        char_polarity.extend(tkn2pol[txt[j:j+k]]*k)
-            polarity = ['None']
-            count = 0
-            for token in tokens[:self.maxlen - 2]:
-                if token[:2] == '##':
-                    tkn = token[2:]
-                else:
-                    tkn = token
-                if tkn == "[UNK]":
-                    polarity.append(0)
-                char_pol_list = char_polarity[count:count+len(tkn)]
-                pol = max(set(char_pol_list), key=char_pol_list.count)
-                polarity.append(pol)
-                count = count+len(tkn)'''
 
         for i in range(len(dataset)):
             txt = str(dataset.at[i,'review'])
@@ -245,14 +218,9 @@ class KNUDataset(Dataset):
             for key in sorted_key:
                 one_polarity_list = self.find_sub_list(list(key),tokens)
                 for start,end in one_polarity_list:
-                    print("-----------")
-                    print(tokens)
-                    print(one_polarity_list)
-                    print(key)
                     polarity[start:end+1] = [key2pol[key]]*(end-start+1)
 
             polarity=[0]+polarity+[0]
-            print(polarity)
             polarities.append(polarity)
 
         return polarities
