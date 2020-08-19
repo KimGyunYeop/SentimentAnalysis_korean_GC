@@ -826,7 +826,9 @@ class KNU_LSTM_ATT_DOT(nn.Module):
         return new_hidden_state
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids, polarity_ids):
-        print(len([" " for i in input_ids.tolist() for j in i if j >= 30522]))
+        ids = [j for i in input_ids.tolist() for j in i if j >= 30522]
+        print(len(ids))
+        print(ids,"\n")
         # embedding
         input_emb_result = self.input_embedding(input_ids)
         polarity_emb_result = self.polarity_embedding(polarity_ids)
