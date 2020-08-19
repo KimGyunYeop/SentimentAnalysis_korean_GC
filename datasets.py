@@ -196,8 +196,8 @@ class KNUDataset(Dataset):
         if sl_string in l_string:
             tmp = l_string.split(sl_string)
             for data in tmp:
-                index = len(data.split(" "))
-                results.append((index,index+len(sl)))
+                index = len(data.split(" ")) + 1
+                results.append((index,index+len(sl) - 1))
 
 
         '''
