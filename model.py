@@ -827,7 +827,6 @@ class KNU_LSTM_ATT_DOT(nn.Module):
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids, polarity_ids):
         # embedding
-        print(input_ids)
         input_emb_result = self.input_embedding(input_ids)
         polarity_emb_result = self.polarity_embedding(polarity_ids)
         print(input_emb_result)

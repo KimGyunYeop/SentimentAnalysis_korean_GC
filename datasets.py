@@ -238,7 +238,7 @@ class KNUDataset(Dataset):
         polarity_ids = torch.LongTensor(self.polarities[idx])
         label = self.dataset.at[idx,"rating"]
 
-        return (input_ids, attention_mask, token_type_ids, label, polarity_ids),txt
+        return (input_ids, attention_mask,token_type_ids, label, polarity_ids),txt
 
 DATASET_LIST = {
     "BASEELECTRA": BaseDataset,
