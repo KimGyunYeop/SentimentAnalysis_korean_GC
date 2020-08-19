@@ -112,6 +112,8 @@ def train(args,
                 #print(list(map(lambda x:x.item(),loss)))
                 ep_loss.append(list(map(lambda x:x.item(),loss)))
                 loss = sum(loss)
+            else:
+                ep_loss.append(list(loss.item()))
 
             loss.backward()
             tr_loss += loss.item()
@@ -203,6 +205,9 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
                 #print(list(map(lambda x:x.item(),tmp_eval_loss)))
                 ep_loss.append(list(map(lambda x:x.item(),tmp_eval_loss)))
                 tmp_eval_loss = sum(tmp_eval_loss)
+            else:
+                ep_loss.append(list(tmp_eval_loss.item()))
+
 
             eval_loss += tmp_eval_loss.mean().item()
         nb_eval_steps += 1
