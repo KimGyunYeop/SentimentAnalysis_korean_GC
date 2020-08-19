@@ -214,7 +214,7 @@ class KNUDataset(Dataset):
             for key in sorted_key:
                 one_polarity_list = self.find_sub_list(list(key),tokens)
                 for start,end in one_polarity_list:
-                    number= key2pol[key]+2
+                    number= key2pol[key] + 2
                     polarity[start:end+1] = [number]*(end-start+1)
             polarity=[0]+polarity+[0]
             polarities.append(polarity)
@@ -232,7 +232,6 @@ class KNUDataset(Dataset):
         attention_mask = torch.LongTensor(data["attention_mask"])
         polarity_ids = torch.LongTensor(self.polarities[idx])
         label = self.dataset.at[idx,"rating"]
-        print(polarity_ids.tolist())
         return (input_ids, attention_mask,token_type_ids, label, polarity_ids),txt
 
 DATASET_LIST = {
