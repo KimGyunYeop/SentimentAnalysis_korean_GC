@@ -205,7 +205,7 @@ class KNUDataset(Dataset):
         key_list_trim = {tuple(self.tokenizer._tokenize(str(word).replace(" ",""))):pol for word,pol in zip(tkn2pol_trim[0],tkn2pol_trim[1])}
         print(len(key_list))
         key_list.update(key_list_trim)
-        key_list = sorted(key_list.items() ,key=len, reverse=True)
+        key_list = dict(sorted(key_list.keys() ,key=len, reverse=True))
         print(key_list)
         for i in key_list.items():
             print(len(i))
