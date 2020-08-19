@@ -244,6 +244,7 @@ class KNUDataset(Dataset):
             polarity = [0]*self.maxlen
             for key in sorted_key:
                 one_polarity_list = self.find_sub_list(tokens, list(key))
+                print(one_polarity_list)
                 for start,end in one_polarity_list:
                     print(polarity)
                     print([key2pol[key]]*(end-start))
