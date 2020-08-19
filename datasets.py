@@ -206,8 +206,8 @@ class KNUDataset(Dataset):
         print(len(key_list))
         tkn2pol[0] = key_list
         tkn2pol_trim[0] = key_list_trim
-        print(len(tkn2pol+tkn2pol_trim))
-        np.unique(np.array(tkn2pol + tkn2pol_trim).astype(str))
+        print(len(tkn2pol.update(tkn2pol_trim)))
+        np.unique(np.array(tkn2pol.update(tkn2pol_trim)).astype(str))
         print(tkn2pol)
         polarities = []
 
