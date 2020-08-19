@@ -190,11 +190,22 @@ class KNUDataset(Dataset):
         self.polarities = self.get_sentiment_data(self.dataset)
 
     def find_sub_list(self, sl, l):
+        sl_string = " ".join(sl)
+        l_string = " ".join(l)
+        results = []
+        if sl_string in l_string:
+            tmp = l.split(sl)
+            for data in tmp:
+                index = len(data.split(" ")) + 1
+                results.append((index,index+len(ls)))
+
+
+        '''
         results = []
         sll = len(sl)
         for ind in (i for i, e in enumerate(l) if e == sl[0]):
             if l[ind:ind + sll] == sl:
-                results.append((ind, ind + sll - 1))
+                results.append((ind, ind + sll - 1))'''
 
         return results
 
@@ -207,7 +218,7 @@ class KNUDataset(Dataset):
         sorted_key = sorted(key2pol.keys() ,key=len)
         polarities = []
 
-        for i in tqdm(range(len(dataset))):
+        for i in range(len(dataset)):
             txt = str(dataset.at[i,'review'])
             tokens = self.tokenizer._tokenize(txt)[:self.maxlen-2]
             polarity = [0]*(self.maxlen-2)
