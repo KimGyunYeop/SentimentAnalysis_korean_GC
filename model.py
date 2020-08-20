@@ -680,6 +680,43 @@ class KOSAC_LSTM_ATT_DOT_ML(nn.Module):
 
 
 #--KNU--
+class KNU_BASE(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(KNU_BASE, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+
+        # Embedding
+        self.input_embedding = self.emb.embeddings.word_embeddings
+        self.polarity_embedding = nn.Embedding(5, 768)
+        self.intensity_embedding = nn.Embedding(5, 768)
+
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
+        self.lstm_dropout = nn.Dropout(0.2)
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 2)
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids,polarity_ids):
+        # embedding
+        input_emb_result = self.input_embedding(input_ids)
+        polarity_emb_result = self.polarity_embedding(polarity_ids)
+
+        embedding_result = input_emb_result + polarity_emb_result/100
+
+        outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=token_type_ids,inputs_embeds = embedding_result)
+
+        outputs = self.dense(outputs[0][:,0,:])
+        outputs = self.dropout(outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
+
+        result = (loss, outputs)
+
+        return result
 
 class KNU_LSTM(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
@@ -1091,6 +1128,7 @@ MODEL_LIST = {
     "LSTM_ATT_DOT_KOSAC": KOSAC_LSTM_ATT_DOT,
     "KOSAC_LSTM_ATT_DOT_ML": KOSAC_LSTM_ATT_DOT_ML,
 
+    "BASE_KNU": KNU_BASE,
     "LSTM_KNU": KNU_LSTM,
     "LSTM_ATT_KNU": KNU_LSTM_ATT,
     "LSTM_ATT_v2_KNU": KNU_LSTM_ATT_v2,
