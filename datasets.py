@@ -207,7 +207,6 @@ class KNUDataset(Dataset):
             for i in tqdm(range(len(dataset))):
                 txt = str(dataset.at[i, 'review'])
                 polarities.append(output[txt])
-            print(polarities)
             a_file.close()
         except:
             tkn2pol = pd.read_csv(os.path.join("lexicon","KNU_origin.csv"),header=None,sep="\t")
