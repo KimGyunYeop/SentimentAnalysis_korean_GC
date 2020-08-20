@@ -18,3 +18,7 @@ kosac+ATTdot,0.925502764,,LSTM_ATT_DOT_KOSAC,kosac_att_dot.out,SNU lexicon 을 e
 KOSAC_LSTM_ATT_v2,0.92519305,,LSTM_ATT_v2_KOSAC,kosac_att_v2,SNU lexicon을 electra이후에 접목한 ATT model,08월 07일,,,model.LSTM_ATT_v2_KOSAC,218
 KOSAC_LSTM_ATT,0.92464097,,LSTM_ATT_KOSAC,kosac_att,SNU lexicon을 electra이후에 접목한 ATT model,08월 07일,,,model.LSTM_ATT_KOSAC,218
 LSTM_KOSAC,0.925839398,,LSTM_KOSAC,kosac,SNU lexicon을 electra이후에 접목한 koelectra + LSTM,08월 07일,,,model.LSTM_KOSAC,225
+,,,,,,,,,,
+koELECTRABASE,0.9273,26000,BASEELECTRA,BASEELECTRA.out,koelectra cls에서 classification,08월 20일,,256 batch,model/BASEELECTRA,217
+koELECTRABASE,0.9241,22000,BASEELECTRA_COS,BASEELECTRA.out,koelectra cls에서 classification에 cossim loss를 추가한 모델,08월 20일,,256 배치 margin모름,model/BASEELECTRA_COS,217
+koELECTRABASE,0.9271,2000,BASEELECTRA_COS2,BASEELECTRA.out,koelectra cls에서 classification에 cossim loss와 star cossim loss를 추가한 모델 ,08월 20일,,400 batch margin -0.5,model/BASEELECTRA_COS2,217
