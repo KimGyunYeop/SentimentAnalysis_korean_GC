@@ -453,7 +453,7 @@ class LSTM_ATT_MIX(nn.Module):
 
         return att_output
 
-    def get_Hierarchical_Att(self, emb_outputs):
+    def get_Hierarchical_Att(self, emb_outputs, data_length):
         emb_3_Grams = []
         batch_size, seq_len, w2v_dim = emb_outputs.shape
         emb_outputs = torch.nn.functional.pad(emb_outputs, (0, 0, 1, 1))
@@ -469,16 +469,19 @@ class LSTM_ATT_MIX(nn.Module):
         _, a3 = self.gram_3_att(inputs)
         lstm_output, a = self.total_word_att(inputs)
         alpha = 0.8
+        for index in range(batch_size):
+            a[index][data_length:] = torch.zeros(50-data_length)
+            a3[index][data_length:] = torch.zeros(50-data_length)
         print(a[0])
-        print(a3[0])
+
         a = a*alpha + a3*(1-alpha)
         output = self.concat_att(lstm_output, a)
 
         return output
 
-    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+    def forward(self, input_ids, attention_mask, labels, token_type_ids, data_length):
         outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        hie_attn_output = self.get_Hierarchical_Att(outputs[0])
+        hie_attn_output = self.get_Hierarchical_Att(outputs[0], data_length)
 
         outputs = self.dense(hie_attn_output)
         outputs = self.dropout(outputs)

@@ -243,13 +243,14 @@ class KNUDataset(Dataset):
 
     def __getitem__(self, idx):
         txt = str(self.dataset.at[idx,"review"])
+        data_length = torch.LongTensor(len(txt))
         data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
         input_ids = torch.LongTensor(data["input_ids"])
         token_type_ids = torch.LongTensor(data["token_type_ids"])
         attention_mask = torch.LongTensor(data["attention_mask"])
         polarity_ids = torch.LongTensor(self.polarities[idx])
         label = self.dataset.at[idx,"rating"]
-        return (input_ids, attention_mask,token_type_ids, label, polarity_ids),txt
+        return (input_ids, attention_mask,token_type_ids, label, polarity_ids,data_length),txt
 
 DATASET_LIST = {
     "BASEELECTRA": BaseDataset,
