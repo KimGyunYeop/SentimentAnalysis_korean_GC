@@ -471,7 +471,6 @@ class LSTM_ATT_MIX(nn.Module):
 
         _, a3 = self.gram_3_att(inputs)
         lstm_output, a = self.total_word_att(inputs)
-        a3 = a3.view(-1, 1).repeat(1, 3).view(batch_size, seq_len*3)[:50]
         a = a*a3
         output = self.concat_att(lstm_output, a)
 
