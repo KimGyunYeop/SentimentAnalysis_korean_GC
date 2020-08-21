@@ -449,6 +449,7 @@ class LSTM_ATT_MIX(nn.Module):
 
     def get_Hierarchical_Att(self, lstm_outputs):
         att_outputs = []
+        print(lstm_outputs.shape)
         for i in range(50 -2):
             att_outputs.append(self.word_base_att[i](lstm_outputs[:,i,:].squeeze()))
 
