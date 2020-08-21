@@ -464,6 +464,7 @@ class LSTM_ATT_MIX(nn.Module):
             lstm_output, a = self.word_base_att[i](lstm_outputs[:,i-1:i+2,:].squeeze())
             att_outputs.append(self.concat_att(lstm_output,a))
 
+        print(len(att_outputs))
         inputs = torch.cat(att_outputs,dim=-1)
         inputs = torch.reshape(inputs, (batch_size,seq_len,w2v_dim))
 
