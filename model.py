@@ -417,7 +417,7 @@ class Hierarchical_Att(nn.Module):
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
         # attention module
         self.softmax = nn.Softmax(dim=-1)
-        self.dense_1 = nn.Linear(768 * 2, 100)
+        self.dense_1 = nn.Linear(768, 100)
         self.dense_2 = nn.Linear(100, 1)
         self.tanh = nn.Tanh()
 
@@ -440,7 +440,6 @@ class LSTM_ATT_MIX(nn.Module):
             model_name_or_path,
             config=config)
         self.config = config
-        self.word_base_att = []
         self.total_word_att = Hierarchical_Att().to(config.device)
         self.gram_3_att = Hierarchical_Att().to(config.device)
         self.dense = nn.Linear(768, 768)
