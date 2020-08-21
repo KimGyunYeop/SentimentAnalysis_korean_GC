@@ -467,7 +467,8 @@ class LSTM_ATT_MIX(nn.Module):
 
         _, a3 = self.gram_3_att(inputs)
         lstm_output, a = self.total_word_att(inputs)
-        a = a*a3
+        alpha = 0.8
+        a = alpha*a+(1-alpha)*a3
         output = self.concat_att(lstm_output, a)
 
         return output
