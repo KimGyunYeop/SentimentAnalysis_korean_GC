@@ -437,20 +437,17 @@ class LSTM_ATT_MIX(nn.Module):
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
-
-        self.config = config
         self.word_base_att = []
 
         for _ in range(50 -2):
-            self.word_base_att.append(Hierarchical_Att().to("cuda:0"))
-        self.gram_3_att = Hierarchical_Att().to("cuda:0")
+            self.word_base_att.append(Hierarchical_Att().to(config.device))
+        self.gram_3_att = Hierarchical_Att().to(config.device)
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
 
     def get_Hierarchical_Att(self, lstm_outputs):
         att_outputs = []
-
         for i in range(50 -2):
             att_outputs.append(self.word_base_att[i](lstm_outputs[:,i:i+2,:].squeeze()))
 

@@ -285,6 +285,7 @@ def main(cli_args):
 
     # GPU or CPU
     args.device = "cuda:{}".format(cli_args.gpu) if torch.cuda.is_available() and not args.no_cuda else "cpu"
+    config.device = args.device
     model.to(args.device)
     if cli_args.small == False:
         # Load dataset
