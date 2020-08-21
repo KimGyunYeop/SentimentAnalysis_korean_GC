@@ -410,6 +410,65 @@ class LSTM_ATT2(nn.Module):
         result = (loss, outputs)
         return result
 
+class Hierarchical_Att(nn.Module):
+    def __init__(self):
+        super(Hierarchical_Att, self).__init__()
+
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=True, dropout=0.2)
+
+    def attention_net(self, lstm_outputs):
+        M = self.tanh(self.dense_1(lstm_outputs))
+        wM_output = self.dense_2(M).squeeze()
+        a = self.softmax(wM_output)
+        c = lstm_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
+        att_output = self.tanh(c)
+
+        return att_output
+
+    def forward(self, input_hidden):
+        outputs, (h, c) = self.lstm(input_hidden)
+        attn_output = self.attention_net(outputs)
+
+        return attn_output
+
+class LSTM_ATT_MIX(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(LSTM_ATT_MIX, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+
+        self.word_base_att = []
+        for _ in range(config.max_seq_len -2):
+            self.word_base_att.append(Hierarchical_Att())
+        self.gram_3_att = Hierarchical_Att()
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 2)
+
+    def get_Hierarchical_Att(self, lstm_outputs):
+        att_outputs = []
+        for i in range(self.config.max_seq_len -2):
+            att_outputs.append(self.word_base_att[i](lstm_outputs[:,i,:].squeeze()))
+
+        inputs = torch.cat(att_outputs,dim=-1)
+        att_output = self.gram_3_att(inputs)
+
+        return att_output
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        attn_output = self.get_Hierarchical_Att(outputs)
+
+        outputs = self.dense(attn_output)
+        outputs = self.dropout(outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
+        result = (loss, outputs)
+
+        return result
 
 #--KOSAC--
 
@@ -627,56 +686,6 @@ class KOSAC_LSTM_ATT_DOT(nn.Module):
         result = (loss, outputs)
         return result
 
-class KOSAC_LSTM_ATT_DOT_ML(nn.Module):
-    def __init__(self, model_type, model_name_or_path, config):
-        super(KOSAC_LSTM_ATT_DOT_ML, self).__init__()
-        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
-            model_name_or_path,
-            config=config)
-
-        # Embedding
-        self.input_embedding = self.emb.embeddings.word_embeddings
-        self.polarity_embedding = nn.Embedding(5, 768)
-        self.intensity_embedding = nn.Embedding(5, 768)
-
-        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
-        self.lstm_dropout = nn.Dropout(0.2)
-        self.dense = nn.Linear(768, 768)
-        self.dropout = nn.Dropout(0.2)
-        self.out_proj = nn.Linear(768, 2)
-
-        self.att_w = nn.Parameter(torch.randn(1, 768, 1))
-
-    def attention_net(self, lstm_output, final_state):
-        attn_weights = torch.bmm(lstm_output, final_state.permute(1, 2, 0))
-        soft_attn_weights = F.softmax(attn_weights, dim=1)  # shape = (batch_size, seq_len, 1)
-        new_hidden_state = torch.bmm(lstm_output.transpose(1, 2),
-                                     soft_attn_weights).squeeze(2)
-
-        return new_hidden_state, soft_attn_weights
-
-    def forward(self, input_ids, attention_mask, labels, token_type_ids,polarity_ids, intensity_ids):
-        # embedding
-        input_emb_result = self.input_embedding(input_ids)
-        polarity_emb_result = self.polarity_embedding(polarity_ids)
-        intensity_emb_result = self.intensity_embedding(intensity_ids)
-
-        embedding_result = input_emb_result + polarity_emb_result / 100 + intensity_emb_result / 100
-
-        outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=token_type_ids,inputs_embeds = embedding_result)
-        outputs, (h, c) = self.lstm(outputs[0][1:-1])
-        attn_output, soft_attn_weights = self.attention_net(outputs, h)
-
-
-        outputs = self.dense(attn_output)
-        outputs = self.dropout(outputs)
-        outputs = self.out_proj(outputs)
-        att_label = F.softmax((torch.abs(polarity_ids)+torch.abs(intensity_ids)).float(),dim=-1)
-        loss_fct = nn.CrossEntropyLoss()
-        loss_att = nn.MSELoss()
-        loss = loss_fct(outputs.view(-1, 2), labels.view(-1)) + loss_att(soft_attn_weights.squeeze(),att_label.long()).float()
-        result = (loss, outputs)
-        return result
 
 
 #--KNU--
@@ -1121,12 +1130,12 @@ MODEL_LIST = {
     "LSTM_ATT_v2": LSTM_ATT_v2,
     "LSTM_ATT_DOT": LSTM_ATT_DOT,
     "LSTM_ATT2" : LSTM_ATT2,
+    "LSTM_ATT_MIX": LSTM_ATT_MIX,
 
     "LSTM_KOSAC": KOSAC_LSTM,
     "LSTM_ATT_KOSAC": KOSAC_LSTM_ATT,
     "LSTM_ATT_v2_KOSAC": KOSAC_LSTM_ATT_v2,
     "LSTM_ATT_DOT_KOSAC": KOSAC_LSTM_ATT_DOT,
-    "KOSAC_LSTM_ATT_DOT_ML": KOSAC_LSTM_ATT_DOT_ML,
 
     "BASE_KNU": KNU_BASE,
     "LSTM_KNU": KNU_LSTM,

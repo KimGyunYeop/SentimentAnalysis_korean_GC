@@ -261,12 +261,12 @@ DATASET_LIST = {
     "LSTM_ATT_v2": BaseDataset,
     "LSTM_ATT_DOT": BaseDataset,
     "LSTM_ATT2" : BaseDataset,
+    "LSTM_ATT_MIX": BaseDataset,
 
     "LSTM_KOSAC": KOSACDataset,
     "LSTM_ATT_KOSAC": KOSACDataset,
     "LSTM_ATT_v2_KOSAC": KOSACDataset,
     "LSTM_ATT_DOT_KOSAC": KOSACDataset,
-    "KOSAC_LSTM_ATT_DOT_ML": KOSACDataset,
 
     "BASE_KNU": KNUDataset,
     "LSTM_KNU": KNUDataset,
