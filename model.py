@@ -442,8 +442,6 @@ class LSTM_ATT_MIX(nn.Module):
         self.config = config
         self.word_base_att = []
         self.total_word_att = Hierarchical_Att().to(config.device)
-        for _ in range(50):
-            self.word_base_att.append(Hierarchical_Att().to(config.device))
         self.gram_3_att = Hierarchical_Att().to(config.device)
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
@@ -461,8 +459,9 @@ class LSTM_ATT_MIX(nn.Module):
         batch_size, seq_len, w2v_dim = lstm_outputs.shape
         lstm_outputs = torch.nn.functional.pad(lstm_outputs, (0, 0, 1, 1))
         for i in range(1, 51):
-            lstm_output, a = self.word_base_att[i - 1](lstm_outputs[:,i-1:i+2,:].squeeze())
-            att_outputs.append(self.concat_att(lstm_output,a))
+            lstm_output = torch.min(lstm_outputs[:,i-1:i+2,:],dim=1)
+            att_outputs.append(lstm_output)
+
         inputs = torch.cat(att_outputs,dim=-1)
         inputs = torch.reshape(inputs, (batch_size,seq_len,w2v_dim))
 
