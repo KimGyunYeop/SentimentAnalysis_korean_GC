@@ -438,8 +438,9 @@ class LSTM_ATT_MIX(nn.Module):
             model_name_or_path,
             config=config)
 
+        self.config = config
         self.word_base_att = []
-        for _ in range(50 -2):
+        for _ in range(self.config.max_seq_len -2):
             self.word_base_att.append(Hierarchical_Att())
         self.gram_3_att = Hierarchical_Att()
         self.dense = nn.Linear(768, 768)
