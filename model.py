@@ -471,8 +471,8 @@ class LSTM_ATT_MIX(nn.Module):
         alpha = 0.8
         for index in range(batch_size):
             print(50-int(data_length[0]))
-            a[index][data_length[0]:] = torch.zeros(50-int(data_length[0])+2)
-            a3[index][data_length[0]:] = torch.zeros(50-int(data_length[0])+2)
+            a[index][data_length[0]+2:] = torch.zeros(50-int(data_length[0])-2)
+            a3[index][data_length[0]+2:] = torch.zeros(50-int(data_length[0])-2)
         print(a[0])
 
         a = a*alpha + a3*(1-alpha)
