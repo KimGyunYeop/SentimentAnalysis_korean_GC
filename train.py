@@ -85,8 +85,6 @@ def train(args,
         ep_loss = []
         for step, (batch, txt) in enumerate(epoch_iterator):
             model.train()
-            if step==0:
-                print(batch[0][0])
             batch = tuple(t.to(args.device) for t in batch)
             inputs = {
                 "input_ids": batch[0],
