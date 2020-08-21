@@ -445,8 +445,6 @@ class LSTM_ATT_MIX(nn.Module):
         self.tanh = nn.Tanh()
 
     def concat_att(self, emb_outputs, a):
-        print(emb_outputs.shape)
-        print(a.shape)
         c = emb_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
         att_output = self.tanh(c)
 
@@ -455,11 +453,11 @@ class LSTM_ATT_MIX(nn.Module):
     def get_Hierarchical_Att(self, emb_outputs):
         emb_3_Grams = []
         batch_size, seq_len, w2v_dim = emb_outputs.shape
-        emb_outputs = torch.nn.functional.pad(emb_outputs, (0, 0, 1, 1))
+        emb_outputs_padding = torch.nn.functional.pad(emb_outputs, (0, 0, 1, 1))
         alpha = 0.5
         for i in range(1, 51):
             #emb_3_Gram = torch.mean(emb_outputs[:,i-1:i+2,:], dim=1)
-            emb_3_Gram = emb_outputs[:,i,:] * alpha + emb_outputs[:,i+1,:] * (1-alpha)/2 + emb_outputs[:,i-1,:] * (1-alpha)/2
+            emb_3_Gram = emb_outputs_padding[:,i,:] * alpha + emb_outputs_padding[:,i+1,:] * (1-alpha)/2 + emb_outputs_padding[:,i-1,:] * (1-alpha)/2
             emb_3_Grams.append(emb_3_Gram)
 
         inputs = torch.cat(emb_3_Grams,dim=-1)
