@@ -414,7 +414,7 @@ class Hierarchical_Att(nn.Module):
     def __init__(self):
         super(Hierarchical_Att, self).__init__()
 
-        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=True, dropout=0.2)
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
         # attention module
         self.softmax = nn.Softmax(dim=-1)
         self.dense_1 = nn.Linear(768 * 2, 100)
@@ -454,13 +454,13 @@ class LSTM_ATT_MIX(nn.Module):
 
         return att_output
 
-    def get_Hierarchical_Att(self, lstm_outputs):
+    def get_Hierarchical_Att(self, outputs):
         att_outputs = []
-        batch_size, seq_len, w2v_dim = lstm_outputs.shape
-        lstm_outputs = torch.nn.functional.pad(lstm_outputs, (0, 0, 1, 1))
+        batch_size, seq_len, w2v_dim = outputs.shape
+        outputs = torch.nn.functional.pad(outputs, (0, 0, 1, 1))
         for i in range(1, 51):
-            lstm_output = torch.mean(lstm_outputs[:,i-1:i+2,:],dim=1)
-            att_outputs.append(lstm_output)
+            outputs = torch.mean(outputs[:,i-1:i+2,:],dim=1)
+            att_outputs.append(outputs)
 
         inputs = torch.cat(att_outputs,dim=-1)
         inputs = torch.reshape(inputs, (batch_size,seq_len,w2v_dim))
