@@ -109,5 +109,6 @@ b = torch.tensor([[0,1, 2, 3],
                   [8,9,10, 11],
                   [12,13, 14, 15]
                   ])
+print(a.view(-1, 1).repeat(1, 3).view(4, 12))
 print(torch.cat([a,b],dim=-1))
 print(torch.reshape(b, (-1,2,2)))

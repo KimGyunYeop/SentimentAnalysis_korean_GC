@@ -425,16 +425,15 @@ class Hierarchical_Att(nn.Module):
         M = self.tanh(self.dense_1(lstm_outputs))
         wM_output = self.dense_2(M).squeeze()
         a = self.softmax(wM_output)
-        c = lstm_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
-        att_output = self.tanh(c)
 
-        return att_output
+
+        return a
 
     def forward(self, input_hidden):
         outputs, (h, c) = self.lstm(input_hidden)
         attn_output = self.attention_net(outputs)
 
-        return attn_output
+        return outputs, attn_output
 
 class LSTM_ATT_MIX(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
@@ -443,7 +442,7 @@ class LSTM_ATT_MIX(nn.Module):
             model_name_or_path,
             config=config)
         self.word_base_att = []
-
+        self.ba
         self.total_word_att = Hierarchical_Att().to(config.device)
         for _ in range(50 -2):
             self.word_base_att.append(Hierarchical_Att().to(config.device))
@@ -452,24 +451,35 @@ class LSTM_ATT_MIX(nn.Module):
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
 
-    def get_Hierarchical_Att(self, lstm_outputs):
-        att_outputs = []
-        for i in range(50 -2):
-            att_outputs.append(self.word_base_att[i](lstm_outputs[:,i:i+3,:].squeeze()))
-
-        inputs = torch.cat(att_outputs,dim=-1)
-        inputs = torch.reshape(inputs, (-1,50-2,768))
-        att_output = self.gram_3_att(inputs)
+    def concat_att(self, lstm_outputs, a):
+        c = lstm_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
+        att_output = self.tanh(c)
 
         return att_output
 
+    def get_Hierarchical_Att(self, lstm_outputs):
+        att_outputs = []
+        lstm_outputs = []
+        for i in range(50,3):
+            lstm_output, a = self.word_base_att[i](lstm_outputs[:,i:i+3,:].squeeze())
+            att_outputs.append(self.concat_att(lstm_output,a))
+
+        inputs = torch.cat(att_outputs,dim=-1)
+        inputs = torch.reshape(inputs, (-1,int(50/3),768))
+        batch_size, seq_len, w2v_dim = inputs.shape
+        _, a3 = self.gram_3_att(inputs)
+        lstm_output, a = self.total_word_att(inputs)
+        a3 = a3.view(-1, 1).repeat(1, 3).view(batch_size, seq_len*3)[:50]
+        a = a*a3
+        output = self.concat_att(lstm_output, a)
+
+        return output
+
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        attn_output = self.total_word_att(outputs[0])
         hie_attn_output = self.get_Hierarchical_Att(outputs[0])
 
-        att_result = attn_output*hie_attn_output
-        outputs = self.dense(att_result)
+        outputs = self.dense(hie_attn_output)
         outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
 
