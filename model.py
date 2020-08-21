@@ -439,6 +439,7 @@ class LSTM_ATT_MIX(nn.Module):
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
+        self.config = config
         self.word_base_att = []
         self.total_word_att = Hierarchical_Att().to(config.device)
         for _ in range(50-2):
@@ -458,10 +459,11 @@ class LSTM_ATT_MIX(nn.Module):
     def get_Hierarchical_Att(self, lstm_outputs):
         att_outputs = []
         batch_size, seq_len, w2v_dim = lstm_outputs.shape
-        lstm_outputs = torch.cat([torch.zeros(batch_size, 1,w2v_dim), lstm_outputs, torch.zeros(batch_size, 1,w2v_dim)])
+        lstm_outputs = torch.cat([torch.zeros(batch_size, 1,w2v_dim).to(self.config.device),
+                                  lstm_outputs,
+                                  torch.zeros(batch_size, 1,w2v_dim).to(self.config.device)])
         print(lstm_outputs.shape)
         for i in range(1, 50):
-            torch.zeros(batch_size, 1,w2v_dim)
             print(self.word_base_att[i](lstm_outputs[:,i-1:i+2,:].squeeze()))
             lstm_output, a = self.word_base_att[i](lstm_outputs[:,i:i+3,:].squeeze())
             att_outputs.append(self.concat_att(lstm_output,a))
