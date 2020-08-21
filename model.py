@@ -418,12 +418,12 @@ class Hierarchical_Att(nn.Module):
         self.dense_1 = nn.Linear(768, 100)
         self.dense_2 = nn.Linear(768, 1)
         self.tanh = nn.Tanh()
-
     def attention_net(self, lstm_outputs):
         M = self.tanh(lstm_outputs)
         wM_output = self.dense_2(M).squeeze()
         a = self.softmax(wM_output)
         return a
+
 
     def forward(self, input_hidden):
         attn_output = self.attention_net(input_hidden)
@@ -436,6 +436,12 @@ class LSTM_ATT_MIX(nn.Module):
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
+
+        #attention
+        self.softmax = nn.Softmax(dim=-1)
+        self.dense_att = nn.Linear(768, 1)
+
+
         self.config = config
         self.total_word_att = Hierarchical_Att().to(config.device)
         self.gram_3_att = Hierarchical_Att().to(config.device)
@@ -444,13 +450,16 @@ class LSTM_ATT_MIX(nn.Module):
         self.out_proj = nn.Linear(768, 2)
         self.tanh = nn.Tanh()
 
-    def concat_att(self, emb_outputs, a):
+    def attention_net(self, emb_outputs):
+        M = self.tanh(emb_outputs)
+        wM_output = self.dense_att(M).squeeze()
+        a = self.softmax(wM_output)
         c = emb_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
         att_output = self.tanh(c)
 
         return att_output
 
-    def get_Hierarchical_Att(self, emb_outputs):
+    def get_3gram_Att(self, emb_outputs):
         emb_3_Grams = []
         batch_size, seq_len, w2v_dim = emb_outputs.shape
         emb_outputs_padding = torch.nn.functional.pad(emb_outputs, (0, 0, 1, 1))
@@ -462,18 +471,13 @@ class LSTM_ATT_MIX(nn.Module):
 
         inputs = torch.cat(emb_3_Grams,dim=-1)
         inputs = torch.reshape(inputs, (batch_size,seq_len,w2v_dim))
-
-        a3 = self.gram_3_att(inputs)
-        a = self.total_word_att(inputs)
-
-        a = a3
-        output = self.concat_att(emb_outputs, a)
+        output = self.attention_net(inputs)
 
         return output
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        hie_attn_output = self.get_Hierarchical_Att(outputs[0])
+        hie_attn_output = self.get_3gram_Att(outputs[0])
 
         outputs = self.dense(hie_attn_output)
         outputs = self.dropout(outputs)
