@@ -459,7 +459,7 @@ class LSTM_ATT_MIX(nn.Module):
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        attn_output = self.get_Hierarchical_Att(outputs)
+        attn_output = self.get_Hierarchical_Att(outputs[0])
 
         outputs = self.dense(attn_output)
         outputs = self.dropout(outputs)
