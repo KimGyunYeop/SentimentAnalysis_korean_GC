@@ -444,8 +444,10 @@ class LSTM_ATT_MIX(nn.Module):
         self.out_proj = nn.Linear(768, 2)
         self.tanh = nn.Tanh()
 
-    def concat_att(self, lstm_outputs, a):
-        c = lstm_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
+    def concat_att(self, emb_outputs, a):
+        print(emb_outputs.shape)
+        print(a.shape)
+        c = emb_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
         att_output = self.tanh(c)
 
         return att_output
