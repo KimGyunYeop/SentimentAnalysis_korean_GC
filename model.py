@@ -444,6 +444,7 @@ class LSTM_ATT_MIX(nn.Module):
             config=config)
         self.word_base_att = []
 
+        self.total_word_att = Hierarchical_Att().to(config.device)
         for _ in range(50 -2):
             self.word_base_att.append(Hierarchical_Att().to(config.device))
         self.gram_3_att = Hierarchical_Att().to(config.device)
@@ -464,9 +465,11 @@ class LSTM_ATT_MIX(nn.Module):
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        attn_output = self.get_Hierarchical_Att(outputs[0])
+        attn_output = self.total_word_att(outputs[0])
+        hie_attn_output = self.get_Hierarchical_Att(outputs[0])
 
-        outputs = self.dense(attn_output)
+        att_result = attn_output*hie_attn_output
+        outputs = self.dense(att_result)
         outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
 
