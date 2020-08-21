@@ -90,12 +90,12 @@ def train(args,
                 "input_ids": batch[0],
                 "attention_mask": batch[1],
                 "token_type_ids" : batch[2],
-                "labels": batch[3]
+                "labels": batch[3],
+                inputs["data_length"] = batch[4]
             }
             if "KOSAC" in args.model_mode:
                 inputs["polarity_ids"] = batch[4]
                 inputs["intensity_ids"] = batch[5]
-                inputs["data_length"] = batch[6]
             if "KNU" in args.model_mode:
                 inputs["polarity_ids"] = batch[4]
             if "CHAR" in args.model_mode:
