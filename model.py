@@ -440,7 +440,7 @@ class LSTM_ATT_MIX(nn.Module):
 
         self.config = config
         self.word_base_att = []
-        for _ in range(self.config.max_seq_len -2):
+        for _ in range(50 -2):
             self.word_base_att.append(Hierarchical_Att())
         self.gram_3_att = Hierarchical_Att()
         self.dense = nn.Linear(768, 768)
@@ -449,7 +449,7 @@ class LSTM_ATT_MIX(nn.Module):
 
     def get_Hierarchical_Att(self, lstm_outputs):
         att_outputs = []
-        for i in range(self.config.max_seq_len -2):
+        for i in range(50 -2):
             att_outputs.append(self.word_base_att[i](lstm_outputs[:,i,:].squeeze()))
 
         inputs = torch.cat(att_outputs,dim=-1)
