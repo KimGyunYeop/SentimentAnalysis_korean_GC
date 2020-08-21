@@ -465,7 +465,7 @@ class LSTM_ATT_MIX(nn.Module):
             att_outputs.append(self.concat_att(lstm_output,a))
 
         inputs = torch.cat(att_outputs,dim=-1)
-        print(input.shape)
+        print(inputs.shape)
         inputs = torch.reshape(inputs, (batch_size,seq_len,w2v_dim))
 
         _, a3 = self.gram_3_att(inputs)
