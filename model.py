@@ -459,6 +459,7 @@ class LSTM_ATT_MIX(nn.Module):
         lstm_outputs = []
         for i in range(0,50,3):
             print(i)
+            print(self.word_base_att[i](lstm_outputs[:,i:i+3,:].squeeze()))
             lstm_output, a = self.word_base_att[i](lstm_outputs[:,i:i+3,:].squeeze())
             att_outputs.append(self.concat_att(lstm_output,a))
 
