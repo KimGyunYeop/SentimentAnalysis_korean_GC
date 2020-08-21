@@ -453,13 +453,12 @@ class LSTM_ATT_MIX(nn.Module):
 
         return att_output
 
-    def get_Hierarchical_Att(self, outputs):
+    def get_Hierarchical_Att(self, emb_outputs):
         att_outputs = []
-        batch_size, seq_len, w2v_dim = outputs.shape
-        outputs = torch.nn.functional.pad(outputs, (0, 0, 1, 1))
+        batch_size, seq_len, w2v_dim = emb_outputs.shape
+        emb_outputs = torch.nn.functional.pad(emb_outputs, (0, 0, 1, 1))
         for i in range(1, 51):
-            print(outputs.shape)
-            outputs = torch.mean(outputs[:,i-1:i+2,:],dim=1)
+            outputs = torch.mean(emb_outputs[:,i-1:i+2,:],dim=1)
             att_outputs.append(outputs)
 
         inputs = torch.cat(att_outputs,dim=-1)
