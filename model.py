@@ -460,7 +460,7 @@ class LSTM_ATT_MIX(nn.Module):
         att_outputs = []
         batch_size, seq_len, w2v_dim = lstm_outputs.shape
         print(torch.zeros(batch_size, 1,w2v_dim).to(self.config.device).shape)
-        lstm_outputs = torch.cat([torch.zeros(batch_size, 1,w2v_dim).to(self.config.device),
+        lstm_outputs = torch.stack([torch.zeros(batch_size, 1,w2v_dim).to(self.config.device),
                                   lstm_outputs,
                                   torch.zeros(batch_size, 1,w2v_dim).to(self.config.device)])
         print(lstm_outputs.shape)
