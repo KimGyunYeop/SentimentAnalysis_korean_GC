@@ -440,8 +440,9 @@ class LSTM_ATT_MIX(nn.Module):
 
         self.config = config
         self.word_base_att = []
+
         for _ in range(50 -2):
-            self.word_base_att.append(Hierarchical_Att())
+            self.word_base_att.append(Hierarchical_Att().to("cuda:0"))
         self.gram_3_att = Hierarchical_Att()
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
