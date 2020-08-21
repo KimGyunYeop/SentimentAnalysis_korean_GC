@@ -441,7 +441,7 @@ class LSTM_ATT_MIX(nn.Module):
             config=config)
         self.word_base_att = []
         self.total_word_att = Hierarchical_Att().to(config.device)
-        for _ in range(50 -2):
+        for _ in range(50-2):
             self.word_base_att.append(Hierarchical_Att().to(config.device))
         self.gram_3_att = Hierarchical_Att().to(config.device)
         self.dense = nn.Linear(768, 768)
@@ -457,15 +457,18 @@ class LSTM_ATT_MIX(nn.Module):
 
     def get_Hierarchical_Att(self, lstm_outputs):
         att_outputs = []
-        for i in range(0,50,3):
-            print(i)
-            print(self.word_base_att[i](lstm_outputs[:,i:i+3,:].squeeze()))
+        batch_size, seq_len, w2v_dim = lstm_outputs.shape
+        lstm_outputs = torch.cat([torch.zeros(batch_size, 1,w2v_dim), lstm_outputs, torch.zeros(batch_size, 1,w2v_dim)])
+        print(lstm_outputs.shape)
+        for i in range(1, 50):
+            torch.zeros(batch_size, 1,w2v_dim)
+            print(self.word_base_att[i](lstm_outputs[:,i-1:i+2,:].squeeze()))
             lstm_output, a = self.word_base_att[i](lstm_outputs[:,i:i+3,:].squeeze())
             att_outputs.append(self.concat_att(lstm_output,a))
 
         inputs = torch.cat(att_outputs,dim=-1)
         inputs = torch.reshape(inputs, (-1,int(50/3),768))
-        batch_size, seq_len, w2v_dim = inputs.shape
+
         _, a3 = self.gram_3_att(inputs)
         lstm_output, a = self.total_word_att(inputs)
         a3 = a3.view(-1, 1).repeat(1, 3).view(batch_size, seq_len*3)[:50]
