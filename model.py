@@ -416,11 +416,11 @@ class Hierarchical_Att(nn.Module):
         # attention module
         self.softmax = nn.Softmax(dim=-1)
         self.dense_1 = nn.Linear(768, 100)
-        self.dense_2 = nn.Linear(100, 1)
+        self.dense_2 = nn.Linear(768, 1)
         self.tanh = nn.Tanh()
 
     def attention_net(self, lstm_outputs):
-        M = self.tanh(self.dense_1(lstm_outputs))
+        M = self.tanh(lstm_outputs)
         wM_output = self.dense_2(M).squeeze()
         a = self.softmax(wM_output)
         return a
