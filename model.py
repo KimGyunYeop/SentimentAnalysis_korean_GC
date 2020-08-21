@@ -422,6 +422,7 @@ class Hierarchical_Att(nn.Module):
         self.dense_2 = nn.Linear(100, 1)
 
     def attention_net(self, lstm_outputs):
+        print(lstm_outputs.shape)
         M = self.tanh(self.dense_1(lstm_outputs))
         wM_output = self.dense_2(M).squeeze()
         a = self.softmax(wM_output)
@@ -431,6 +432,7 @@ class Hierarchical_Att(nn.Module):
         return att_output
 
     def forward(self, input_hidden):
+        print(input_hidden.shape)
         outputs, (h, c) = self.lstm(input_hidden)
         attn_output = self.attention_net(outputs)
 
