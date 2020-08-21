@@ -410,26 +410,6 @@ class LSTM_ATT2(nn.Module):
         result = (loss, outputs)
         return result
 
-class Hierarchical_Att(nn.Module):
-    def __init__(self):
-        super(Hierarchical_Att, self).__init__()
-        # attention module
-        self.softmax = nn.Softmax(dim=-1)
-        self.dense_1 = nn.Linear(768, 100)
-        self.dense_2 = nn.Linear(768, 1)
-        self.tanh = nn.Tanh()
-    def attention_net(self, lstm_outputs):
-        M = self.tanh(lstm_outputs)
-        wM_output = self.dense_2(M).squeeze()
-        a = self.softmax(wM_output)
-        return a
-
-
-    def forward(self, input_hidden):
-        attn_output = self.attention_net(input_hidden)
-
-        return attn_output
-
 class LSTM_ATT_MIX(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(LSTM_ATT_MIX, self).__init__()
@@ -443,8 +423,6 @@ class LSTM_ATT_MIX(nn.Module):
 
 
         self.config = config
-        self.total_word_att = Hierarchical_Att().to(config.device)
-        self.gram_3_att = Hierarchical_Att().to(config.device)
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
