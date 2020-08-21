@@ -459,7 +459,7 @@ class LSTM_ATT_MIX(nn.Module):
     def get_Hierarchical_Att(self, lstm_outputs):
         att_outputs = []
         batch_size, seq_len, w2v_dim = lstm_outputs.shape
-        lstm_outputs = torch.nn.functional.pad(lstm_outputs, (0, 0, 0, 0))
+        lstm_outputs = torch.nn.functional.pad(lstm_outputs, (0, 0, 1, 1))
         print(lstm_outputs.shape)
         for i in range(1, 50):
             print(self.word_base_att[i](lstm_outputs[:,i-1:i+2,:].squeeze()))

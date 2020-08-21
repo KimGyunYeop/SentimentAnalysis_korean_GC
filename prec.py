@@ -99,16 +99,15 @@ loss = loss_fn(x1, y)
 print(loss)
 print(loss.shape)'''
 
-a = torch.tensor([[0,1, 2, 3],
-                  [4,5,6, 7],
-                  [8,9,10, 11],
-                  [12,13, 14, 15]
+a = torch.tensor([[[0,1],[2, 3]],
+                  [[4,5],[6, 7]],
+                  [[8,9],[10, 11]],
+                  [[12,13], [14, 15]]
                   ])
 b = torch.tensor([[0,1, 2, 3],
                   [4,5,6, 7],
                   [8,9,10, 11],
                   [12,13, 14, 15]
                   ])
-print(a.view(-1, 1).repeat(1, 3).view(4, 12))
-print(torch.cat([a,b],dim=-1))
-print(torch.reshape(b, (-1,2,2)))
+print(a.shape)
+print(torch.nn.functional.pad(a, (0, 0, 1, 1)))
