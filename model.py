@@ -457,7 +457,7 @@ class LSTM_ATT_MIX(nn.Module):
             att_outputs.append(self.word_base_att[i](lstm_outputs[:,i:i+3,:].squeeze()))
 
         inputs = torch.cat(att_outputs,dim=-1)
-        print(inputs.shape)
+        inputs = torch.reshape(inputs, (-1,50,768))
         att_output = self.gram_3_att(inputs)
 
         return att_output
