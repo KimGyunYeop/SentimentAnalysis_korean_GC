@@ -457,8 +457,10 @@ class LSTM_ATT_MIX(nn.Module):
         emb_3_Grams = []
         batch_size, seq_len, w2v_dim = emb_outputs.shape
         emb_outputs = torch.nn.functional.pad(emb_outputs, (0, 0, 1, 1))
+        alpha = 0.8
         for i in range(1, 51):
-            emb_3_Gram = torch.mean(emb_outputs[:,i-1:i+2,:],dim=1)
+            #emb_3_Gram = torch.mean(emb_outputs[:,i-1:i+2,:], dim=1)
+            emb_3_Gram = emb_outputs[:,i,:] * alpha + emb_outputs[:,i+1,:] * (1-alpha)/2 + emb_outputs[:,i-1,:] * (1-alpha)/2
             emb_3_Grams.append(emb_3_Gram)
 
         inputs = torch.cat(emb_3_Grams,dim=-1)
