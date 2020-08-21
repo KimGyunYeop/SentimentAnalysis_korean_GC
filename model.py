@@ -770,7 +770,7 @@ class KNU_LSTM(nn.Module):
         embedding_result = input_emb_result
 
         outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=token_type_ids,inputs_embeds = embedding_result)
-        outputs = torch.concat([outputs[0], polarity_emb_result/100],dim=-1)
+        outputs = torch.cat([outputs[0], polarity_emb_result/100],dim=-1)
         outputs, _ = self.lstm(outputs)
 
         outputs = self.dense(outputs[:,-1,:])
