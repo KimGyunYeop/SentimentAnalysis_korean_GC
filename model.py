@@ -470,6 +470,7 @@ class LSTM_ATT_MIX(nn.Module):
         lstm_output, a = self.total_word_att(inputs)
         alpha = 0.8
         for index in range(batch_size):
+            print(50-data_length[0])
             a[index][data_length:] = torch.zeros(50-data_length[0])
             a3[index][data_length:] = torch.zeros(50-data_length[0])
         print(a[0])
