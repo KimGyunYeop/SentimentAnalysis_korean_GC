@@ -415,6 +415,11 @@ class Hierarchical_Att(nn.Module):
         super(Hierarchical_Att, self).__init__()
 
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=True, dropout=0.2)
+        # attention module
+        self.tanh = nn.Tanh()
+        self.softmax = nn.Softmax(dim=-1)
+        self.dense_1 = nn.Linear(768, 100)
+        self.dense_2 = nn.Linear(100, 1)
 
     def attention_net(self, lstm_outputs):
         M = self.tanh(self.dense_1(lstm_outputs))
