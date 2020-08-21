@@ -414,7 +414,7 @@ class Hierarchical_Att(nn.Module):
     def __init__(self):
         super(Hierarchical_Att, self).__init__()
 
-        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=True, dropout=0.2)
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
         # attention module
         self.tanh = nn.Tanh()
         self.softmax = nn.Softmax(dim=-1)
@@ -422,7 +422,6 @@ class Hierarchical_Att(nn.Module):
         self.dense_2 = nn.Linear(100, 1)
 
     def attention_net(self, lstm_outputs):
-        print(lstm_outputs.shape)
         M = self.tanh(self.dense_1(lstm_outputs))
         wM_output = self.dense_2(M).squeeze()
         a = self.softmax(wM_output)
@@ -432,7 +431,6 @@ class Hierarchical_Att(nn.Module):
         return att_output
 
     def forward(self, input_hidden):
-        print(input_hidden.shape)
         outputs, (h, c) = self.lstm(input_hidden)
         attn_output = self.attention_net(outputs)
 
@@ -456,7 +454,7 @@ class LSTM_ATT_MIX(nn.Module):
     def get_Hierarchical_Att(self, lstm_outputs):
         att_outputs = []
         for i in range(50 -2):
-            att_outputs.append(self.word_base_att[i](lstm_outputs[:,i:i+2,:].squeeze()))
+            att_outputs.append(self.word_base_att[i](lstm_outputs[:,i:i+3,:].squeeze()))
 
         inputs = torch.cat(att_outputs,dim=-1)
         att_output = self.gram_3_att(inputs)
