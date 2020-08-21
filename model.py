@@ -416,7 +416,6 @@ class Hierarchical_Att(nn.Module):
 
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
         # attention module
-        self.tanh = nn.Tanh()
         self.softmax = nn.Softmax(dim=-1)
         self.dense_1 = nn.Linear(768, 100)
         self.dense_2 = nn.Linear(100, 1)
@@ -425,8 +424,6 @@ class Hierarchical_Att(nn.Module):
         M = self.tanh(self.dense_1(lstm_outputs))
         wM_output = self.dense_2(M).squeeze()
         a = self.softmax(wM_output)
-
-
         return a
 
     def forward(self, input_hidden):
@@ -449,6 +446,7 @@ class LSTM_ATT_MIX(nn.Module):
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
+        self.tanh = nn.Tanh()
 
     def concat_att(self, lstm_outputs, a):
         c = lstm_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
