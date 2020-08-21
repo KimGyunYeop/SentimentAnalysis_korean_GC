@@ -414,7 +414,7 @@ class Hierarchical_Att(nn.Module):
     def __init__(self):
         super(Hierarchical_Att, self).__init__()
 
-        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.5)
         # attention module
         self.softmax = nn.Softmax(dim=-1)
         self.dense_1 = nn.Linear(768, 100)
@@ -443,7 +443,7 @@ class LSTM_ATT_MIX(nn.Module):
         self.total_word_att = Hierarchical_Att().to(config.device)
         self.gram_3_att = Hierarchical_Att().to(config.device)
         self.dense = nn.Linear(768, 768)
-        self.dropout = nn.Dropout(0.2)
+        self.dropout = nn.Dropout(0.5)
         self.out_proj = nn.Linear(768, 2)
         self.tanh = nn.Tanh()
 
@@ -454,14 +454,14 @@ class LSTM_ATT_MIX(nn.Module):
         return att_output
 
     def get_Hierarchical_Att(self, emb_outputs):
-        att_outputs = []
+        emb_3_Grams = []
         batch_size, seq_len, w2v_dim = emb_outputs.shape
         emb_outputs = torch.nn.functional.pad(emb_outputs, (0, 0, 1, 1))
         for i in range(1, 51):
-            outputs = torch.mean(emb_outputs[:,i-1:i+2,:],dim=1)
-            att_outputs.append(outputs)
+            emb_3_Gram = torch.mean(emb_outputs[:,i-1:i+2,:],dim=1)
+            emb_3_Grams.append(emb_3_Gram)
 
-        inputs = torch.cat(att_outputs,dim=-1)
+        inputs = torch.cat(emb_3_Grams,dim=-1)
         inputs = torch.reshape(inputs, (batch_size,seq_len,w2v_dim))
 
         _, a3 = self.gram_3_att(inputs)
