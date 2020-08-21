@@ -754,25 +754,23 @@ class KNU_LSTM(nn.Module):
 
         # Embedding
         self.input_embedding = self.emb.embeddings.word_embeddings
-        self.polarity_embedding = nn.Embedding(5, 768)
-        self.intensity_embedding = nn.Embedding(5, 768)
+        self.polarity_embedding = nn.Embedding(5, 300)
 
-        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
+        self.lstm = nn.LSTM(1068, 768, batch_first=True, bidirectional=False)
         self.lstm_dropout = nn.Dropout(0.2)
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
 
-    def forward(self, input_ids, attention_mask, labels, token_type_ids,polarity_ids, intensity_ids):
+    def forward(self, input_ids, attention_mask, labels, token_type_ids,polarity_ids):
         # embedding
         input_emb_result = self.input_embedding(input_ids)
         polarity_emb_result = self.polarity_embedding(polarity_ids)
-        intensity_emb_result = self.intensity_embedding(intensity_ids)
 
         embedding_result = input_emb_result
 
         outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=token_type_ids,inputs_embeds = embedding_result)
-        outputs = outputs[0] + polarity_emb_result/100 + intensity_emb_result/100
+        outputs = torch.concat([outputs[0], polarity_emb_result/100],dim=-1)
         outputs, _ = self.lstm(outputs)
 
         outputs = self.dense(outputs[:,-1,:])
