@@ -458,6 +458,7 @@ class LSTM_ATT_MIX(nn.Module):
         batch_size, seq_len, w2v_dim = outputs.shape
         outputs = torch.nn.functional.pad(outputs, (0, 0, 1, 1))
         for i in range(1, 51):
+            print(outputs.shape)
             outputs = torch.mean(outputs[:,i-1:i+2,:],dim=1)
             att_outputs.append(outputs)
 
