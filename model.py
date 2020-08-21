@@ -413,8 +413,6 @@ class LSTM_ATT2(nn.Module):
 class Hierarchical_Att(nn.Module):
     def __init__(self):
         super(Hierarchical_Att, self).__init__()
-
-        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
         # attention module
         self.softmax = nn.Softmax(dim=-1)
         self.dense_1 = nn.Linear(768, 100)
@@ -428,10 +426,9 @@ class Hierarchical_Att(nn.Module):
         return a
 
     def forward(self, input_hidden):
-        outputs, (h, c) = self.lstm(input_hidden)
-        attn_output = self.attention_net(outputs)
+        attn_output = self.attention_net(input_hidden)
 
-        return outputs, attn_output
+        return attn_output
 
 class LSTM_ATT_MIX(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
@@ -466,12 +463,12 @@ class LSTM_ATT_MIX(nn.Module):
         inputs = torch.cat(emb_3_Grams,dim=-1)
         inputs = torch.reshape(inputs, (batch_size,seq_len,w2v_dim))
 
-        _, a3 = self.gram_3_att(inputs)
-        lstm_output, a = self.total_word_att(inputs)
+        a3 = self.gram_3_att(inputs)
+        a = self.total_word_att(inputs)
         alpha = 0.8
 
         a = a3
-        output = self.concat_att(lstm_output, a)
+        output = self.concat_att(emb_outputs, a)
 
         return output
 
