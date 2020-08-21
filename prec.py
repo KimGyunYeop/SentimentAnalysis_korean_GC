@@ -6,16 +6,9 @@ import glob
 
 import numpy as np
 import torch
-import torch.nn.functional as F
-from torch import nn
-from fastprogress.fastprogress import master_bar, progress_bar
-from attrdict import AttrDict
 
-from model import *
-import pickle
-import pandas as pd
 
-from transformers import (
+"""from transformers import (
     AdamW,
     get_linear_schedule_with_warmup
 )
@@ -57,7 +50,7 @@ for i, batch in enumerate(dataloader):
 print("\n")
 for i, batch in enumerate(dataloader):
     print(batch[1])
-
+"""
 
 '''
 from konlpy.tag import Okt
@@ -105,3 +98,16 @@ loss = loss_fn(x1, y)
 
 print(loss)
 print(loss.shape)'''
+
+a = torch.tensor([[0,1, 2, 3],
+                  [4,5,6, 7],
+                  [8,9,10, 11],
+                  [12,13, 14, 15]
+                  ])
+b = torch.tensor([[0,1, 2, 3],
+                  [4,5,6, 7],
+                  [8,9,10, 11],
+                  [12,13, 14, 15]
+                  ])
+print(torch.cat([a,b],dim=-1))
+print(torch.reshape(b, (-1,2,2)))
