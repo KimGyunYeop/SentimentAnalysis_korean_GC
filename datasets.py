@@ -28,14 +28,13 @@ class BaseDataset(Dataset):
 
     def __getitem__(self, idx):
         txt = str(self.dataset.at[idx,"review"])
-        data_length = len(txt[:self.maxlen-2])
         data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
         input_ids = torch.LongTensor(data["input_ids"])
         token_type_ids = torch.LongTensor(data["token_type_ids"])
         attention_mask = torch.LongTensor(data["attention_mask"])
         label = self.dataset.at[idx,"rating"]
 
-        return (input_ids, token_type_ids, attention_mask, label, data_length),txt
+        return (input_ids, token_type_ids, attention_mask, label),txt
 
 class CharBaseDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
