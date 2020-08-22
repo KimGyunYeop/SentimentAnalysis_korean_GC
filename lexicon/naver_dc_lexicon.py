@@ -1,120 +1,76 @@
-from bs4 import BeautifulSoup
 import pandas as pd
+from bs4 import BeautifulSoup
 from selenium import webdriver
 import time
-from requests.packages.urllib3.exceptions import MaxRetryError
 
-urls = []
-adj_sents = []
-url_df = pd.DataFrame()
+MAX_LEVEL = 2
 
-results = pd.DataFrame()
-words = []
-sentiments = []
-tests = []
+def search_node(url, sentiment, level):
+    #get now word's dict homepage
+    driver.get(url)
+    time.sleep(0.1)
+    bs = BeautifulSoup(driver.page_source, "html.parser")
 
-test = 0
+    #get word in metadata
+    word_meta = bs.find("meta",{"property":"og:title"})
+    cur_word = word_meta.get("content").split("\'")[1]
+    global sent_dc
+    sent_dc = sent_dc.append(pd.Series([cur_word, sentiment, level], index=sent_dc.columns), ignore_index=True)
 
-searched = []
-
-max_depth = 5
-
-chromeDriver = "C:\\Users\\parksoyoung\\Downloads\\chromedriver_win32\\chromedriver.exe"
-driver = webdriver.Chrome(chromeDriver)
-time.sleep(3)
-
-source = driver.page_source
-soup = BeautifulSoup(source, "html.parser")
-
-# 한 단어 크롤링
-def oneWord(sent):
-    source = driver.page_source
-    soup = BeautifulSoup(source, "html.parser")
-
-    # 원형 저장
-    word = soup.find("meta", {"property": "og:title"})
-    cur_word = word.get("content").split("\'")[1]
-    words.append(cur_word)
-    sentiments.append(sent)
-    tests.append(test)
     # 활용어
-    dl = soup.find_all("dl")
-    # 활용어 유무 확인
+    dl = bs.find_all("dl")
     ct = 0
     for d in dl:
         if d.get('class')[0] == 'entry_conjugation':
             ct = 1
-    aps = []
     if ct == 1:
-        aps = soup.find("dl", {"class": "entry_conjugation"}).find("dd", {"class": "cont"}).find("ul", {
+        aps = bs.find("dl", {"class": "entry_conjugation"}).find("dd", {"class": "cont"}).find("ul", {
             "class": "tray"}).find_all("li", {"class": "item"})
         for ap in aps:
-            #print(ap)
-            ap = ap.find("span", {"class": "word"})
-            word = ap.find("span", {"class": "u_word_dic"}).text.strip()
-            words.append(word)
-            sentiments.append(sent)
-            tests.append(test)
-    # 유의어, 반의어
-    # 유의어, 반의어 없는지 확인
-    all_div = soup.find_all("div")
-    if "slides_content _slides_content _visible" in str(all_div):
-        dc = soup.find("div", {"class": "slides_content _slides_content _visible"})
-        div = dc.find_all("div")
-        for d in div:
-            if 'synonym' in d.get("class")[0] or 'antonym' in d.get("class")[0]:
-                sa = d.get("class")[0]
-                em = d.find_all("em")
-                for e in em:
-                    urls.append(base_link+ e.find("a", {"class": "blank"}).get("href"))
-                    time.sleep(3)
-                    if sa == 'synonym':
-                        ap_sent = sent
-                    else:
-                        ap_sent = sent*-1
-                    adj_sents.append(ap_sent)
-    return 0
+            if "word" in ap.get("class")[0]:
+                word = ap.find("span", {"class": "u_word_dic"}).text.strip()
+                sent_dc = sent_dc.append(pd.Series([word, sentiment,level], index=sent_dc.columns), ignore_index=True)
 
-time.sleep(3)
+    if level >= MAX_LEVEL:
+        return 0
 
-def start(link, senti):
-    driver.get(link)
-    time.sleep(3)
-    source = driver.page_source
-    soup = BeautifulSoup(source, "html.parser")
-    oneWord(senti)
+    antonym_list = []
+    synonym_list = []
 
-# 흥미롭다
-base_link = "https://ko.dict.naver.com/"
-senti = 1
-urls.append('https://ko.dict.naver.com/#/entry/koko/b9fbbe6ab1734c93ba2213b4ac22fbba')
-adj_sents.append(1)
+    #find next word's url and store in antonym_list, synonym_list
+    word_box = bs.find("div",{"class":"slides_content _slides_content _visible"})
+    if word_box is None:
+        return 0
+    box_list = word_box.findAll("div")
+    for tmp_box in box_list:
+        if "synonym" in tmp_box.get("class"):
+            synonym_list_box = tmp_box.findAll("em")
+            for i in synonym_list_box:
+                synonym_list.append(i.find("a",{"class":"blank"}).get("href"))
 
-url_df = pd.DataFrame()
-url_df['url'] = urls
-url_df['adj_sent'] = adj_sents
-idx = 0
-try:
-    while True:
-        prev = len(words)
-        print(idx)
-        for i in range(idx, len(url_df)):
-            results = pd.DataFrame()
-            start(url_df.iloc[i]['url'], url_df.iloc[i]['adj_sent'])
-            idx+=1
-            url_df = pd.DataFrame({'url': urls, 'adj_sent': adj_sents})
-            url_df.drop(url_df[(url_df['url'] == url_df.iloc[i]['url'])].index)
-            if test == max_depth or prev == len(words):
-                break
-            results['word'] = words
-            results['sentiment'] = sentiments
-            results['test'] = tests
-            print('full', len(results))
-            uni = results.drop_duplicates(subset=['word'])
-            print('unique', len(uni))
-            results.to_csv('naver_dc_흥미롭다.txt', encoding="utf8", sep="\t")
-            uni.to_csv('naver_dc_흥미롭다_uni.txt', encoding="utf8", sep="\t")
-        test += 1
-except ConnectionError as ce:
-    if (isinstance(ce.args[0], MaxRetryError)):
-        pass
+        if "antonym" in tmp_box.get("class"):
+            antonym_list_box = tmp_box.findAll("em")
+            for i in antonym_list_box:
+                antonym_list.append(i.find("a",{"class":"blank"}).get("href"))
+
+    print(antonym_list,synonym_list)
+
+    #find next nodes word
+    for i in antonym_list:
+        search_node(baselink+i, -(sentiment), level+1)
+    for i in synonym_list:
+        search_node(baselink+i, sentiment, level+1)
+
+
+baselink = "https://ko.dict.naver.com/"
+first_word_url = "#/entry/koko/61a8e24d442d4b47a7a241797f968195"
+chromeDriver = "C:\\Users\\parksoyoung\\Downloads\\chromedriver_win32\\chromedriver.exe"
+driver = webdriver.Chrome(chromeDriver)
+sent_dc = pd.DataFrame(columns=["word",'sentiment',"level"])
+
+search_node(baselink+first_word_url, 1, 0)
+
+print(sent_dc)
+sent_dc.to_csv("result_예쁘다.csv", encoding='utf-8-sig')
+
+driver.close()
