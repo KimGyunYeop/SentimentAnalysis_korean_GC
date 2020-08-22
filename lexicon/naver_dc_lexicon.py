@@ -102,8 +102,8 @@ try:
             results = pd.DataFrame()
             start(url_df.iloc[i]['url'], url_df.iloc[i]['adj_sent'])
             idx+=1
-            df = pd.DataFrame({'url': urls, 'adj_sent': adj_sents})
-            url_df = url_df.append(df)
+            url_df = pd.DataFrame({'url': urls, 'adj_sent': adj_sents})
+            url_df.drop(url_df[(url_df['url'] == url_df.iloc[i]['url'])].index)
             if test == max_depth or prev == len(words):
                 break
             results['word'] = words
