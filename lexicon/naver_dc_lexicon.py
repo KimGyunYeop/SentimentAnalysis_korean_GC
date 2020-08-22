@@ -3,12 +3,12 @@ from bs4 import BeautifulSoup
 from selenium import webdriver
 import time
 
-MAX_LEVEL = 2
+MAX_LEVEL = 5
 
 def search_node(url, sentiment, level):
     #get now word's dict homepage
     driver.get(url)
-    time.sleep(0.1)
+    time.sleep(0.3)
     bs = BeautifulSoup(driver.page_source, "html.parser")
 
     #get word in metadata
@@ -27,8 +27,12 @@ def search_node(url, sentiment, level):
         aps = bs.find("dl", {"class": "entry_conjugation"}).find("dd", {"class": "cont"}).find("ul", {
             "class": "tray"}).find_all("li", {"class": "item"})
         for ap in aps:
-            if "word" in ap.get("class")[0]:
-                word = ap.find("span", {"class": "u_word_dic"}).text.strip()
+            word = ap.find("span", {"class" : "word"}).text.strip()
+            # two use cases
+            if '(' in word:
+                sent_dc = sent_dc.append(pd.Series([word[:word.find('(')], sentiment,level], index=sent_dc.columns), ignore_index=True)
+                sent_dc = sent_dc.append(pd.Series([word[word.find('(')+1:word.find(')')], sentiment, level], index=sent_dc.columns), ignore_index=True)
+            else:
                 sent_dc = sent_dc.append(pd.Series([word, sentiment,level], index=sent_dc.columns), ignore_index=True)
 
     if level >= MAX_LEVEL:
@@ -53,7 +57,7 @@ def search_node(url, sentiment, level):
             for i in antonym_list_box:
                 antonym_list.append(i.find("a",{"class":"blank"}).get("href"))
 
-    print(antonym_list,synonym_list)
+    #print(antonym_list,synonym_list)
 
     #find next nodes word
     for i in antonym_list:
@@ -68,7 +72,10 @@ chromeDriver = "C:\\Users\\parksoyoung\\Downloads\\chromedriver_win32\\chromedri
 driver = webdriver.Chrome(chromeDriver)
 sent_dc = pd.DataFrame(columns=["word",'sentiment',"level"])
 
-search_node(baselink+first_word_url, 1, 0)
+try:
+    search_node(baselink+first_word_url, 1, 0)
+except:
+    pass
 
 print(sent_dc)
 sent_dc.to_csv("result_예쁘다.csv", encoding='utf-8-sig')
