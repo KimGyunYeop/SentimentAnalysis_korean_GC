@@ -72,5 +72,7 @@ optimizer = AdamW(model.parameters(), lr=0.01)
 for epoch in range(10):
     neighbors = torch.FloatTensor(neighbors)
     outputs = model(neighbors)
+    outputs.requires_grad = True
     outputs.backward()
     optimizer.step()
+
