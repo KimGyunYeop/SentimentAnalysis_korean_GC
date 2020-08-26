@@ -30,7 +30,7 @@ class REFINEEMB(nn.Module):
         for i in range(len(neighbors)):
             batch_parameters = self.vector_parameters[i].repeat(10,1)
             total_loss += self.loss(batch_parameters,neighbors[i]).tolist()
-        return torch.FloatTensor([total_loss])
+        return torch.tensor([total_loss], requires_grad=True, dtype=torch.float)
 
 tkn2pol = pickle.load(open(os.path.join('../lexicon','kosac_polarity.pkl'), 'rb'))
 tkn2int = pickle.load(open(os.path.join('../lexicon','kosac_intensity.pkl'), 'rb'))
@@ -81,7 +81,6 @@ model.train()
 for epoch in range(10):
     neighbors = torch.FloatTensor(neighbors)
     loss = model(neighbors)
-
     optimizer.zero_grad()
     loss.backward()
     optimizer.step()
