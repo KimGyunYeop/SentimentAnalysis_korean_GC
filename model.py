@@ -123,7 +123,7 @@ class BASEELECTRA_COS2(nn.Module):
         batch_size, seq_len, w2v_dim = embs.shape
 
         outputs = self.lstm(embs)
-        outputs = self.dense(outputs[0])
+        outputs = self.dense(outputs[0][:,-1,:])
         outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
 
