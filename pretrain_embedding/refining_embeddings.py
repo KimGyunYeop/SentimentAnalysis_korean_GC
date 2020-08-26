@@ -37,7 +37,6 @@ tkn2pol = pickle.load(open(os.path.join('../lexicon','kosac_polarity.pkl'), 'rb'
 tkn2int = pickle.load(open(os.path.join('../lexicon','kosac_intensity.pkl'), 'rb'))
 print(tkn2pol)
 print(tkn2int)
-['None', 'POS', 'NEUT', 'COMP', 'NEG']
 pol2idx = ['None','NEG', 'COMP', 'NEUT', 'POS']
 int2idx = ['None','Low', 'Medium', 'High']
 dict_pol2idx = {y:x for x,y in enumerate(pol2idx)}
