@@ -27,9 +27,9 @@ class REFINEEMB(nn.Module):
         return torch.sum(weight * self.softmax(self.distance(parameters, neighbors),dim=-1),dim=-1)
     def forward(self, neighbors):
         total_loss = 0
+        neighbors.grad_fn = True
         for i in range(len(neighbors)):
             batch_parameters = self.vector_parameters[i].repeat(10,1)
-            batch_parameters.grad_fn = True
             total_loss += self.loss(batch_parameters,neighbors[i]).tolist()
         return torch.tensor([total_loss], dtype=torch.float)
 
