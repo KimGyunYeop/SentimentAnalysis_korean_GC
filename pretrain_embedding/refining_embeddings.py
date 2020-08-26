@@ -24,7 +24,7 @@ class REFINEEMB(nn.Module):
     def distance(self, x, y):
         return torch.sum((x-y)*(x-y),dim=-1)
     def loss(self,parameters,neighbors):
-        weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10]).repeat(len(parameters),1)
+        weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10]).repeat(len(parameters),1).cuda()
         return torch.sum(weight * self.softmax(self.distance(parameters, neighbors)),dim=-1)
 
     def forward(self, neighbors):
@@ -35,8 +35,6 @@ class REFINEEMB(nn.Module):
 
 tkn2pol = pickle.load(open(os.path.join('../lexicon','kosac_polarity.pkl'), 'rb'))
 tkn2int = pickle.load(open(os.path.join('../lexicon','kosac_intensity.pkl'), 'rb'))
-print(tkn2pol)
-print(tkn2int)
 pol2idx = ['None','NEG', 'COMP', 'NEUT', 'POS']
 int2idx = ['None','Low', 'Medium', 'High']
 dict_pol2idx = {y:x for x,y in enumerate(pol2idx)}
@@ -76,8 +74,6 @@ for name, param in model.named_parameters():
 
 optimizer = Adam(model.parameters(), lr=5e-5)
 model.train()
-loss_fn = nn.MSELoss()
-ground_truth = torch.FloatTensor([0])
 for epoch in range(10):
     optimizer.zero_grad()
     neighbors = torch.FloatTensor(neighbors).to(device)
