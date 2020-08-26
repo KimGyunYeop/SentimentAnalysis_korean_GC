@@ -112,6 +112,7 @@ class BASEELECTRA_COS2(nn.Module):
             config=config)
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
         self.out_proj = nn.Linear(768, 2)
         self.star_emb = nn.Linear(2,768)
 
@@ -121,7 +122,8 @@ class BASEELECTRA_COS2(nn.Module):
         embs = outputs[0]
         batch_size, seq_len, w2v_dim = embs.shape
 
-        outputs = self.dense(embs[:,0,:])
+        outputs = self.lstm(embs)
+        outputs = self.dense(outputs[0][:,-1,:])
         outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
 
@@ -145,7 +147,6 @@ class BASEELECTRA_COS2(nn.Module):
         star = torch.zeros(batch_size, 2).cuda()
         star[range(batch_size), labels] = 1
         star = self.star_emb(star)
-        star = self.dropout(star)
 
         loss3 = loss_fn(embs[:, 0, :].squeeze(),
                         star,

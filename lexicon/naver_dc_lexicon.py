@@ -17,7 +17,7 @@ def search_node(url, sentiment, level):
     word_meta = bs.find("meta",{"property":"og:title"})
     cur_word = word_meta.get("content").split("\'")[1]
     print(cur_word, level)
-    global sent_dc
+    global sent_dc, all_urls
     sent_dc = sent_dc.append(pd.Series([cur_word, sentiment, level], index=sent_dc.columns), ignore_index=True)
 
     # 활용어
