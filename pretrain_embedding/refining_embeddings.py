@@ -5,6 +5,7 @@ from gensim.models import Word2Vec
 import torch.nn as nn
 import torch
 from transformers import AdamW
+from torch.optim import Adam
 
 class REFINEEMB(nn.Module):
     def __init__(self, dic, w2v):
@@ -18,18 +19,17 @@ class REFINEEMB(nn.Module):
             except:
                 continue
         self.vector_parameters = nn.Parameter(torch.FloatTensor(vectors))
+        self.softmax = nn.Softmax()
     def distance(self, x, y):
         return torch.sum((x-y)*(x-y),dim=-1)
     def loss(self,parameters,neighbors):
         weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10])
-        return torch.sum(weight*self.distance(parameters, neighbors),dim=-1)
+        return torch.sum(weight * self.softmax(self.distance(parameters, neighbors)),dim=-1)
     def forward(self, neighbors):
         total_loss =  0
         for i in range(len(neighbors)):
             batch_parameters = self.vector_parameters[i].repeat(10,1)
-            print(self.loss(batch_parameters,neighbors[i]))
             total_loss += self.loss(batch_parameters,neighbors[i]).tolist()
-            print(total_loss)
         return torch.FloatTensor([total_loss])
 
 tkn2pol = pickle.load(open(os.path.join('../lexicon','kosac_polarity.pkl'), 'rb'))
@@ -68,11 +68,23 @@ for word, score in dic_sentiment2score.items():
 print(error_count)
 
 model = REFINEEMB(dic_sentiment2score, word2vec)
-optimizer = AdamW(model.parameters(), lr=0.01)
+#optimizer = AdamW(model.parameters(), lr=5e-5)
+params_to_update = []
+for name, param in model.named_parameters():
+    param.requires_grad = True
+    params_to_update.append(param)
+
+optimizer = Adam([
+    {'params': params_to_update, 'weight_decay': 0.1}
+], lr=0.001)
+model.train()
 for epoch in range(10):
     neighbors = torch.FloatTensor(neighbors)
-    outputs = model(neighbors)
-    outputs.requires_grad = True
-    outputs.backward()
+    loss = model(neighbors)
+
+    optimizer.zero_grad()
+    loss.backward()
     optimizer.step()
+    print("loss : ",loss)
+
 
