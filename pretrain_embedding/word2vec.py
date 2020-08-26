@@ -29,7 +29,6 @@ for file_name in file_list:
             m = m_
 
         found_sentence = re.sub(r'[\t\n\r]', '', m_)
-        print(m)
         if len(found_sentence.replace(" ", "")) > 0:
             tokenize_sentence = list(okt.morphs(found_sentence))
             tokenize_sentences.append(tokenize_sentence)
