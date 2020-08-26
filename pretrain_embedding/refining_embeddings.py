@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch
 from transformers import AdamW
 from torch.optim import Adam
+import numpy as np
 
 class REFINEEMB(nn.Module):
     def __init__(self, dic, w2v):
@@ -18,18 +19,17 @@ class REFINEEMB(nn.Module):
                 vectors.append(w2v.wv.word_vec(word))
             except:
                 continue
-        self.vector_parameters = nn.Parameter(torch.FloatTensor(vectors))
+        self.vector_parameters = nn.Parameter(torch.tensor(vectors, requires_grad = True,dtype=torch.float))
         self.softmax = nn.Softmax()
     def distance(self, x, y):
         return torch.sum((x-y)*(x-y),dim=-1)
     def loss(self,parameters,neighbors):
-        weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10])
+        weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10]).repeat(len(parameters),1)
         return torch.sum(weight * self.softmax(self.distance(parameters, neighbors)),dim=-1)
+
     def forward(self, neighbors):
-        total_loss = 0
-        for i in range(len(neighbors)):
-            batch_parameters = self.vector_parameters[i].repeat(10,1)
-            total_loss += self.loss(batch_parameters,neighbors[i]).tolist()
+        batch_parameters = self.vector_parameters.unsqueeze(1).repeat(1,10,1).view(-1,10,200)
+        total_loss = torch.sum(self.loss(batch_parameters,neighbors)).tolist()
 
         return torch.tensor([total_loss/1000], requires_grad = True,dtype=torch.float)
 
@@ -81,13 +81,12 @@ loss_fn = nn.MSELoss()
 ground_truth = torch.FloatTensor([0])
 for epoch in range(10):
     optimizer.zero_grad()
-    neighbors = torch.tensor(neighbors, dtype=torch.float)
+    neighbors = torch.FloatTensor(neighbors)
     loss = model(neighbors)
-    loss = loss_fn(loss,ground_truth)
     loss.backward()
     optimizer.step()
     print("loss : ",loss)
-    print("vectors : ",model.vector_parameters[0])
+    #print("vectors : ",model.vector_parameters[0])
     print(model.vector_parameters.grad)
 
 
