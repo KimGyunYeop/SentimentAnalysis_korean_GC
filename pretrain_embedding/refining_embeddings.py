@@ -24,14 +24,14 @@ class REFINEEMB(nn.Module):
         return torch.sum((x-y)*(x-y),dim=-1)
     def loss(self,parameters,neighbors):
         weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10])
-        return torch.sum(weight * self.softmax(self.distance(parameters, neighbors),dim=-1),dim=-1)
+        return torch.sum(weight * self.softmax(self.distance(parameters, neighbors)),dim=-1)
     def forward(self, neighbors):
         total_loss = 0
-        neighbors.grad_fn = True
         for i in range(len(neighbors)):
             batch_parameters = self.vector_parameters[i].repeat(10,1)
             total_loss += self.loss(batch_parameters,neighbors[i]).tolist()
-        return torch.tensor([total_loss], dtype=torch.float)
+
+        return torch.tensor([total_loss/1000], requires_grad = True,dtype=torch.float)
 
 tkn2pol = pickle.load(open(os.path.join('../lexicon','kosac_polarity.pkl'), 'rb'))
 tkn2int = pickle.load(open(os.path.join('../lexicon','kosac_intensity.pkl'), 'rb'))
@@ -75,16 +75,19 @@ for name, param in model.named_parameters():
     param.requires_grad = True
     params_to_update.append(param)
 
-optimizer = Adam([
-    {'params': params_to_update, 'weight_decay': 0.1}
-], lr=0.001)
+optimizer = Adam(model.parameters(), lr=5e-5)
 model.train()
+loss_fn = nn.MSELoss()
+ground_truth = torch.FloatTensor([0])
 for epoch in range(10):
-    neighbors = torch.FloatTensor(neighbors)
-    loss = model(neighbors)
     optimizer.zero_grad()
+    neighbors = torch.tensor(neighbors, dtype=torch.float)
+    loss = model(neighbors)
+    loss = loss_fn(loss,ground_truth)
     loss.backward()
     optimizer.step()
     print("loss : ",loss)
+    print("vectors : ",model.vector_parameters[0])
+    print(model.vector_parameters.grad)
 
 
