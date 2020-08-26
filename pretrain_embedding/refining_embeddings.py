@@ -66,8 +66,9 @@ for word, score in dic_sentiment2score.items():
         error_count+=1
         continue
 print(error_count)
-
+device = "cuda:{}".format(0) if torch.cuda.is_available() else "cpu"
 model = REFINEEMB(dic_sentiment2score, word2vec)
+model.to(device)
 #optimizer = AdamW(model.parameters(), lr=5e-5)
 params_to_update = []
 for name, param in model.named_parameters():
@@ -80,7 +81,7 @@ loss_fn = nn.MSELoss()
 ground_truth = torch.FloatTensor([0])
 for epoch in range(10):
     optimizer.zero_grad()
-    neighbors = torch.FloatTensor(neighbors)
+    neighbors = torch.FloatTensor(neighbors).to(device)
     loss = model(neighbors)
     loss.backward()
     optimizer.step()
