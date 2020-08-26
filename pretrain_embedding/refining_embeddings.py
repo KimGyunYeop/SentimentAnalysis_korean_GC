@@ -41,10 +41,7 @@ pol2idx = ['None','NEG', 'COMP', 'NEUT', 'POS']
 int2idx = ['None','Low', 'Medium', 'High']
 dict_pol2idx = {y:x for x,y in enumerate(pol2idx)}
 dict_int2idx = {y:x for x,y in enumerate(int2idx)}
-print(dict_pol2idx)
-print(tkn2pol.items())
 dic_sentiment2score = {tokens:(dict_pol2idx[pol] * dict_int2idx[int]) for (tokens,pol),int in zip(tkn2pol.items(),tkn2int.values())}
-print(len(dic_sentiment2score))
 
 #word2vec
 word2vec = Word2Vec.load('word2vec.model')
@@ -68,7 +65,9 @@ for word, score in dic_sentiment2score.items():
 print(error_count)
 device = "cuda:{}".format(0) if torch.cuda.is_available() else "cpu"
 model = REFINEEMB(dic_sentiment2score, word2vec)
+model.cuda()
 model.to(device)
+
 #optimizer = AdamW(model.parameters(), lr=5e-5)
 params_to_update = []
 for name, param in model.named_parameters():
