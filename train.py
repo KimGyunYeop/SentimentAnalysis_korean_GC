@@ -104,7 +104,7 @@ def train(args,
             outputs = model(**inputs)
             # print(outputs)
             loss = outputs[0]
-            #print(loss)
+            print(loss)
             if args.gradient_accumulation_steps > 1:
                 loss = loss / args.gradient_accumulation_steps
 
