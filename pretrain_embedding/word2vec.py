@@ -1,4 +1,4 @@
-from konlpy.tag import Okt
+from konlpy.tag import Okt,Kkma
 import glob
 import re
 from gensim.models import Word2Vec
@@ -27,7 +27,6 @@ for file_name in file_list:
             m = m[:idx]
         else:
             m = m_
-
         found_sentence = re.sub(r'[\t\n\r]', '', m_)
         if len(found_sentence.replace(" ", "")) > 0:
             tokenize_sentence = list(okt.morphs(found_sentence))
