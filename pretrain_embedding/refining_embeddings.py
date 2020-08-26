@@ -24,13 +24,14 @@ class REFINEEMB(nn.Module):
         return torch.sum((x-y)*(x-y),dim=-1)
     def loss(self,parameters,neighbors):
         weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10])
-        return torch.sum(weight * self.softmax(self.distance(parameters, neighbors)),dim=-1)
+        return torch.sum(weight * self.softmax(self.distance(parameters, neighbors),dim=-1),dim=-1)
     def forward(self, neighbors):
-        total_loss =  0
+        total_loss = 0
         for i in range(len(neighbors)):
             batch_parameters = self.vector_parameters[i].repeat(10,1)
+            batch_parameters.grad_fn = True
             total_loss += self.loss(batch_parameters,neighbors[i]).tolist()
-        return torch.tensor([total_loss], requires_grad=True, dtype=torch.float)
+        return torch.tensor([total_loss], dtype=torch.float)
 
 tkn2pol = pickle.load(open(os.path.join('../lexicon','kosac_polarity.pkl'), 'rb'))
 tkn2int = pickle.load(open(os.path.join('../lexicon','kosac_intensity.pkl'), 'rb'))
