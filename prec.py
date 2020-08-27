@@ -99,15 +99,8 @@ loss = loss_fn(x1, y)
 print(loss)
 print(loss.shape)'''
 
-a = torch.tensor([[[0,1],[2, 3]],
-                  [[4,5],[6, 7]],
-                  [[8,9],[10, 11]],
-                  [[12,13], [14, 15]]
-                  ])
-b = torch.tensor([[0,1, 2, 3],
-                  [4,5,6, 7],
-                  [8,9,10, 11],
-                  [12,13, 14, 15]
-                  ])
-print(a.shape)
-print(torch.nn.functional.pad(a, (0, 0, 1, 1)))
+from konlpy.tag import Okt,Kkma
+
+okt = Okt()
+print(okt.morphs("우아하여"))
+print(okt.morphs("진짜 너무 우아하여 감동입니다"))
