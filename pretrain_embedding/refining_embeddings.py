@@ -63,7 +63,7 @@ for word, score in dic_sentiment2score.items():
         continue
 print(error_count)
 device = "cuda:{}".format(0) if torch.cuda.is_available() else "cpu"
-model = REFINEEMB(dic_sentiment2score, word2vec)
+model = REFINEEMB(dic_sentiment2score, word2vec,device)
 model.to(device)
 
 #optimizer = AdamW(model.parameters(), lr=5e-5)
@@ -74,7 +74,7 @@ print(model)
 for epoch in range(10):
     optimizer.zero_grad()
     neighbors = torch.tensor(neighbors, requires_grad=True, dtype=torch.float).to(device)
-    loss = model(neighbors,device)
+    loss = model(neighbors)
     loss.retain_grad()
     loss.backward()
     optimizer.step()
