@@ -7,7 +7,7 @@ file_list = glob.glob("../big_corpus/*.txt")
 print(file_list)
 tokenize_sentences = []
 okt = Okt()
-for file_name in file_list:
+for file_name in file_list[0]:
     my_file = open(file_name, "r", encoding="EUCKR",errors="ignore")
     sentences = my_file.readlines()
     for sentence in sentences:

@@ -99,10 +99,8 @@ loss = loss_fn(x1, y)
 print(loss)
 print(loss.shape)'''
 
-a = torch.ones((2,2))
-c = torch.ones((2,2))
-a.mul_(3)
-print(a)
-b = torch.sub(a,c).mul(3)
-print(a)
-print(b)
+from konlpy.tag import Okt,Kkma
+
+okt = Okt()
+print(okt.morphs("우아하여"))
+print(okt.morphs("진짜 너무 우아하여 감동입니다"))
