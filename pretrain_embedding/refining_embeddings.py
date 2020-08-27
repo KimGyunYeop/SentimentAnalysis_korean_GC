@@ -21,16 +21,20 @@ class REFINEEMB(nn.Module):
             except:
                 continue
         self.vector_parameters = nn.Parameter(torch.tensor(vectors,dtype=torch.float),requires_grad = True)
+        self.linear = nn.Linear(200,200,bias=False)
+        self.linear.weight = self.vector_parameters.t()
         self.softmax = nn.Softmax(dim=-1)
 
     def distance(self, x, y):
         return torch.sum(torch.sub(x,y).mul(2),dim=-1)
-    def loss(self,neighbors):
+    def loss(self,neighbors, result):
         weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10]).repeat(len(neighbors),1).to(self.device)
-        return torch.sum(weight * self.softmax(self.distance(self.vector_parameters.unsqueeze(1).repeat(1,10,1), neighbors)),dim=-1)
+        return torch.sum(weight * self.softmax(self.distance(result.unsqueeze(1).repeat(1,10,1), neighbors)),dim=-1)
 
-    def forward(self, neighbors):
-        total_loss = torch.sum(self.loss(neighbors)).tolist()
+    def forward(self,ones_data, neighbors):
+        result = self.linear(ones_data).t()
+        print(result.shape)
+        total_loss = torch.sum(self.loss(neighbors,result)).tolist()
 
         return torch.tensor([total_loss], requires_grad = True,dtype=torch.float)
 
@@ -70,16 +74,19 @@ model.to(device)
 
 optimizer = Adam(model.parameters(), lr=1e-5, weight_decay=1e-6)
 model.train()
+
 print(model)
 for epoch in range(10):
-    optimizer.zero_grad()
-    neighbors = torch.tensor(neighbors, requires_grad=True, dtype=torch.float).to(device)
-    loss = model(neighbors)
-    loss.retain_grad()
-    loss.backward()
-    optimizer.step()
-    print("loss : ",loss)
-    for name, parameter in model.named_parameters():
-        print(name, f'data({parameter.data}), grad({parameter.grad})')
+    with torch.no_grad():
+        optimizer.zero_grad()
+        neighbors = torch.tensor(neighbors, requires_grad=True, dtype=torch.float).to(device)
+        tmp_data = torch.ones(10, 200).to(device)
+        loss = model(tmp_data,neighbors)
+        loss.retain_grad()
+        loss.backward()
+        optimizer.step()
+        print("loss : ",loss)
+        for name, parameter in model.named_parameters():
+            print(name, f'data({parameter.data}), grad({parameter.grad})')
 
 
