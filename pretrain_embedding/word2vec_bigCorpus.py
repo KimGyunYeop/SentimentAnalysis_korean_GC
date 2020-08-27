@@ -8,13 +8,13 @@ print(file_list)
 tokenize_sentences = []
 okt = Okt()
 for file_name in file_list:
-    print("file name : ",file_name)
-    u'\xc5'.encode('utf-8')
     my_file = open(file_name, "r", encoding="EUCKR",errors="ignore")
     sentences = my_file.readlines()
     for sentence in sentences:
         print(sentence)
+        sentence = re.sub(r'[\t\n\r]', '', sentence)
         tokenize_sentence = list(okt.morphs(sentence))
+        print(tokenize_sentence)
         tokenize_sentences.append(tokenize_sentence)
 
 embedding_model = Word2Vec(tokenize_sentences, size=200,workers=1)
