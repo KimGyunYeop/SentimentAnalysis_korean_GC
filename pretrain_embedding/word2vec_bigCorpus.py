@@ -10,7 +10,7 @@ okt = Okt()
 for file_name in file_list:
     print("file name : ",file_name)
     u'\xc5'.encode('utf-8')
-    my_file = open(file_name, "r", encoding="EUCKR")
+    my_file = open(file_name, "r", encoding="utf8")
     sentences = my_file.readlines()
     for sentence in sentences:
         print(sentence)
