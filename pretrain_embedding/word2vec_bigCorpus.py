@@ -9,7 +9,6 @@ tokenize_sentences = []
 okt = Okt()
 for file_name in file_list:
     print("file name : ",file_name)
-    u'\xc5'.encode('utf-8')
     my_file = open(file_name, "r", encoding="utf-8-sig")
     sentences = my_file.readlines()
     for sentence in sentences:
