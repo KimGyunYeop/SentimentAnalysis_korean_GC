@@ -255,6 +255,7 @@ DATASET_LIST = {
     "BASEELECTRA": BaseDataset,
     "BASEELECTRA_COS": BaseDataset,
     "BASEELECTRA_COS2": BaseDataset,
+    "BASEELECTRA_COS2_LSTM": BaseDataset,
 
     "LSTM": BaseDataset,
     "LSTM_ATT": BaseDataset,
