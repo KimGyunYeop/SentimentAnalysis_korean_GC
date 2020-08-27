@@ -32,6 +32,7 @@ for file_name in file_list:
             tokenize_sentence = list(okt.morphs(found_sentence))
             tokenize_sentences.append(tokenize_sentence)
 embedding_model = Word2Vec.load('ko.bin')
+#embedding_model = Word2Vec(tokenize_sentences, size=200,workers=1)
 embedding_model.train(tokenize_sentences, total_examples=len(tokenize_sentences), epochs=10)
 print(len(embedding_model.wv.vocab))
 embedding_model.save("word2vec.model")

@@ -20,23 +20,22 @@ class REFINEEMB(nn.Module):
                 vectors.append(w2v.wv.word_vec(word))
             except:
                 continue
-        self.vector_parameters = nn.Parameter(torch.tensor(vectors,dtype=torch.float),requires_grad = True)
-        self.linear = nn.Linear(200,200,bias=False)
-        self.linear.weight = self.vector_parameters.t()
+        self.vector_parameter = nn.Parameter(torch.tensor(vectors).t(),requires_grad = True)
+        self.linear = nn.Linear(len(vectors), 200, bias=False)
+        self.linear.weight = self.vector_parameter
         self.softmax = nn.Softmax(dim=-1)
+        self.weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10]).repeat(len(vectors),1)
 
     def distance(self, x, y):
         return torch.sum(torch.sub(x,y).mul(2),dim=-1)
-    def loss(self,neighbors, result):
-        weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10]).repeat(len(neighbors),1).to(self.device)
-        return torch.sum(weight * self.softmax(self.distance(result.unsqueeze(1).repeat(1,10,1), neighbors)),dim=-1)
+    def loss(self,result,neighbors):
+        result = torch.sum(self.weight.mul(self.softmax(self.distance(result, neighbors))),dim=-1)
+        return result
 
-    def forward(self,ones_data, neighbors):
-        result = self.linear(ones_data).t()
-        print(result.shape)
-        total_loss = torch.sum(self.loss(neighbors,result)).tolist()
-
-        return torch.tensor([total_loss], requires_grad = True,dtype=torch.float)
+    def forward(self, ones_data,neighbors):
+        result = self.linear(ones_data).unsqueeze(1).repeat(1,10,1)
+        total_loss = self.loss(result,neighbors).sum()
+        return total_loss
 
 tkn2pol = pickle.load(open(os.path.join('../lexicon','kosac_polarity.pkl'), 'rb'))
 tkn2int = pickle.load(open(os.path.join('../lexicon','kosac_intensity.pkl'), 'rb'))
@@ -70,23 +69,20 @@ device = "cuda:{}".format(0) if torch.cuda.is_available() else "cpu"
 model = REFINEEMB(dic_sentiment2score, word2vec,device)
 model.to(device)
 
-#optimizer = AdamW(model.parameters(), lr=5e-5)
-
-optimizer = Adam(model.parameters(), lr=1e-5, weight_decay=1e-6)
+optimizer = AdamW(model.parameters(), lr=1)
+for param in model.parameters():
+    param.requires_grad = True
+#optimizer = Adam(model.parameters(),lr=10)
 model.train()
 
 print(model)
 for epoch in range(10):
-    with torch.no_grad():
-        optimizer.zero_grad()
-        neighbors = torch.tensor(neighbors, requires_grad=True, dtype=torch.float).to(device)
-        tmp_data = torch.ones(10, 200).to(device)
-        loss = model(tmp_data,neighbors)
-        loss.retain_grad()
-        loss.backward()
-        optimizer.step()
-        print("loss : ",loss)
-        for name, parameter in model.named_parameters():
-            print(name, f'data({parameter.data}), grad({parameter.grad})')
+    optimizer.zero_grad()
+    neighbors = torch.tensor(neighbors, dtype=torch.float).to(device)
+    tmp_data = torch.ones(len(neighbors), len(neighbors), requires_grad=True).to(device)
+    loss = model(tmp_data,neighbors)
+    print("loss : ", loss)
+    loss.backward(create_graph=True)
+    optimizer.step()
 
 
