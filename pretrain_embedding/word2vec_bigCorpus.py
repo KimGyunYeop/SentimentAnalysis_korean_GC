@@ -12,7 +12,7 @@ for file_name in file_list:
     sentences = my_file.readlines()
     for sentence in sentences:
         print(sentence)
-        sentence = re.sub(r'[\t\n\r]', '', sentence)
+        sentence = re.sub(r'[\t\n\r]', ' ', sentence)
         tokenize_sentence = list(okt.morphs(sentence))
         print(tokenize_sentence)
         tokenize_sentences.append(tokenize_sentence)
