@@ -11,10 +11,8 @@ for file_name in file_list:
     my_file = open(file_name, "r", encoding="EUCKR",errors="ignore")
     sentences = my_file.readlines()
     for sentence in sentences:
-        print(sentence)
         sentence = re.sub(r'[\t\n\r]', ' ', sentence)
         tokenize_sentence = list(okt.morphs(sentence))
-        print(tokenize_sentence)
         tokenize_sentences.append(tokenize_sentence)
 
 embedding_model = Word2Vec(tokenize_sentences, size=200,workers=1)
