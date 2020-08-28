@@ -82,6 +82,7 @@ for param in model.parameters():
 model.train()
 
 print(model)
+print(model.linear.weight)
 for epoch in range(100):
     optimizer.zero_grad()
     neighbors = torch.FloatTensor(neighbors).to(device)
@@ -90,5 +91,7 @@ for epoch in range(100):
     print("loss : ", loss)
     loss.backward(create_graph=True)
     optimizer.step()
+
+print(model.linear.weight)
 
 
