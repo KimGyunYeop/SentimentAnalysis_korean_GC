@@ -29,7 +29,7 @@ class REFINEEMB(nn.Module):
     def distance(self, x, y):
         return torch.sum(torch.sub(x,y).mul(2),dim=-1)
     def loss(self,result,neighbors):
-        weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10]).repeat(len(vectors),1).to(device)
+        weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10]).repeat(len(neighbors),1).to(device)
         result = torch.sum(weight.mul_(self.softmax(self.distance(result, neighbors))),dim=-1)
         return result
 
