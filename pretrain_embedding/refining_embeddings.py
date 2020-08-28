@@ -25,12 +25,12 @@ class REFINEEMB(nn.Module):
         self.linear = nn.Linear(len(vectors), 200, bias=False)
         self.linear.weight = self.vector_parameter
         self.softmax = nn.Softmax(dim=-1)
-        self.weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10]).repeat(len(vectors),1).to(device)
 
     def distance(self, x, y):
         return torch.sum(torch.sub(x,y).mul(2),dim=-1)
     def loss(self,result,neighbors):
-        result = torch.sum(self.weight.mul_(self.softmax(self.distance(result, neighbors))),dim=-1)
+        weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10]).repeat(len(vectors),1).to(device)
+        result = torch.sum(weight.mul_(self.softmax(self.distance(result, neighbors))),dim=-1)
         return result
 
     def forward(self, ones_data,neighbors):
