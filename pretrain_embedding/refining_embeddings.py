@@ -95,6 +95,8 @@ for epoch in range(100):
     loss.backward(create_graph=True)
     optimizer.step()
     del loss
+    del neighbors
+    del tmp_data
 
 print(model.linear.weight)
 
