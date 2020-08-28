@@ -58,6 +58,7 @@ neighbors =  []
 for word, score in dic_sentiment2score.items():
     try:
         neighbor = word2vec.wv.similar_by_word(word, topn=10)
+        print(word)
         neighbor_score = {}
         for neighbor_word,_ in neighbor:
             try:
