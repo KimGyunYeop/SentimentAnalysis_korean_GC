@@ -32,7 +32,7 @@ class REFINEEMB(nn.Module):
     def loss(self,previous_vector,result,neighbors):
         alpha=0.2
         beta = 0.8
-        result1= self.distance(previous_vector, result).mul_(alpha)
+        result1= self.distance(previous_vector.unsqueeze(1).repeat(1,10,1), result).mul_(alpha)
         result2 = torch.sum(self.weight.mul_(self.softmax(self.distance(result, neighbors))),dim=-1).mul_(beta)
         return result1 + result2
 
