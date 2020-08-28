@@ -72,6 +72,7 @@ print(error_count)
 
 #model learning
 device = "cuda:{}".format(0) if torch.cuda.is_available() else "cpu"
+print(device)
 model = REFINEEMB(dic_sentiment2score, word2vec,device)
 model.to(device)
 
