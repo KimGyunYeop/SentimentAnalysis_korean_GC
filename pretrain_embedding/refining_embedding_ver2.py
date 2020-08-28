@@ -41,27 +41,36 @@ for word, score in dic_sentiment2score.items():
         error_count+=1
         continue
 print(error_count)
+vectors = []
 for word in dic_sentiment2score.keys():
-    vectors = []
     try:
         vectors.append(word2vec.wv.word_vec(word))
     except:
         continue
 weight = torch.FloatTensor([1,1/2,1/3,1/4,1/5,1/6,1/7,1/8,1/9,1/10]).repeat(len(vectors),1)
+neighbors = torch.FloatTensor(neighbors)
 softmax = nn.Softmax(dim=-1)
 #model learning
-def distance( x, y):
+def distance(x, y):
     return torch.sum(torch.sub(x, y).mul(2), dim=-1)
 
 def loss( f_vectors,f_after_vectors, neighbors):
-    beta = 0.8
+    beta = 0.5
     alpha = 1 - beta
-    result = torch.sum(distance(f_vectors, f_after_vectors).mul_(alpha) ,torch.sum(weight.mul_(distance(f_after_vectors.unsqueeze(1).repeat(1,10,1), neighbors)), dim=-1).mul_(beta))
+    result = distance(f_vectors, f_after_vectors).mul_(alpha) +torch.sum(weight.mul_(distance(f_after_vectors.unsqueeze(1).repeat(1,10,1), neighbors)), dim=-1).mul_(beta)
+    return result.sum()/1000
+def next_vector(f_vectors):
+    r = 0.5
+    beta = 0.8
+    vectororoo = weight.unsqueeze(2).repeat(1,1,200).view(-1,10,200).mul_(neighbors)
+    result = f_vectors.mul_(r)+torch.sum(vectororoo, dim=1).mul_(beta)\
+        .div(torch.sum(weight.unsqueeze(2).repeat(1,1,200).view(-1,10,200), dim=1).mul_(beta)+r)
     return result
-
 for epoch in range(100):
-    print(epoch)
+    print("epoch : ",epoch)
     f_vectors = torch.tensor(vectors)
-    f_after_vectors = torch.tensor(vectors)
+    f_after_vectors = next_vector(f_vectors)
     obj_fn =loss(f_vectors,f_after_vectors,neighbors)
+    print(obj_fn)
+    f_vectors = f_after_vectors
 
