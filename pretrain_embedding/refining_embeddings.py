@@ -90,10 +90,8 @@ tmp_data = torch.ones(len(neighbors), len(neighbors), requires_grad=True).to(dev
 model.train()
 for epoch in range(100):
     optimizer.zero_grad()
-    loss = model(tmp_data,neighbors)
+    loss = model(tmp_data,neighbors).detach().cpu()
     print("loss : ", loss)
-    loss.to("cpu")
-    print(loss.device)
     loss.backward(create_graph=True)
     optimizer.step()
     del loss
