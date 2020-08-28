@@ -29,16 +29,15 @@ class REFINEEMB(nn.Module):
 
     def distance(self, x, y):
         return torch.sum(torch.sub(x,y).mul(2),dim=-1)
-    def loss(self,previous_vector,result,neighbors):
+    def loss(self,previous_vector,now_vector,neighbors):
         alpha=0.2
         beta = 0.8
-        result1= self.distance(previous_vector.unsqueeze(1).repeat(1,10,1), result).mul_(alpha)
-        result2 = torch.sum(self.weight.mul_(self.softmax(self.distance(result, neighbors))),dim=-1).mul_(beta)
+        result1= self.distance(previous_vector, now_vector).mul_(alpha)
+        result2 = torch.sum(self.weight.mul_(self.distance(now_vector.unsqueeze(1).repeat(1,10,1), neighbors)),dim=-1).mul_(beta)
         return result1 + result2
 
     def forward(self, previous_vector,ones_data,neighbors):
-        result = self.linear(ones_data).unsqueeze(1).repeat(1,10,1)
-        total_loss = self.loss(previous_vector,result,neighbors).sum()
+        total_loss = self.loss(previous_vector,self.linear(ones_data),neighbors).sum()
         return total_loss
 #tokenizer
 okt = Okt()
