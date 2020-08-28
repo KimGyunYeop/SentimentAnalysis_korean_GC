@@ -101,7 +101,7 @@ for epoch in range(100):
     optimizer.step()
     del loss
     torch.cuda.empty_cache()
-
+print(previous_weight[0])
 print(model.linear.weight.t())
 
 
