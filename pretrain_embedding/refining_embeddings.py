@@ -21,7 +21,7 @@ class REFINEEMB(nn.Module):
                 vectors.append(w2v.wv.word_vec(word))
             except:
                 continue
-        self.vector_parameter = nn.Parameter(torch.tensor(vectors).t(),requires_grad = True).to(device)
+        self.vector_parameter = nn.Parameter(torch.tensor(vectors).t(),requires_grad = True)
         self.linear = nn.Linear(len(vectors), 200, bias=False)
         self.linear.weight = self.vector_parameter
         self.softmax = nn.Softmax(dim=-1)
