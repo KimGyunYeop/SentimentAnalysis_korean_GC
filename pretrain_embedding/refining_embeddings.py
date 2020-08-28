@@ -25,7 +25,7 @@ class REFINEEMB(nn.Module):
         self.linear = nn.Linear(len(vectors), 200, bias=False)
         self.linear.weight = self.vector_parameter
         self.softmax = nn.Softmax(dim=-1)
-        self.weight = torch.FloatTensor([1, 1 / 2, 1 / 3, 1 / 4, 1 / 5, 1 / 6, 1 / 7, 1 / 8, 1 / 9, 1 / 10]).repeat(len(neighbors), 1).to(device)
+        self.weight = torch.FloatTensor([1, 1 / 2, 1 / 3, 1 / 4, 1 / 5, 1 / 6, 1 / 7, 1 / 8, 1 / 9, 1 / 10]).repeat(len(neighbors), 1,requires_grad=False).to(device)
 
     def distance(self, x, y):
         print("bbb")
@@ -86,11 +86,11 @@ for param in model.parameters():
 print(model)
 print(model.linear.weight)
 neighbors = torch.FloatTensor(neighbors).to(device)
-tmp_data = torch.ones(len(neighbors), len(neighbors), requires_grad=True).to(device)
+tmp_data = torch.ones(len(neighbors), len(neighbors), requires_grad=False).to(device)
 model.train()
 for epoch in range(100):
     optimizer.zero_grad()
-    loss = model(tmp_data,neighbors).cpu().detach
+    loss = model(tmp_data,neighbors)
     print("loss : ", loss)
     loss.backward(create_graph=True)
     optimizer.step()
