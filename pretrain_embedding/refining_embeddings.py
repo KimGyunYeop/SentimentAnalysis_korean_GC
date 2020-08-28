@@ -91,7 +91,7 @@ model.train()
 previous_weight=[]
 for epoch in range(100):
     optimizer.zero_grad()
-    previous_weight.append(model.linear.weight.t())
+    previous_weight.append(model.linear.weight.values().t())
     if epoch>=1:
         loss = model(previous_weight[epoch-1],tmp_data, neighbors)
     else:
@@ -99,7 +99,6 @@ for epoch in range(100):
     print("loss : ", loss)
     loss.backward(create_graph=True)
     optimizer.step()
-    print(previous_weight[0])
     del loss
     torch.cuda.empty_cache()
 print(previous_weight[0])
