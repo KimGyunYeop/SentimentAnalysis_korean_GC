@@ -91,7 +91,7 @@ model.train()
 previous_weight=[]
 for epoch in range(100):
     optimizer.zero_grad()
-    previous_weight.append(model.named_parameters()[0][1].data)
+    previous_weight.append(model.vector_parameter.data.state_dict().t())
     if epoch>=1:
         loss = model(previous_weight[epoch-1],tmp_data, neighbors)
     else:
