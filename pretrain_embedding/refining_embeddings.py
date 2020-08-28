@@ -33,8 +33,8 @@ class REFINEEMB(nn.Module):
         alpha=0.2
         beta = 0.8
         result1= self.distance(previous_vector, result).mul_(alpha)
-        result1 = torch.sum(self.weight.mul_(self.softmax(self.distance(result, neighbors))),dim=-1).mul_(beta)
-        return result1 + result1
+        result2 = torch.sum(self.weight.mul_(self.softmax(self.distance(result, neighbors))),dim=-1).mul_(beta)
+        return result1 + result2
 
     def forward(self, previous_vector,ones_data,neighbors):
         result = self.linear(ones_data).unsqueeze(1).repeat(1,10,1)
