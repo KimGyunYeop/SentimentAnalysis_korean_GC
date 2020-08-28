@@ -99,6 +99,7 @@ for epoch in range(100):
     print("loss : ", loss)
     loss.backward(create_graph=True)
     optimizer.step()
+    print(previous_weight[0])
     del loss
     torch.cuda.empty_cache()
 print(previous_weight[0])
