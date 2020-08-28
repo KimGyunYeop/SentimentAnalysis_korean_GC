@@ -249,13 +249,11 @@ class BASEELECTRA_COS2_NEG(nn.Module):
         len_p = len(x1_p)
         len_n = len(x1_n)
         loss2 = 0
-        if len_p != 0 and len_n != 0:
-            x1_p = x1_p.squeeze().repeat(1, len_n)
-            # print('x1_p', x1_p.shape)
-            x1_p = x1_p.view(1, len_n * len_p, w2v_dim).squeeze()
-            # print('x1_p', x1_p.shape)
-            x1_n = x1_n.squeeze().repeat(1, len_p)
-            x1_n = x1_n.view(1, len_p * len_n, w2v_dim).squeeze()
+        if len_p != 0 or len_n != 0:
+            x1_p = x1_p.squeeze()
+            x1_p = x1_p.repeat(1, len_n)
+            x1_p = x1_p.view(-1, w2v_dim)
+            x1_n = x1_n.squeeze().repeat(len_p, 1)
 
             y = -torch.ones(len_p * len_n).type(torch.FloatTensor).cuda()
             loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=-0.5)
