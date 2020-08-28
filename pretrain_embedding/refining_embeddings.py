@@ -57,7 +57,7 @@ error_count = 0
 neighbors =  []
 for word, score in dic_sentiment2score.items():
     try:
-        neighbor = word2vec.wv.similar_by_word(word, topn=0.1)
+        neighbor = word2vec.wv.similar_by_word(word, topn=10)
         neighbor_score = {}
         for neighbor_word,_ in neighbor:
             try:
@@ -78,7 +78,7 @@ print(device)
 model = REFINEEMB(dic_sentiment2score, word2vec,device)
 model.to(device)
 
-optimizer = AdamW(model.parameters(), lr=1)
+optimizer = AdamW(model.parameters(), lr=0.001)
 for param in model.parameters():
     param.requires_grad = True
 #optimizer = Adam(model.parameters(),lr=10)
