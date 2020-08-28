@@ -28,16 +28,17 @@ class REFINEEMB(nn.Module):
         self.weight = torch.FloatTensor([1, 1 / 2, 1 / 3, 1 / 4, 1 / 5, 1 / 6, 1 / 7, 1 / 8, 1 / 9, 1 / 10]).repeat(len(neighbors), 1).to(device)
 
     def distance(self, x, y):
-        print("bbb")
         return torch.sum(torch.sub(x,y).mul(2),dim=-1)
-    def loss(self,result,neighbors):
-        print("aaa")
-        result = torch.sum(self.weight.mul_(self.softmax(self.distance(result, neighbors))),dim=-1)
-        return result
+    def loss(self,previous_vector,result,neighbors):
+        alpha=0.2
+        beta = 0.8
+        result1= self.distance(previous_vector, result).mul_(alpha)
+        result1 = torch.sum(self.weight.mul_(self.softmax(self.distance(result, neighbors))),dim=-1).mul_(beta)
+        return result1 + result1
 
-    def forward(self, ones_data,neighbors):
+    def forward(self, previous_vector,ones_data,neighbors):
         result = self.linear(ones_data).unsqueeze(1).repeat(1,10,1)
-        total_loss = self.loss(result,neighbors).sum()
+        total_loss = self.loss(previous_vector,result,neighbors).sum()
         return total_loss
 #tokenizer
 okt = Okt()
@@ -88,9 +89,14 @@ print(model.linear.weight)
 neighbors = torch.FloatTensor(neighbors).to(device)
 tmp_data = torch.ones(len(neighbors), len(neighbors), requires_grad=False).to(device)
 model.train()
+previous_weight=[]
 for epoch in range(100):
     optimizer.zero_grad()
-    loss = model(tmp_data,neighbors)
+    previous_weight.apped(model.linear.weight.t())
+    if epoch>=1:
+        loss = model(previous_weight[epoch-1],tmp_data, neighbors)
+    else:
+        loss = model(previous_weight[epoch], tmp_data, neighbors)
     print("loss : ", loss)
     loss.backward(create_graph=True)
     optimizer.step()
