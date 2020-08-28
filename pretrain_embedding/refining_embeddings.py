@@ -92,7 +92,7 @@ for epoch in range(100):
     optimizer.zero_grad()
     loss = model(tmp_data,neighbors)
     print("loss : ", loss)
-    loss.data.cpu()
+    loss.to("cpu")
     print(loss.device)
     loss.backward(create_graph=True)
     optimizer.step()
