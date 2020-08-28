@@ -82,12 +82,12 @@ optimizer = AdamW(model.parameters(), lr=10)
 for param in model.parameters():
     param.requires_grad = True
 #optimizer = Adam(model.parameters(),lr=10)
-model.train()
 
 print(model)
 print(model.linear.weight)
 neighbors = torch.FloatTensor(neighbors).to(device)
 tmp_data = torch.ones(len(neighbors), len(neighbors), requires_grad=True).to(device)
+model.train()
 for epoch in range(100):
     optimizer.zero_grad()
     loss = model(tmp_data,neighbors)
@@ -95,6 +95,7 @@ for epoch in range(100):
     loss.backward(create_graph=True)
     optimizer.step()
     del loss
+    torch.cuda.empty_cache()
 
 print(model.linear.weight)
 
