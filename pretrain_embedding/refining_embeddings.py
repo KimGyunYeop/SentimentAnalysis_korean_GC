@@ -85,14 +85,14 @@ for param in model.parameters():
 #optimizer = Adam(model.parameters(),lr=10)
 
 print(model)
-print(model.linear.weight)
+print(model.linear.weight.t())
 neighbors = torch.FloatTensor(neighbors).to(device)
 tmp_data = torch.ones(len(neighbors), len(neighbors), requires_grad=False).to(device)
 model.train()
 previous_weight=[]
 for epoch in range(100):
     optimizer.zero_grad()
-    previous_weight.apped(model.linear.weight.t())
+    previous_weight.append(model.linear.weight.t())
     if epoch>=1:
         loss = model(previous_weight[epoch-1],tmp_data, neighbors)
     else:
@@ -103,6 +103,6 @@ for epoch in range(100):
     del loss
     torch.cuda.empty_cache()
 
-print(model.linear.weight)
+print(model.linear.weight.t())
 
 
