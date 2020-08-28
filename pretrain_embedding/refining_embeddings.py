@@ -89,11 +89,12 @@ tmp_data = torch.ones(len(neighbors), len(neighbors), requires_grad=True).to(dev
 for epoch in range(100):
     torch.cuda.empty_cache()
     optimizer.zero_grad()
-    print("a")
     loss = model(tmp_data,neighbors)
     print("loss : ", loss)
     loss.backward(create_graph=True)
     optimizer.step()
+    del loss
+    torch.cuda.empty_cache()
 
 print(model.linear.weight)
 
