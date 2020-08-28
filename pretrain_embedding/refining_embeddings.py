@@ -88,13 +88,12 @@ print(model.linear.weight)
 neighbors = torch.FloatTensor(neighbors).to(device)
 tmp_data = torch.ones(len(neighbors), len(neighbors), requires_grad=True).to(device)
 for epoch in range(100):
-    torch.cuda.empty_cache()
     optimizer.zero_grad()
     loss = model(tmp_data,neighbors)
     print("loss : ", loss)
     loss.backward(create_graph=True)
     optimizer.step()
-    del model
+    del loss
     torch.cuda.empty_cache()
 
 print(model.linear.weight)
