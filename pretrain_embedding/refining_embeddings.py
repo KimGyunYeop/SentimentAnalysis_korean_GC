@@ -78,10 +78,9 @@ print(device)
 model = REFINEEMB(dic_sentiment2score, word2vec,device)
 model.to(device)
 
-optimizer = AdamW(model.parameters(), lr=0.001)
+optimizer = AdamW(model.parameters(), lr=0.01)
 for param in model.parameters():
     param.requires_grad = True
-#optimizer = Adam(model.parameters(),lr=10)
 
 print(model)
 print(model.linear.weight.t())
