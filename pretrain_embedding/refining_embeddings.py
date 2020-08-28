@@ -93,6 +93,7 @@ for epoch in range(100):
     loss = model(tmp_data,neighbors)
     print("loss : ", loss)
     loss.data.cpu()
+    print(loss.device)
     loss.backward(create_graph=True)
     optimizer.step()
     del loss
