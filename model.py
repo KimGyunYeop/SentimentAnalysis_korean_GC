@@ -1079,7 +1079,6 @@ class KNU_BASE(nn.Module):
 
         return result
 
-
 class KNU_LSTM(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(KNU_LSTM, self).__init__()
@@ -1507,6 +1506,7 @@ MODEL_LIST = {
     "LSTM_ATT_v2_KNU": KNU_LSTM_ATT_v2,
     "LSTM_ATT_DOT_KNU": KNU_LSTM_ATT_DOT,
     "KOSAC_LSTM_ATT_DOT_ML": KNU_LSTM_ATT_DOT_ML,
+    "BASE_KNU_ALL": KNU_BASE,
 
     "CHAR_KOELECTRA": CHAR_LSTM,
 
