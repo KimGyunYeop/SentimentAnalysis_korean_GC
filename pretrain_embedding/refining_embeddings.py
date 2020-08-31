@@ -58,7 +58,7 @@ neighbors =  []
 for word, score in dic_sentiment2score.items():
     try:
         neighbor = word2vec.wv.similar_by_word(word, topn=10)
-        print(word)
+        print(word[0])
         neighbor_score = {}
         for neighbor_word,_ in neighbor:
             try:
@@ -72,7 +72,7 @@ for word, score in dic_sentiment2score.items():
         error_count+=1
         continue
 print(error_count)
-
+print(neighbor[0])
 #model learning
 device = "cuda:{}".format(0) if torch.cuda.is_available() else "cpu"
 print(device)
@@ -89,7 +89,7 @@ neighbors = torch.FloatTensor(neighbors).to(device)
 tmp_data = torch.ones(len(neighbors), len(neighbors), requires_grad=False).to(device)
 model.train()
 previous_weight=[]
-for epoch in range(100):
+for epoch in range(80):
     optimizer.zero_grad()
     previous_weight.append(model.vector_parameter.data.clone().t())
     if epoch>=1:
