@@ -325,7 +325,7 @@ class BASEELECTRA_COS2_NEG(nn.Module):
                         torch.ones(batch_size).cuda())
 
         if len_p == 0 or len_n == 0:
-            result = ((loss1, 0.5 * loss3, 0.5 * loss3), outputs)
+            result = ((loss1, torch.tensor(0), loss3), outputs)
         else:
             result = ((loss1, 0.5 * loss2, 0.5 * loss3), outputs)
 
@@ -396,17 +396,17 @@ class BASEELECTRA_COS2_STAR_NEG(nn.Module):
                               -torch.ones(len_n).cuda())
         if len_p <= 1 and len_n > 1:
             if len_p == 0:
-                result = ((loss1, 0.5 * loss3_n, 0.5 * loss3_n), outputs)
+                result = ((loss1, torch.tensor(0), torch.tensor(0), 0.5 * loss3_n), outputs)
             else:
-                result = ((loss1, 0.5 * loss2, 0.5 * loss3_n), outputs)
+                result = ((loss1, torch.tensor(0), torch.tensor(0), 0.5 * loss3_n), outputs)
         elif len_p > 1 and len_n <= 1:
             if len_n == 0:
-                result = ((loss1, 0.5 * loss3_p, 0.5 * loss3_p), outputs)
+                result = ((loss1, torch.tensor(0), 0.5 * loss3_p, torch.tensor(0)), outputs)
             else:
-                result = ((loss1, 0.5 * loss2, 0.5 * loss3_p), outputs)
+                result = ((loss1, torch.tensor(0), 0.5 * loss3_p, torch.tensor(0)), outputs)
         else:
             result = ((loss1, 0.5 * loss2,
-                       float(len_p) / (len_p + len_n) / 2 * loss3_p + float(len_n) / (len_p + len_n) / 2 * loss3_n),
+                       float(len_p) / (len_p + len_n) / 2 * loss3_p, float(len_n) / (len_p + len_n) / 2 * loss3_n),
                       outputs)
 
         return result
@@ -725,6 +725,94 @@ class LSTM_ATT_MIX(nn.Module):
         loss_fct = nn.CrossEntropyLoss()
         loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
         result = (loss, outputs)
+
+        return result
+
+
+class LSTM_ATT_MIX_NEG(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(LSTM_ATT_MIX_NEG, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+
+        # attention
+        self.softmax = nn.Softmax(dim=-1)
+        self.dense_att = nn.Linear(768, 1)
+
+        self.config = config
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 2)
+        self.tanh = nn.Tanh()
+
+    def attention_net(self, emb_outputs):
+        M = self.tanh(emb_outputs)
+        wM_output = self.dense_att(M).squeeze()
+        a = self.softmax(wM_output)
+        c = emb_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
+        att_output = self.tanh(c)
+
+        return att_output
+
+    def get_3gram_Att(self, emb_outputs):
+        emb_3_Grams = []
+        batch_size, seq_len, w2v_dim = emb_outputs.shape
+        emb_outputs_padding = torch.nn.functional.pad(emb_outputs, (0, 0, 1, 1))
+        alpha = 0.5
+        for i in range(1, 51):
+            # emb_3_Gram = torch.mean(emb_outputs[:,i-1:i+2,:], dim=1)
+            emb_3_Gram = emb_outputs_padding[:, i, :] * alpha + emb_outputs_padding[:, i + 1, :] * (
+                    1 - alpha) / 2 + emb_outputs_padding[:, i - 1, :] * (1 - alpha) / 2
+            emb_3_Grams.append(emb_3_Gram)
+
+        inputs = torch.cat(emb_3_Grams, dim=-1)
+        inputs = torch.reshape(inputs, (batch_size, seq_len, w2v_dim))
+        output = self.attention_net(inputs)
+
+        return output
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        embs = outputs[0]
+        hie_attn_output = self.get_3gram_Att(outputs[0])
+
+        outputs = self.dense(hie_attn_output)
+        outputs = self.dropout(outputs)
+        outputs = self.out_proj(outputs)
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
+        labels_2 = labels.type(torch.FloatTensor).cuda()
+
+        for i in range(len(labels_2)):
+            labels_2[i] = labels_2[i].double() * 2 - 1
+        p_idx = (labels_2 == 1).nonzero().cuda()
+        n_idx = (labels_2 == -1).nonzero().cuda()
+
+        x1 = embs[:, 0, :].squeeze()
+        batch_size, seq_len, w2v_dim = embs.shape
+        x1_p = x1[p_idx]
+        x1_n = x1[n_idx]
+        len_p = len(x1_p)
+        len_n = len(x1_n)
+
+        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=-0.5)
+        if len_p != 0 and len_n != 0:
+            x1_p = x1_p.squeeze()
+            x1_p = x1_p.repeat(1, len_n)
+            x1_p = x1_p.view(-1, w2v_dim)
+            x1_n = x1_n.squeeze().repeat(len_p, 1)
+
+            y = -torch.ones(len_p * len_n).type(torch.FloatTensor).cuda()
+
+            loss2 = loss_fn(x1_p.view(-1, w2v_dim),
+                            x1_n.view(-1, w2v_dim),
+                            y.view(-1))
+
+        if len_p != 0 and len_n != 0:
+            result = ((loss, loss2), outputs)
+        else:
+            result = ((loss, torch.tensor(0)), outputs)
 
         return result
 
@@ -1406,6 +1494,7 @@ MODEL_LIST = {
     "LSTM_ATT_DOT": LSTM_ATT_DOT,
     "LSTM_ATT2": LSTM_ATT2,
     "LSTM_ATT_MIX": LSTM_ATT_MIX,
+    "LSTM_ATT_MIX_NEG": LSTM_ATT_MIX_NEG,
 
     "LSTM_KOSAC": KOSAC_LSTM,
     "LSTM_ATT_KOSAC": KOSAC_LSTM_ATT,
