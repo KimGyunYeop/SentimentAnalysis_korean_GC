@@ -53,6 +53,7 @@ dic_naver_sentiment2score = {list(okt.morphs(naver_sentiment["word"][i]))[0]:nav
 dic_sentiment2score.update(dic_naver_sentiment2score)
 #word2vec
 word2vec = Word2Vec.load('word2vec.model')
+print("aaa")
 error_count = 0
 neighbors =  []
 for word, score in dic_sentiment2score.items():
@@ -106,4 +107,5 @@ for i, (k, _) in enumerate(neighbor_sorted):
     word2vec.wv[k] = model.linear.weight.data.clone().t()[i]
     print(word2vec.wv[k])
 
+word2vec.save("word2vec_refining.model")
 
