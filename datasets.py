@@ -88,9 +88,9 @@ class GensimDataset(Dataset):
     def __getitem__(self, idx):
         txt = str(self.dataset.at[idx,"review"])
         data = self.tokenizer.morphs(txt)
-        input_ids = torch.LongTensor(data)
-        token_type_ids = torch.LongTensor(data)
-        attention_mask = torch.LongTensor(data)
+        input_ids = torch.tensor(data)
+        token_type_ids = torch.tensor(data)
+        attention_mask = torch.tensor(data)
         label = self.dataset.at[idx,"rating"]
 
         return (input_ids, token_type_ids, attention_mask, label),txt
