@@ -69,7 +69,7 @@ class CharBaseDataset(Dataset):
 
 class GensimDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
-        super(BaseDataset,self).__init__()
+        super(GensimDataset,self).__init__()
         self.tokenizer = tokenizer
         self.maxlen = args.max_seq_len
         if "train" in mode:
