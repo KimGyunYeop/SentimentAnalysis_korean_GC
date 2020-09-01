@@ -94,9 +94,7 @@ class GensimDataset(Dataset):
         for i, token in enumerate(tokens):
             try:
                 data[i] = self.pretrain_emb.wv[token]
-                print(data[i])
             except:
-
                 continue
         input_ids = torch.FloatTensor(data)
         token_type_ids = torch.FloatTensor([0])
