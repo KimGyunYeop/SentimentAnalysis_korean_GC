@@ -97,6 +97,7 @@ class GensimDataset(Dataset):
                 print(data[i])
             except:
                 continue
+        print(len(data))
         input_ids = torch.FloatTensor(data)
         token_type_ids = torch.FloatTensor([0])
         attention_mask = torch.FloatTensor([0])
