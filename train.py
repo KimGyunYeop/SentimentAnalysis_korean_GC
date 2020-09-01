@@ -288,11 +288,8 @@ def main(cli_args):
     # GPU or CPU
     args.device = "cuda:{}".format(cli_args.gpu) if torch.cuda.is_available() and not args.no_cuda else "cpu"
     config.device = args.device
-    if "PRETRAIN_EMB" in cli_args.model_mode:
-        pretrain_embedding = Word2Vec.load("pretrain_embedding/word2vec.model")
-        model = MODEL_LIST[cli_args.model_mode](pretrain_embedding)
-    else:
-        model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
+
+    model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
     model.to(args.device)
     if cli_args.small == False:
         # Load dataset

@@ -1478,10 +1478,8 @@ class CHAR_LSTM(nn.Module):
         return result
 
 class PRETRAIN_EMB_LSTM_ATT(nn.Module):
-    def __init__(self, pretrain_embedding):
+    def __init__(self, model_type, model_name_or_path, config):
         super(PRETRAIN_EMB_LSTM_ATT, self).__init__()
-        # Embedding
-        self.emb = pretrain_embedding
 
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
 
@@ -1508,10 +1506,7 @@ class PRETRAIN_EMB_LSTM_ATT(nn.Module):
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # embedding
-
-        outputs = self.emb.load_word2vec_format(input_ids)
-        print(outputs)
-        outputs, (h, c) = self.lstm(outputs)
+        outputs, (h, c) = self.lstm(input_ids)
 
         # attention
         attention_outputs = self.attention_net(outputs)

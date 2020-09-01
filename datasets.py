@@ -7,6 +7,7 @@ import pickle
 import numpy as np
 from konlpy.tag import Twitter
 from tqdm import tqdm
+from gensim.models import Word2Vec
 
 class BaseDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
@@ -81,13 +82,14 @@ class GensimDataset(Dataset):
         self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
         if "small" in mode:
             self.dataset = self.dataset[:10000]
+        self.pretrain_emb = Word2Vec.load("pretrain_embedding/word2vec.model")
 
     def __len__(self):
         return len(self.dataset)
 
     def __getitem__(self, idx):
         txt = str(self.dataset.at[idx,"review"])
-        data = self.tokenizer.morphs(txt)
+        data = self.pretrain_emb.load_word2vec_format(self.tokenizer.morphs(txt))
         print(data)
         input_ids = torch.tensor(data)
         token_type_ids = torch.tensor(data)
