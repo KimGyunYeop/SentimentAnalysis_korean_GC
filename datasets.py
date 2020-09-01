@@ -89,8 +89,12 @@ class GensimDataset(Dataset):
 
     def __getitem__(self, idx):
         txt = str(self.dataset.at[idx,"review"])
-        data = [self.pretrain_emb.wv[i] for i in self.tokenizer.morphs(txt)]
-        data = data + [0]*(self.maxlen - len(self.tokenizer.morphs(txt)))
+        data = np.zeros()
+        for i in self.tokenizer.morphs(txt):
+            try:
+                data[i] = self.pretrain_emb.wv[i]
+            except:
+                data[i] = 0
         print(data)
         input_ids = torch.tensor(data)
         token_type_ids = torch.tensor(data)
