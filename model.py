@@ -1481,16 +1481,16 @@ class PRETRAIN_EMB_LSTM_ATT(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(PRETRAIN_EMB_LSTM_ATT, self).__init__()
 
-        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
+        self.lstm = nn.LSTM(300, 300, batch_first=True, bidirectional=False, dropout=0.2)
 
         # attention module
         self.tanh = nn.Tanh()
         self.softmax = nn.Softmax(dim=-1)
-        self.dense_1 = nn.Linear(768, 100)
+        self.dense_1 = nn.Linear(300, 100)
         self.dense_2 = nn.Linear(100, 1)
 
         # full connected
-        self.fc = nn.Linear(768, 300)
+        self.fc = nn.Linear(300, 300)
 
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(300, 2)
