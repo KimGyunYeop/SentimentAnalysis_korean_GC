@@ -91,9 +91,9 @@ class GensimDataset(Dataset):
         txt = str(self.dataset.at[idx,"review"])
         tokens = self.tokenizer.morphs(txt)
         data = np.zeros((self.maxlen,300))
-        for i in tokens:
+        for i, token in enumerate(tokens):
             try:
-                data[i] = self.pretrain_emb.wv["나"]
+                data[i] = self.pretrain_emb.wv[token]
                 print(data[i])
             except:
 
