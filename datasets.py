@@ -94,6 +94,7 @@ class GensimDataset(Dataset):
         for i, token in enumerate(tokens):
             try:
                 print(token)
+                print(self.pretrain_emb.wv[token])
                 data[i] = self.pretrain_emb.wv[token]
                 print(self.pretrain_emb.wv[token])
                 print(data[i])
