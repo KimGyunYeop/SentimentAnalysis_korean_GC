@@ -90,7 +90,7 @@ class GensimDataset(Dataset):
     def __getitem__(self, idx):
         txt = str(self.dataset.at[idx,"review"])
         tokens = self.tokenizer.morphs(txt)
-        data = np.zeros((len(self.maxlen),300))
+        data = np.zeros((self.maxlen,300))
         for i in tokens:
             try:
                 data[i] = self.pretrain_emb.wv[i]
