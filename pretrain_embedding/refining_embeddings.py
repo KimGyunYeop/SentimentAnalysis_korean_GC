@@ -104,8 +104,8 @@ for epoch in range(80):
 print(previous_weight[0])
 print(model.linear.weight.t())
 for i, (k, _) in enumerate(neighbor_sorted):
-    word2vec.wv[k] = model.linear.weight.data.clone().t()[i]
-    print(word2vec.wv[k])
+    word2vec[k] = np.array(model.linear.weight.data.clone().t()[i])
+    print(word2vec[k])
 
 word2vec.save("word2vec_refining.model")
 
