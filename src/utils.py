@@ -125,6 +125,7 @@ def set_seed(args):
 
 
 def simple_accuracy(labels, preds):
+    print(labels == preds)
     return (labels == preds).mean()
 
 
