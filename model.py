@@ -1511,9 +1511,7 @@ class PRETRAIN_EMB_LSTM_ATT(nn.Module):
         # attention
         attention_outputs = self.attention_net(outputs)
 
-        fc_outputs = self.fc(attention_outputs)
-
-        outputs = self.dropout(fc_outputs)
+        outputs = self.dropout(attention_outputs)
         outputs = self.out_proj(outputs)
 
         loss_fct = nn.CrossEntropyLoss()
