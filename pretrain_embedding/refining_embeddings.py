@@ -65,7 +65,8 @@ for word, score in dic_sentiment2score.items():
             except:
                 neighbor_score[neighbor_word] = dic_sentiment2score[word]
                 continue
-        neighbor = [word2vec.wv.word_vec(k) for k, _ in sorted(neighbor_score.items(), key=lambda item: item[1],reverse=False)]
+        neighbor_sorted = sorted(neighbor_score.items(), key=lambda item: item[1],reverse=False)
+        neighbor = [word2vec.wv.word_vec(k) for k, _ in neighbor_sorted]
         neighbors.append(neighbor)
     except:
         error_count+=1
@@ -83,7 +84,6 @@ for param in model.parameters():
     param.requires_grad = True
 
 print(model)
-print(model.linear.weight.t())
 neighbors = torch.FloatTensor(neighbors).to(device)
 tmp_data = torch.ones(len(neighbors), len(neighbors), requires_grad=False).to(device)
 model.train()
@@ -102,5 +102,8 @@ for epoch in range(80):
     torch.cuda.empty_cache()
 print(previous_weight[0])
 print(model.linear.weight.t())
+for i, (k, _) in enumerate(neighbor_sorted):
+    word2vec.wv[k] = model.linear.weight.data.clone().t()[i]
+    print(word2vec.wv[k])
 
 
