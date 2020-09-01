@@ -89,7 +89,7 @@ class GensimDataset(Dataset):
 
     def __getitem__(self, idx):
         txt = str(self.dataset.at[idx,"review"])
-        data = self.pretrain_emb.load_word2vec_format(self.tokenizer.morphs(txt))
+        data = self.pretrain_emb(self.tokenizer.morphs(txt))
         print(data)
         input_ids = torch.tensor(data)
         token_type_ids = torch.tensor(data)
