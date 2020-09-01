@@ -82,6 +82,7 @@ def train(args,
 
     model.zero_grad()
     mb = master_bar(range(int(args.num_train_epochs)))
+    best_acc = 0
     for epoch in mb:
         epoch_iterator = progress_bar(train_dataloader, parent=mb)
         ep_loss = []
@@ -132,23 +133,27 @@ def train(args,
 
                 if args.logging_steps > 0 and global_step % args.logging_steps == 0:
                     if args.evaluate_test_during_training:
-                        evaluate(args, model, test_dataset, "test", global_step)
+                        results = evaluate(args, model, test_dataset, "test", global_step)
+                        acc = str(results['acc'])
                     else:
-                        evaluate(args, model, dev_dataset, "dev", global_step)
+                        results = evaluate(args, model, dev_dataset, "dev", global_step)
+                        acc = str(results['acc'])
 
                 if args.save_steps > 0 and global_step % args.save_steps == 0:
                     # Save model checkpoint
                     output_dir = os.path.join(args.output_dir, "checkpoint-{}".format(global_step))
                     if not os.path.exists(output_dir):
                         os.makedirs(output_dir)
-                    torch.save(model.state_dict(), os.path.join(output_dir, "training_model.bin"))
-                    torch.save(args, os.path.join(output_dir, "training_args.bin"))
+                    if float(best_acc) <= float(acc):
+                        torch.save(model.state_dict(), os.path.join(output_dir, "training_model.bin"))
+                        torch.save(args, os.path.join(output_dir, "training_args.bin"))
                     logger.info("Saving model checkpoint to {}".format(output_dir))
 
                     if args.save_optimizer:
-                        torch.save(optimizer.state_dict(), os.path.join(output_dir, "optimizer.pt"))
-                        torch.save(scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
-                        logger.info("Saving optimizer and scheduler states to {}".format(output_dir))
+                        if float(best_acc) <= float(acc):
+                            torch.save(optimizer.state_dict(), os.path.join(output_dir, "optimizer.pt"))
+                            torch.save(scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
+                            logger.info("Saving optimizer and scheduler states to {}".format(output_dir))
 
             if args.max_steps > 0 and global_step > args.max_steps:
                 break
