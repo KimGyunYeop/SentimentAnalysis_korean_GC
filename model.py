@@ -1481,7 +1481,7 @@ class PRETRAIN_EMB_LSTM_ATT(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(PRETRAIN_EMB_LSTM_ATT, self).__init__()
 
-        self.lstm = nn.LSTM(300, 300, batch_first=True, bidirectional=False, dropout=0.2)
+        self.lstm = nn.LSTM(200, 300, batch_first=True, bidirectional=False, dropout=0.2)
 
         # attention module
         self.tanh = nn.Tanh()
