@@ -93,9 +93,10 @@ class GensimDataset(Dataset):
         data = np.zeros((self.maxlen,300))
         for i in tokens:
             try:
-                data[i] = self.pretrain_emb.wv[i]
+                data[i] = self.pretrain_emb.wv["나"]
                 print(data[i])
             except:
+
                 continue
         input_ids = torch.FloatTensor(data)
         token_type_ids = torch.FloatTensor([0])
