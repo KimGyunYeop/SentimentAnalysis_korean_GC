@@ -93,10 +93,7 @@ class GensimDataset(Dataset):
         data = np.zeros((self.maxlen,300))
         for i, token in enumerate(tokens):
             try:
-                print(token)
-                print(self.pretrain_emb.wv[token])
                 data[i] = self.pretrain_emb.wv[token]
-                print(self.pretrain_emb.wv[token])
                 print(data[i])
             except:
 
