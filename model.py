@@ -1477,6 +1477,57 @@ class CHAR_LSTM(nn.Module):
 
         return result
 
+class PRETRAIN_EMB_LSTM_ATT(nn.Module):
+    def __init__(self, pretrain_embedding):
+        super(PRETRAIN_EMB_LSTM_ATT, self).__init__()
+        # Embedding
+        self.emb = pretrain_embedding
+
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
+
+        # attention module
+        self.tanh = nn.Tanh()
+        self.softmax = nn.Softmax(dim=-1)
+        self.dense_1 = nn.Linear(768, 100)
+        self.dense_2 = nn.Linear(100, 1)
+
+        # full connected
+        self.fc = nn.Linear(768, 300)
+
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(300, 2)
+
+    def attention_net(self, lstm_outputs):
+        M = self.tanh(self.dense_1(lstm_outputs))
+        wM_output = self.dense_2(M).squeeze()
+        a = self.softmax(wM_output)
+        c = lstm_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
+        att_output = self.tanh(c)
+
+        return att_output
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        # embedding
+
+        outputs = self.emb.load_word2vec_format(input_ids)
+        print(outputs)
+        outputs, (h, c) = self.lstm(outputs)
+
+        # attention
+        attention_outputs = self.attention_net(outputs)
+
+        fc_outputs = self.fc(attention_outputs)
+
+        outputs = self.dropout(fc_outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
+
+        result = (loss, outputs)
+
+        return result
+
 
 MODEL_LIST = {
     "BASEELECTRA": BASEELECTRA,
@@ -1511,5 +1562,7 @@ MODEL_LIST = {
     "CHAR_KOELECTRA": CHAR_LSTM,
 
     "EMB2_LSTM": EMB2_LSTM,
-    "EMB1_LSTM2": EMB1_LSTM2
+    "EMB1_LSTM2": EMB1_LSTM2,
+
+    "PRETRAIN_EMB_LSTM_ATT": PRETRAIN_EMB_LSTM_ATT
 }
