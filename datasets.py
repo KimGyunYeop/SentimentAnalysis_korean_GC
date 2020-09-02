@@ -378,6 +378,7 @@ DATASET_LIST = {
 
     "LSTM": BaseDataset,
     "LSTM_ATT": BaseDataset,
+    "LSTM_ATT_NEG" : BaseDataset,
     "LSTM_ATT_v2": BaseDataset,
     "LSTM_ATT_DOT": BaseDataset,
     "LSTM_ATT2" : BaseDataset,
