@@ -147,7 +147,8 @@ def train(args,
                     if float(best_acc) <= float(acc):
                         torch.save(model.state_dict(), os.path.join(output_dir, "training_model.bin"))
                         torch.save(args, os.path.join(output_dir, "training_args.bin"))
-                    logger.info("Saving model checkpoint to {}".format(output_dir))
+                        logger.info("Saving model checkpoint to {}".format(output_dir))
+                        best_acc = acc
 
                     if args.save_optimizer:
                         if float(best_acc) <= float(acc):
