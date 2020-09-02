@@ -142,13 +142,14 @@ def train(args,
                 if args.save_steps > 0 and global_step % args.save_steps == 0:
                     # Save model checkpoint
                     output_dir = os.path.join(args.output_dir, "checkpoint-{}".format(global_step))
-                    if not os.path.exists(output_dir):
-                        os.makedirs(output_dir)
+
                     if float(best_acc) <= float(acc):
                         torch.save(model.state_dict(), os.path.join(output_dir, "training_model.bin"))
                         torch.save(args, os.path.join(output_dir, "training_args.bin"))
                         logger.info("Saving model checkpoint to {}".format(output_dir))
                         temp = acc
+                    if not os.path.exists(output_dir):
+                        os.makedirs(output_dir)
 
                     if args.save_optimizer:
                         if float(best_acc) <= float(acc):
