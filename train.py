@@ -92,7 +92,7 @@ def train(args,
             inputs = {
                 "input_ids": batch[0],
                 "attention_mask": batch[1],
-                "token_type_ids" : batch[2],
+                "token_type_ids": batch[2],
                 "labels": batch[3]
             }
             if "KOSAC" in args.model_mode:
@@ -107,13 +107,13 @@ def train(args,
             outputs = model(**inputs)
             # print(outputs)
             loss = outputs[0]
-            #print(loss)
+            # print(loss)
             if args.gradient_accumulation_steps > 1:
                 loss = loss / args.gradient_accumulation_steps
 
             if type(loss) == tuple:
-                #print(list(map(lambda x:x.item(),loss)))
-                ep_loss.append(list(map(lambda x:x.item(),loss)))
+                # print(list(map(lambda x:x.item(),loss)))
+                ep_loss.append(list(map(lambda x: x.item(), loss)))
                 loss = sum(loss)
             else:
                 ep_loss.append([loss.item()])
@@ -148,19 +148,21 @@ def train(args,
                         torch.save(model.state_dict(), os.path.join(output_dir, "training_model.bin"))
                         torch.save(args, os.path.join(output_dir, "training_args.bin"))
                         logger.info("Saving model checkpoint to {}".format(output_dir))
-                        best_acc = acc
+                        temp = acc
 
                     if args.save_optimizer:
                         if float(best_acc) <= float(acc):
                             torch.save(optimizer.state_dict(), os.path.join(output_dir, "optimizer.pt"))
                             torch.save(scheduler.state_dict(), os.path.join(output_dir, "scheduler.pt"))
                             logger.info("Saving optimizer and scheduler states to {}".format(output_dir))
+                    best_acc = temp
 
             if args.max_steps > 0 and global_step > args.max_steps:
                 break
 
+        print('best:', best_acc, 'acc:', acc)
         mb.write("Epoch {} done".format(epoch + 1))
-        mb.write("Epoch loss = {} ".format(np.mean(np.array(ep_loss),axis=0)))
+        mb.write("Epoch loss = {} ".format(np.mean(np.array(ep_loss), axis=0)))
 
         if args.max_steps > 0 and global_step > args.max_steps:
             break
@@ -184,7 +186,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
     nb_eval_steps = 0
     preds = None
     out_label_ids = None
-    ep_loss= []
+    ep_loss = []
 
     for (batch, txt) in progress_bar(eval_dataloader):
         model.eval()
@@ -194,7 +196,7 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             inputs = {
                 "input_ids": batch[0],
                 "attention_mask": batch[1],
-                "token_type_ids":batch[2],
+                "token_type_ids": batch[2],
                 "labels": batch[3]
             }
             if "KOSAC" in args.model_mode:
@@ -210,12 +212,11 @@ def evaluate(args, model, eval_dataset, mode, global_step=None):
             tmp_eval_loss, logits = outputs[:2]
 
             if type(tmp_eval_loss) == tuple:
-                #print(list(map(lambda x:x.item(),tmp_eval_loss)))
-                ep_loss.append(list(map(lambda x:x.item(),tmp_eval_loss)))
+                # print(list(map(lambda x:x.item(),tmp_eval_loss)))
+                ep_loss.append(list(map(lambda x: x.item(), tmp_eval_loss)))
                 tmp_eval_loss = sum(tmp_eval_loss)
             else:
                 ep_loss.append([tmp_eval_loss.item()])
-
 
             eval_loss += tmp_eval_loss.mean().item()
         nb_eval_steps += 1
@@ -304,11 +305,12 @@ def main(cli_args):
         test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test") if args.test_file else None
     else:
         # Load dataset
-        train_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="train_small") if args.train_file else None
+        train_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer,
+                                                          mode="train_small") if args.train_file else None
         dev_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="dev_small") if args.dev_file else None
         test_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="test_small") if args.test_file else None
 
-        args.logging_steps = int(len(train_dataset) / args.train_batch_size)+2
+        args.logging_steps = int(len(train_dataset) / args.train_batch_size) + 2
 
     if dev_dataset == None:
         args.evaluate_test_during_training = True  # If there is no dev dataset, only use testset
