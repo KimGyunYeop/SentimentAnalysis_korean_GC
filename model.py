@@ -1580,9 +1580,9 @@ class EMB_ATT_LSTM_ATT(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(EMB_ATT_LSTM_ATT, self).__init__()
 
-        model = Word2Vec.load("pretrain_embedding/word2vec_refining.model")
-        weights = torch.FloatTensor(model.wv.vectors)
-        self.embedding = nn.Embedding.from_pretrained(weights)
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
         self.lstm = nn.LSTM(200, 768, batch_first=True, bidirectional=False, dropout=0.2)
 
         #sentiment module
@@ -1614,7 +1614,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         return senti_output
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # embedding
-        emb_output = self.embedding(input_ids)
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
         outputs, (h, c) = self.lstm(emb_output)
 
         sentiment_outputs = self.sentiment_net(outputs)
