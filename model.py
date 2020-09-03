@@ -1606,10 +1606,9 @@ class EMB_ATT_LSTM_ATT(nn.Module):
 
     def sentiment_net(self, lstm_outputs):
         result = self.word_dense(lstm_outputs)
-        print(result.shape)
         sig_output = torch.sigmoid(result).repeat(1,1,768)
-        print(sig_output.shape)
         senti_output = lstm_outputs.mul_(sig_output)
+        print(senti_output.shape)
         return senti_output
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
