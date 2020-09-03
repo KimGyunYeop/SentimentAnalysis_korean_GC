@@ -52,7 +52,7 @@ dic_naver_sentiment2score = {list(okt.morphs(naver_sentiment["word"][i]))[0]:nav
 
 dic_sentiment2score.update(dic_naver_sentiment2score)
 #word2vec
-word2vec = Word2Vec.load('word2vec.model')
+word2vec = Word2Vec.load('ko.bin')
 error_count = 0
 neighbors =  []
 for word, score in dic_sentiment2score.items():
