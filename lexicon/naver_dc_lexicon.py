@@ -10,9 +10,11 @@ all_urls = []
 
 MAX_LEVEL = 2
 
+
 def search_node(url, sentiment, level):
     #get now word's dict homepage
     global driver
+    global sent_dc, all_urls
 
     try:
         driver.get(url)
@@ -20,6 +22,7 @@ def search_node(url, sentiment, level):
     except:
         driver = webdriver.Chrome(chromeDriver)
         search_node(url, sentiment, level)
+        sent_dc.to_csv("result_add_lex.csv", encoding='utf-8-sig')
         return 0
 
     bs = BeautifulSoup(driver.page_source, "html.parser")
@@ -28,7 +31,6 @@ def search_node(url, sentiment, level):
     word_meta = bs.find("meta",{"property":"og:title"})
     cur_word = word_meta.get("content").split("\'")[1]
     print(cur_word, level)
-    global sent_dc, all_urls
     sent_dc = sent_dc.append(pd.Series([cur_word, sentiment, level], index=sent_dc.columns), ignore_index=True)
 
     # 활용어
