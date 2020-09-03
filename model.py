@@ -1583,7 +1583,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
-        self.lstm = nn.LSTM(200, 768, batch_first=True, bidirectional=False, dropout=0.2)
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
 
         #sentiment module
         self.word_dense = nn.Linear(768, 1)
@@ -1615,7 +1615,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # embedding
         emb_output = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        outputs, (h, c) = self.lstm(emb_output[0])
+        outputs, _ = self.lstm(emb_output[0])
 
         sentiment_outputs = self.sentiment_net(outputs)
 
