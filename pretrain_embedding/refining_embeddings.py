@@ -40,7 +40,7 @@ class REFINEEMB(nn.Module):
         total_loss = self.loss(previous_vector,self.linear(ones_data),neighbors).sum()
         return total_loss
 #tokenizer
-okt = Okt()
+okt = Kkma()
 tkn2pol = pickle.load(open(os.path.join('../lexicon','kosac_polarity.pkl'), 'rb'))
 pol2idx = ['NEG', 'None','POS']
 dict_pol2idx = {y:(x-1) for x,y in enumerate(pol2idx)}
