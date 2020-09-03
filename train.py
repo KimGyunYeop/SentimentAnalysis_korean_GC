@@ -8,8 +8,6 @@ import torch
 import torch.nn.functional as F
 from attrdict import AttrDict
 from fastprogress.fastprogress import master_bar, progress_bar
-from gensim.models import Word2Vec
-from konlpy.tag import Okt, Kkma
 from torch import nn
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from transformers import (
@@ -285,13 +283,10 @@ def main(cli_args):
             id2label={str(i): label for i, label in enumerate(labels)},
             label2id={label: i for i, label in enumerate(labels)},
         )
-    if "PRETRAIN_EMB" in cli_args.model_mode:
-        tokenizer = Kkma()
-    else:
-        tokenizer = TOKENIZER_CLASSES[args.model_type].from_pretrained(
-            args.model_name_or_path,
-            do_lower_case=args.do_lower_case
-        )
+    tokenizer = TOKENIZER_CLASSES[args.model_type].from_pretrained(
+        args.model_name_or_path,
+        do_lower_case=args.do_lower_case
+    )
     # GPU or CPU
     args.device = "cuda:{}".format(cli_args.gpu) if torch.cuda.is_available() and not args.no_cuda else "cpu"
     config.device = args.device

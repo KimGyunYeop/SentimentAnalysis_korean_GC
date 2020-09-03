@@ -68,43 +68,6 @@ class CharBaseDataset(Dataset):
 
         return (input_ids, attention_mask,token_type_ids, label),[txt, char_token, word_token]
 
-class GensimDataset(Dataset):
-    def __init__(self, args, tokenizer, mode):
-        super(GensimDataset,self).__init__()
-        self.tokenizer = tokenizer
-        self.maxlen = args.max_seq_len
-        if "train" in mode:
-            data_path = os.path.join(args.data_dir, args.task, args.train_file)
-        elif "dev" in mode:
-            data_path = os.path.join(args.data_dir, args.task, args.dev_file)
-        elif "test" in mode:
-            data_path = os.path.join(args.data_dir, args.task, args.test_file)
-        self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
-        if "small" in mode:
-            self.dataset = self.dataset[:10000]
-        self.vocab = Word2Vec.load("pretrain_embedding/word2vec_refining.model").wv.vocab
-
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, idx):
-        txt = str(self.dataset.at[idx,"review"])
-        tokens = self.tokenizer.morphs(txt)
-        data = np.zeros(self.maxlen)
-        for i, token in enumerate(tokens):
-            if i>=self.maxlen:
-                break
-            try:
-                data[i] = self.vocab[token].index
-            except:
-                data[i] = 0
-        input_ids = torch.LongTensor(data)
-        token_type_ids = torch.FloatTensor([0])
-        attention_mask = torch.FloatTensor([0])
-        label = self.dataset.at[idx,"rating"]
-
-        return (input_ids, token_type_ids, attention_mask, label),[txt, tokens]
-
 class KOSACDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
         super(KOSACDataset,self).__init__()
