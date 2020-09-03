@@ -94,9 +94,9 @@ class GensimDataset(Dataset):
         for i, token in enumerate(tokens):
             try:
                 data[i] = self.vocab[token].index
+                print(data[i])
             except:
                 data[i] = 0
-                continue
         input_ids = torch.FloatTensor(data)
         token_type_ids = torch.FloatTensor([0])
         attention_mask = torch.FloatTensor([0])
