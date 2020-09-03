@@ -1600,7 +1600,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         wM_output = self.dense_2(M).squeeze()
         a = F.softmax(wM_output)
         c = lstm_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
-        att_output = self.tanh(c)
+        att_output = torch.tanh(c)
 
         return att_output
 
