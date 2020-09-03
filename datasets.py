@@ -91,13 +91,7 @@ class GensimDataset(Dataset):
         txt = str(self.dataset.at[idx,"review"])
         tokens = self.tokenizer.morphs(txt)
         data = np.zeros(self.maxlen)
-        for i, token in enumerate(tokens):
-            if i>=self.maxlen:
-                break
-            try:
-                data[i] = self.vocab[token].index
-            except:
-                data[i] = 0
+
         input_ids = torch.LongTensor(data)
         token_type_ids = torch.FloatTensor([0])
         attention_mask = torch.FloatTensor([0])
