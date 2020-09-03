@@ -1608,7 +1608,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         result = self.word_dense(lstm_outputs)
         sig_output = torch.sigmoid(result).repeat(768)
         print(sig_output.shape)
-        senti_output = lstm_outputs * sig_output
+        senti_output = lstm_outputs.mul_(sig_output)
         return senti_output
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
