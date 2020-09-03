@@ -1609,9 +1609,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
     def sentiment_net(self, lstm_outputs):
         result = self.word_dense(lstm_outputs)
         sig_output = self.softmax(result)
-        print(sig_output.shape)
         argmax_result = torch.argmax(sig_output,dim=-1)
-        print(argmax_result.shape)
         emb_result = self.sentiment_embedding(argmax_result)
         senti_output = lstm_outputs * emb_result
         return senti_output
