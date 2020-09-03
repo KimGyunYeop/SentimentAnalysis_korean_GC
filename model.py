@@ -512,6 +512,103 @@ class LSTM_ATT(nn.Module):
         return result
 
 
+class LSTM_ATT_NEG(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(LSTM_ATT_NEG, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
+        self.lstm_dropout = nn.Dropout(0.2)
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 2)
+
+        self.att_w = nn.Parameter(torch.randn(1, 768, 1))
+
+    def attention_net(self, lstm_output, final_state):
+        attn_weights = torch.bmm(lstm_output, final_state.unsqueeze(2)).squeeze(2)
+        soft_attn_weights = F.softmax(attn_weights, 1).unsqueeze(2)  # shape = (batch_size, seq_len, 1)
+        new_hidden_state = torch.bmm(lstm_output.transpose(1, 2),
+                                     soft_attn_weights).squeeze(2)
+
+        return new_hidden_state
+
+    def re_attention(self, lstm_output, final_h, input):
+        batch_size, seq_len = input.shape
+
+        final_h = final_h.squeeze()
+
+        # final_h.size() = (batch_size, hidden_size)
+        # output.size() = (batch_size, num_seq, hidden_size)
+        # lstm_output(batch_size, seq_len, lstm_dir_dim)
+        att = torch.bmm(torch.tanh(lstm_output),
+                        self.att_w.repeat(batch_size, 1, 1))
+        att = F.softmax(att, dim=1)  # att(batch_size, seq_len, 1)
+        att = torch.bmm(lstm_output.transpose(1, 2), att).squeeze(2)
+        attn_output = torch.tanh(att)  # attn_output(batch_size, lstm_dir_dim)
+        return attn_output
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        # print(input_ids)
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        # print(outputs)
+        # print(len(input_ids))
+        # print(len(input_ids[0]))
+        # print(len(outputs))
+        # print(outputs[0].shape)
+        outputs, (h, c) = self.lstm(outputs[0])
+        embs = outputs
+        # print("lstm")
+        # print(len(outputs))
+        # print(outputs.shape)
+
+        attn_output = self.re_attention(outputs, h, input_ids)
+
+        outputs = self.dense(attn_output)
+        outputs = self.dropout(outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
+        # print(loss.shape)
+        # print(loss)
+        # print(len(outputs))
+        # print(outputs.shape)
+        labels_2 = labels.type(torch.FloatTensor).cuda()
+
+        for i in range(len(labels_2)):
+            labels_2[i] = labels_2[i].double() * 2 - 1
+        p_idx = (labels_2 == 1).nonzero().cuda()
+        n_idx = (labels_2 == -1).nonzero().cuda()
+
+        x1 = embs[:, 0, :].squeeze()
+        batch_size, seq_len, w2v_dim = embs.shape
+        x1_p = x1[p_idx]
+        x1_n = x1[n_idx]
+        len_p = len(x1_p)
+        len_n = len(x1_n)
+
+        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=-0.5)
+        if len_p != 0 and len_n != 0:
+            x1_p = x1_p.squeeze()
+            x1_p = x1_p.repeat(1, len_n)
+            x1_p = x1_p.view(-1, w2v_dim)
+            x1_n = x1_n.squeeze().repeat(len_p, 1)
+
+            y = -torch.ones(len_p * len_n).type(torch.FloatTensor).cuda()
+
+            loss2 = loss_fn(x1_p.view(-1, w2v_dim),
+                            x1_n.view(-1, w2v_dim),
+                            y.view(-1))
+
+        if len_p != 0 and len_n != 0:
+            result = ((loss, loss2), outputs)
+        else:
+            result = ((loss, torch.tensor(0)), outputs)
+        return result
+
+
 class LSTM_ATT_v2(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(LSTM_ATT_v2, self).__init__()
@@ -1079,6 +1176,7 @@ class KNU_BASE(nn.Module):
 
         return result
 
+
 class KNU_LSTM(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(KNU_LSTM, self).__init__()
@@ -1477,6 +1575,7 @@ class CHAR_LSTM(nn.Module):
 
         return result
 
+
 class PRETRAIN_EMB_LSTM_ATT(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(PRETRAIN_EMB_LSTM_ATT, self).__init__()
@@ -1530,6 +1629,7 @@ MODEL_LIST = {
 
     "LSTM": LSTM,
     "LSTM_ATT": LSTM_ATT,
+    "LSTM_ATT_NEG": LSTM_ATT_NEG,
     "LSTM_ATT_v2": LSTM_ATT_v2,
     "LSTM_ATT_DOT": LSTM_ATT_DOT,
     "LSTM_ATT2": LSTM_ATT2,
