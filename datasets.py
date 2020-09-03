@@ -83,6 +83,7 @@ class GensimDataset(Dataset):
         if "small" in mode:
             self.dataset = self.dataset[:10000]
         self.pretrain_emb = Word2Vec.load("pretrain_embedding/word2vec_refining.model")
+        print(self.pretrain_emb.wv.vectors)
 
     def __len__(self):
         return len(self.dataset)
@@ -91,11 +92,12 @@ class GensimDataset(Dataset):
         txt = str(self.dataset.at[idx,"review"])
         tokens = self.tokenizer.morphs(txt)
         data = np.zeros((self.maxlen,200)).tolist()
+        """
         for i, token in enumerate(tokens):
             try:
                 data[i] = self.pretrain_emb.wv[token]
             except:
-                continue
+                continue"""
         input_ids = torch.FloatTensor(data)
         token_type_ids = torch.FloatTensor([0])
         attention_mask = torch.FloatTensor([0])
