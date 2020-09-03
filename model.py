@@ -1590,6 +1590,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         # attention module
         self.dense_1 = nn.Linear(768, 100)
         self.dense_2 = nn.Linear(100, 1)
+        self.softmax = nn.Softmax(dim=-1)
 
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
@@ -1598,7 +1599,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
     def attention_net(self, lstm_outputs):
         M = torch.tanh(self.dense_1(lstm_outputs))
         wM_output = self.dense_2(M).squeeze()
-        a = F.softmax(wM_output)
+        a = self.softmax(wM_output)
         c = lstm_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
         att_output = torch.tanh(c)
 
@@ -1607,7 +1608,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
     def sentiment_net(self, lstm_outputs):
         result = self.word_dense(lstm_outputs)
         sig_output = torch.sigmoid(result).repeat(1,1,768)
-        senti_output = lstm_outputs.mul_(sig_output)
+        senti_output = lstm_outputs * sig_output
         return senti_output
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
