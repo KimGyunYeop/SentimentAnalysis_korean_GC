@@ -1604,9 +1604,10 @@ class PRETRAIN_EMB_LSTM_ATT(nn.Module):
 
         return att_output
 
-    def forward(self, input_ids, attention_mask, labels, token_type_ids, txt):
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # embedding
-        outputs, (h, c) = self.lstm(input_ids)
+        emb_output = self.embedding(input_ids)
+        outputs, (h, c) = self.lstm(emb_output)
 
         # attention
         attention_outputs = self.attention_net(outputs)
