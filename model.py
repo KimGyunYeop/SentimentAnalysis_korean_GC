@@ -1589,7 +1589,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         self.word_dense = nn.Linear(768, 1)
 
         # attention module
-        self.tanh = nn.Tanh()
+        self.tanh = nn.Tanh(inplace=False)
         self.dense_1 = nn.Linear(768, 100)
         self.dense_2 = nn.Linear(100, 1)
 
@@ -1610,6 +1610,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         sig_output = torch.sigmoid(result)
         senti_output = lstm_outputs.mul_(sig_output)
         return senti_output
+
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # embedding
         emb_output = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
