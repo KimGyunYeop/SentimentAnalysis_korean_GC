@@ -1589,7 +1589,6 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         self.word_dense = nn.Linear(768, 1)
 
         # attention module
-        self.tanh = nn.Tanh(inplace=False)
         self.dense_1 = nn.Linear(768, 100)
         self.dense_2 = nn.Linear(100, 1)
 
@@ -1597,7 +1596,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         self.out_proj = nn.Linear(768, 2)
 
     def attention_net(self, lstm_outputs):
-        M = self.tanh(self.dense_1(lstm_outputs))
+        M = torch.tanh(self.dense_1(lstm_outputs))
         wM_output = self.dense_2(M).squeeze()
         a = F.softmax(wM_output)
         c = lstm_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
