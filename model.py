@@ -1615,7 +1615,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         emb_output = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
         outputs, _ = self.lstm(emb_output[0])
 
-        sentiment_outputs = self.sentiment_net(outputs)
+        #sentiment_outputs = self.sentiment_net(outputs)
 
         # attention
         attention_outputs = self.attention_net(sentiment_outputs)
