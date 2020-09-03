@@ -9,7 +9,7 @@ import torch.nn.functional as F
 from attrdict import AttrDict
 from fastprogress.fastprogress import master_bar, progress_bar
 from gensim.models import Word2Vec
-from konlpy.tag import Okt
+from konlpy.tag import Okt, Kkma
 from torch import nn
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from transformers import (
@@ -287,7 +287,7 @@ def main(cli_args):
             label2id={label: i for i, label in enumerate(labels)},
         )
     if "PRETRAIN_EMB" in cli_args.model_mode:
-        tokenizer = Okt()
+        tokenizer = Kkma()
     else:
         tokenizer = TOKENIZER_CLASSES[args.model_type].from_pretrained(
             args.model_name_or_path,
