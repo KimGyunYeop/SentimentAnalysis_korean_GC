@@ -1614,7 +1614,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         return senti_output
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # embedding
-        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        emb_output = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
         outputs, (h, c) = self.lstm(emb_output)
 
         sentiment_outputs = self.sentiment_net(outputs)
