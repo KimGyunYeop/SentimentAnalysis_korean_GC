@@ -1579,7 +1579,6 @@ class CHAR_LSTM(nn.Module):
 class EMB_ATT_LSTM_ATT(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(EMB_ATT_LSTM_ATT, self).__init__()
-
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
