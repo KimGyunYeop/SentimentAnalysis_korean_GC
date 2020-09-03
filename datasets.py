@@ -82,8 +82,8 @@ class GensimDataset(Dataset):
         self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
         if "small" in mode:
             self.dataset = self.dataset[:10000]
-        print(Word2Vec.load("pretrain_embedding/word2vec_refining.model").wv.vocab())
-        self.vocab = Word2Vec.load("pretrain_embedding/word2vec_refining.model").wv.vocab()
+        print(Word2Vec.load("pretrain_embedding/word2vec_refining.model").vocab)
+        self.vocab = Word2Vec.load("pretrain_embedding/word2vec_refining.model").wv.vocab
 
     def __len__(self):
         return len(self.dataset)
