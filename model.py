@@ -8,6 +8,7 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from torch import nn
+from gensim.models import Word2Vec
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from fastprogress.fastprogress import master_bar, progress_bar
 from attrdict import AttrDict
@@ -1580,6 +1581,9 @@ class PRETRAIN_EMB_LSTM_ATT(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(PRETRAIN_EMB_LSTM_ATT, self).__init__()
 
+        model = Word2Vec.load("pretrain_embedding/word2vec_refining.model")
+        weights = torch.FloatTensor(model.wv.vectors)
+        self.embedding = nn.Embedding.from_pretrained(weights)
         self.lstm = nn.LSTM(200, 768, batch_first=True, bidirectional=False, dropout=0.2)
 
         # attention module
@@ -1602,7 +1606,8 @@ class PRETRAIN_EMB_LSTM_ATT(nn.Module):
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # embedding
-        outputs, (h, c) = self.lstm(input_ids)
+        emb_output = self.embedding(input_ids)
+        outputs, (h, c) = self.lstm(emb_output)
 
         # attention
         attention_outputs = self.attention_net(outputs)

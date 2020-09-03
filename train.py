@@ -9,7 +9,7 @@ import torch.nn.functional as F
 from attrdict import AttrDict
 from fastprogress.fastprogress import master_bar, progress_bar
 from gensim.models import Word2Vec
-from konlpy.tag import Okt
+from konlpy.tag import Okt, Kkma
 from torch import nn
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from transformers import (
@@ -161,7 +161,6 @@ def train(args,
             if args.max_steps > 0 and global_step > args.max_steps:
                 break
 
-        print('best:', best_acc, 'acc:', acc)
         mb.write("Epoch {} done".format(epoch + 1))
         mb.write("Epoch loss = {} ".format(np.mean(np.array(ep_loss), axis=0)))
 
@@ -287,7 +286,7 @@ def main(cli_args):
             label2id={label: i for i, label in enumerate(labels)},
         )
     if "PRETRAIN_EMB" in cli_args.model_mode:
-        tokenizer = Okt()
+        tokenizer = Kkma()
     else:
         tokenizer = TOKENIZER_CLASSES[args.model_type].from_pretrained(
             args.model_name_or_path,
