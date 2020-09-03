@@ -40,7 +40,7 @@ class REFINEEMB(nn.Module):
         total_loss = self.loss(previous_vector,self.linear(ones_data),neighbors).sum()
         return total_loss
 #tokenizer
-okt = Okt()
+okt = Kkma()
 tkn2pol = pickle.load(open(os.path.join('../lexicon','kosac_polarity.pkl'), 'rb'))
 pol2idx = ['NEG', 'None','POS']
 dict_pol2idx = {y:(x-1) for x,y in enumerate(pol2idx)}
@@ -52,7 +52,8 @@ dic_naver_sentiment2score = {list(okt.morphs(naver_sentiment["word"][i]))[0]:nav
 
 dic_sentiment2score.update(dic_naver_sentiment2score)
 #word2vec
-word2vec = Word2Vec.load('word2vec.model')
+word2vec = Word2Vec.load("ko.bin")
+print(len(word2vec.wv.vocab))
 error_count = 0
 neighbors =  []
 for word, score in dic_sentiment2score.items():
