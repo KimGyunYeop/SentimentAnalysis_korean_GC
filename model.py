@@ -1587,7 +1587,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
 
         #sentiment module
         self.word_dense = nn.Linear(768, 1)
-        self.sigmoid = nn.Sigmoid(inplace=False)
+        self.sigmoid = nn.Sigmoid()
 
         # attention module
         self.tanh = nn.Tanh()
@@ -1595,7 +1595,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         self.dense_1 = nn.Linear(768, 100)
         self.dense_2 = nn.Linear(100, 1)
 
-        self.dropout = nn.Dropout(0.2)
+        self.dropout = nn.Dropout(0.2,inplace=False)
         self.out_proj = nn.Linear(768, 2)
 
     def attention_net(self, lstm_outputs):
