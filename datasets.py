@@ -405,5 +405,5 @@ DATASET_LIST = {
     "EMB2_LSTM": BaseDataset,
     "EMB1_LSTM2" : BaseDataset,
 
-    "PRETRAIN_EMB_LSTM_ATT": GensimDataset
+    "EMB_COS_LSTM_ATT": GensimDataset
 }

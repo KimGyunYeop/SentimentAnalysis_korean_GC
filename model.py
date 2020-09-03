@@ -1147,8 +1147,7 @@ class KNU_BASE(nn.Module):
 
         # Embedding
         self.input_embedding = self.emb.embeddings.word_embeddings
-        self.polarity_embedding = nn.Embedding(5, 768)
-        self.intensity_embedding = nn.Embedding(5, 768)
+        self.polarity_embedding = nn.Embedding(4, 768)
 
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
         self.lstm_dropout = nn.Dropout(0.2)
@@ -1577,7 +1576,7 @@ class CHAR_LSTM(nn.Module):
         return result
 
 
-class PRETRAIN_EMB_LSTM_ATT(nn.Module):
+class EMB_COS_LSTM_ATT(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(PRETRAIN_EMB_LSTM_ATT, self).__init__()
 
@@ -1659,5 +1658,5 @@ MODEL_LIST = {
     "EMB2_LSTM": EMB2_LSTM,
     "EMB1_LSTM2": EMB1_LSTM2,
 
-    "PRETRAIN_EMB_LSTM_ATT": PRETRAIN_EMB_LSTM_ATT
+    "EMB_COS_LSTM_ATT": EMB_COS_LSTM_ATT
 }
