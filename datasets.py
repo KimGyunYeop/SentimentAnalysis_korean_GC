@@ -83,7 +83,8 @@ class GensimDataset(Dataset):
         if "small" in mode:
             self.dataset = self.dataset[:10000]
         self.pretrain_emb = Word2Vec.load("pretrain_embedding/word2vec_refining.model")
-        print(self.pretrain_emb.wv.vectors)
+        self.vocab = self.pretrain_emb.vocabulary
+        print(self.vocab)
 
     def __len__(self):
         return len(self.dataset)
@@ -103,7 +104,7 @@ class GensimDataset(Dataset):
         attention_mask = torch.FloatTensor([0])
         label = self.dataset.at[idx,"rating"]
 
-        return (input_ids, token_type_ids, attention_mask, label),txt
+        return (input_ids, token_type_ids, attention_mask, label),[txt, tokens]
 
 class KOSACDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
