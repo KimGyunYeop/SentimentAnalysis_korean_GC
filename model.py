@@ -1592,7 +1592,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         self.dense_2 = nn.Linear(100, 1)
 
         self.dense = nn.Linear(768, 768)
-        self.dropout = nn.Dropout(0.2,inplace=False)
+        self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
 
     def attention_net(self, lstm_outputs):
@@ -1608,7 +1608,6 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         result = self.word_dense(lstm_outputs)
         sig_output = torch.sigmoid(result).repeat(1,1,768)
         senti_output = lstm_outputs.mul_(sig_output)
-        print(senti_output.shape)
         return senti_output
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
