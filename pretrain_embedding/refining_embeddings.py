@@ -75,7 +75,7 @@ for word, score in dic_sentiment2score.items():
 print(error_count)
 print(neighbor[0])
 #model learning
-device = "cuda:{}".format(0) if torch.cuda.is_available() else "cpu"
+device = "cuda:{}".format(1) if torch.cuda.is_available() else "cpu"
 print(device)
 model = REFINEEMB(dic_sentiment2score, word2vec,device)
 model.to(device)
