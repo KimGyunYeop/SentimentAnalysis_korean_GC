@@ -1592,7 +1592,8 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         self.dense_1 = nn.Linear(768, 100)
         self.dense_2 = nn.Linear(100, 1)
 
-        self.dropout = nn.Dropout(0.2,inplace=True)
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2,inplace=False)
         self.out_proj = nn.Linear(768, 2)
 
     def attention_net(self, lstm_outputs):
@@ -1620,7 +1621,8 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         # attention
         attention_outputs = self.attention_net(sentiment_outputs)
 
-        outputs = self.dropout(attention_outputs)
+        outputs = self.dense(attention_outputs)
+        outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
 
         loss_fct = nn.CrossEntropyLoss()
