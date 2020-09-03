@@ -83,7 +83,7 @@ class GensimDataset(Dataset):
         if "small" in mode:
             self.dataset = self.dataset[:10000]
         self.pretrain_emb = Word2Vec.load("pretrain_embedding/word2vec_refining.model")
-        self.vocab = self.pretrain_emb.vocabulary
+        self.vocab = self.wv.vocab
         print(self.vocab)
 
     def __len__(self):
