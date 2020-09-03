@@ -1585,7 +1585,8 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
 
         #sentiment module
-        self.word_dense = nn.Linear(768, 1)
+        self.word_dense = nn.Linear(768, 2)
+        self.sentiment_embedding = nn.Embedding(2, 768)
 
         # attention module
         self.dense_1 = nn.Linear(768, 100)
@@ -1607,7 +1608,11 @@ class EMB_ATT_LSTM_ATT(nn.Module):
 
     def sentiment_net(self, lstm_outputs):
         result = self.word_dense(lstm_outputs)
-        sig_output = torch.sigmoid(result).repeat(1,1,768)
+        sig_output = self.softmax(result)
+        print(sig_output.shape)
+        argmax_result = torch.argmax(sig_output,dim=-1)
+        print(argmax_result.shape)
+        emb_result = self.sentiment_embedding(argmax_result)
         senti_output = lstm_outputs * sig_output
         return senti_output
 
