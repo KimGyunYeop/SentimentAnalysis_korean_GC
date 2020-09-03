@@ -92,7 +92,7 @@ class GensimDataset(Dataset):
         tokens = self.tokenizer.morphs(txt)
         data = np.zeros(self.maxlen)
         for i, token in enumerate(tokens):
-            if i>50:
+            if i>self.maxlen:
                 break
             try:
                 data[i] = self.vocab[token].index
