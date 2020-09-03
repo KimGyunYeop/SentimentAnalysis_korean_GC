@@ -96,7 +96,6 @@ class GensimDataset(Dataset):
                 break
             try:
                 data[i] = self.vocab[token].index
-                print(data[i])
             except:
                 data[i] = 0
         input_ids = torch.FloatTensor(data)
