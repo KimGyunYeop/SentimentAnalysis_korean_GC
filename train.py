@@ -287,7 +287,7 @@ def main(cli_args):
             label2id={label: i for i, label in enumerate(labels)},
         )
     if "PRETRAIN_EMB" in cli_args.model_mode:
-        tokenizer = Kkma()
+        tokenizer = Okt()
     else:
         tokenizer = TOKENIZER_CLASSES[args.model_type].from_pretrained(
             args.model_name_or_path,
