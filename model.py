@@ -1576,14 +1576,18 @@ class CHAR_LSTM(nn.Module):
         return result
 
 
-class EMB_COS_LSTM_ATT(nn.Module):
+class EMB_ATT_LSTM_ATT(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
-        super(PRETRAIN_EMB_LSTM_ATT, self).__init__()
+        super(EMB_ATT_LSTM_ATT, self).__init__()
 
         model = Word2Vec.load("pretrain_embedding/word2vec_refining.model")
         weights = torch.FloatTensor(model.wv.vectors)
         self.embedding = nn.Embedding.from_pretrained(weights)
         self.lstm = nn.LSTM(200, 768, batch_first=True, bidirectional=False, dropout=0.2)
+
+        #sentiment module
+        self.word_dense = nn.Linear(768, 1)
+        self.sigmoid = nn.Sigmoid()
 
         # attention module
         self.tanh = nn.Tanh()
@@ -1603,13 +1607,20 @@ class EMB_COS_LSTM_ATT(nn.Module):
 
         return att_output
 
+    def sentiment_net(self, lstm_outputs):
+        result = self.word_dense(lstm_outputs)
+        sig_output = self.sigmoid(result)
+        senti_output = lstm_outputs.mul_(sig_output)
+        return senti_output
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # embedding
         emb_output = self.embedding(input_ids)
         outputs, (h, c) = self.lstm(emb_output)
 
+        sentiment_outputs = self.sentiment_net(outputs)
+
         # attention
-        attention_outputs = self.attention_net(outputs)
+        attention_outputs = self.attention_net(sentiment_outputs)
 
         outputs = self.dropout(attention_outputs)
         outputs = self.out_proj(outputs)
@@ -1658,5 +1669,5 @@ MODEL_LIST = {
     "EMB2_LSTM": EMB2_LSTM,
     "EMB1_LSTM2": EMB1_LSTM2,
 
-    "EMB_COS_LSTM_ATT": EMB_COS_LSTM_ATT
+    "EMB_ATT_LSTM_ATT": EMB_ATT_LSTM_ATT
 }
