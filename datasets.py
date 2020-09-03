@@ -7,7 +7,6 @@ import pickle
 import numpy as np
 from konlpy.tag import Twitter
 from tqdm import tqdm
-from gensim.models import Word2Vec
 
 class BaseDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
