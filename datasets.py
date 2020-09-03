@@ -90,7 +90,7 @@ class GensimDataset(Dataset):
     def __getitem__(self, idx):
         txt = str(self.dataset.at[idx,"review"])
         tokens = self.tokenizer.morphs(txt)
-        data = list(np.zeros((self.maxlen,200)))
+        data = np.zeros((self.maxlen,200)).tolist()
         other = self.pretrain_emb.predict_output_word(data)
         print(other)
         for i, token in enumerate(tokens):
