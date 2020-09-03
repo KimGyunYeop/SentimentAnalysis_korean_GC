@@ -90,6 +90,7 @@ class GensimDataset(Dataset):
     def __getitem__(self, idx):
         txt = str(self.dataset.at[idx,"review"])
         tokens = self.tokenizer.morphs(txt)
+        print(tokens)
         data = list(np.zeros((self.maxlen,200)))
         for i, token in enumerate(tokens):
             try:
