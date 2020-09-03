@@ -1609,7 +1609,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
 
     def sentiment_net(self, lstm_outputs):
         result = self.word_dense(lstm_outputs)
-        sig_output = self.sigmoid(result)
+        sig_output = self.sigmoid(result,inplace=False)
         senti_output = lstm_outputs.mul_(sig_output)
         return senti_output
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
