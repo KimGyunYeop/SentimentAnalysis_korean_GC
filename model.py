@@ -1613,7 +1613,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         argmax_result = torch.argmax(sig_output,dim=-1)
         print(argmax_result.shape)
         emb_result = self.sentiment_embedding(argmax_result)
-        senti_output = lstm_outputs * sig_output
+        senti_output = lstm_outputs * emb_result
         return senti_output
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
