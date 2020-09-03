@@ -7,7 +7,7 @@ import pickle
 import numpy as np
 from konlpy.tag import Twitter
 from tqdm import tqdm
-from gensim.models import Word2Vec
+from gensim.models import KeyedVectors
 
 class BaseDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
@@ -82,7 +82,7 @@ class GensimDataset(Dataset):
         self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
         if "small" in mode:
             self.dataset = self.dataset[:10000]
-        self.vocab = Word2Vec.load("pretrain_embedding/word2vec_refining.model").vocab
+        self.vocab = KeyedVectors.load_word2vec_format("pretrain_embedding/word2vec_refining.model", binary=False).vocab
         print(self.vocab)
 
     def __len__(self):
