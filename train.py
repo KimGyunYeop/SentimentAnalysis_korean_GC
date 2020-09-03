@@ -161,7 +161,6 @@ def train(args,
             if args.max_steps > 0 and global_step > args.max_steps:
                 break
 
-        print('best:', best_acc, 'acc:', acc)
         mb.write("Epoch {} done".format(epoch + 1))
         mb.write("Epoch loss = {} ".format(np.mean(np.array(ep_loss), axis=0)))
 
