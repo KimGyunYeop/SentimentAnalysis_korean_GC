@@ -98,7 +98,7 @@ class GensimDataset(Dataset):
                 data[i] = self.vocab[token].index
             except:
                 data[i] = 0
-        input_ids = torch.FloatTensor(data)
+        input_ids = torch.LongTensor(data)
         token_type_ids = torch.FloatTensor([0])
         attention_mask = torch.FloatTensor([0])
         label = self.dataset.at[idx,"rating"]
