@@ -81,6 +81,7 @@ def train(args,
     model.zero_grad()
     mb = master_bar(range(int(args.num_train_epochs)))
     best_acc = 0
+    acc = 0
     for epoch in mb:
         epoch_iterator = progress_bar(train_dataloader, parent=mb)
         ep_loss = []
