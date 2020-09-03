@@ -1587,7 +1587,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
 
         #sentiment module
         self.word_dense = nn.Linear(768, 1)
-        self.sigmoid = nn.Sigmoid()
+        self.sigmoid = nn.Sigmoid(inplace=False)
 
         # attention module
         self.tanh = nn.Tanh()
