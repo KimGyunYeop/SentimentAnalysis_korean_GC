@@ -8,7 +8,7 @@ import os
 
 all_urls = []
 
-MAX_LEVEL = 3
+MAX_LEVEL = 2
 
 def search_node(url, sentiment, level):
     #get now word's dict homepage
@@ -16,9 +16,8 @@ def search_node(url, sentiment, level):
 
     try:
         driver.get(url)
-        WebDriverWait(driver, 2).until(lambda x: url.split("/")[-1] in x.page_source)
+        WebDriverWait(driver, 10).until(lambda x: url.split("/")[-1] in x.page_source)
     except:
-        driver.close()
         driver = webdriver.Chrome(chromeDriver)
         search_node(url, sentiment, level)
         return 0
