@@ -1735,7 +1735,7 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         self.out_proj = nn.Linear(768, 2)
         self.gelu = nn.ReLU()
 
-    def attention_net(self, lstm_output, final_h, input):
+    def attention_net(self, lstm_output, input):
         batch_size, seq_len = input.shape
 
         att = torch.bmm(torch.tanh(lstm_output),
