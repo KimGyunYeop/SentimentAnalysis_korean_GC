@@ -1764,7 +1764,7 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         outputs, (h,_) = self.lstm(sentiment_outputs)
 
         # attention
-        attention_outputs = self.attention_net(outputs,h,input_ids)
+        attention_outputs = self.attention_net(outputs,input_ids)
 
         outputs = self.dropout(attention_outputs)
         outputs = self.dense(outputs)
