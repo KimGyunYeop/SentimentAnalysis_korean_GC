@@ -355,7 +355,6 @@ class BASEELECTRA_COS2_NEG_EMB(nn.Module):
         self.out_proj = nn.Linear(768, 2)
         self.star_emb = nn.Embedding(2, 768)
         self.gelu = nn.GELU()
-        self.tanh = nn.Tanh()
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # print(input_ids)
