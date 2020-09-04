@@ -1582,7 +1582,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
-        self.maxlen = config.max_len
+        self.maxlen = config.max_seq_len
         self.lstm = nn.LSTM(50, 768, batch_first=True, bidirectional=False, dropout=0.2)
 
         #sentiment module
