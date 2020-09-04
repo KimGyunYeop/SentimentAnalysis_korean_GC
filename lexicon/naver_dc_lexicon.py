@@ -21,8 +21,15 @@ def search_node(url, sentiment, level):
         WebDriverWait(driver, 10).until(lambda x: url.split("/")[-1] in x.page_source)
     except:
         driver = webdriver.Chrome(chromeDriver)
+
+        bs = BeautifulSoup(driver.page_source, "html.parser")
+        word_meta = bs.find("meta", {"property": "og:title"})
+        if word_meta is None:
+            return 0
+
         search_node(url, sentiment, level)
         sent_dc.to_csv("result_add_lex.csv", encoding='utf-8-sig')
+
         return 0
 
     bs = BeautifulSoup(driver.page_source, "html.parser")
