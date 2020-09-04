@@ -1575,8 +1575,65 @@ class CHAR_LSTM(nn.Module):
 
         return result
 
-
 class EMB_ATT_LSTM_ATT(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(EMB_ATT_LSTM_ATT, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
+
+        #sentiment module
+        self.word_dense = nn.Linear(768, 2)
+        self.sentiment_embedding = nn.Embedding(2, 768)
+
+        # attention module
+        self.dense_1 = nn.Linear(768, 100)
+        self.dense_2 = nn.Linear(100, 1)
+        self.softmax = nn.Softmax(dim=-1)
+
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 2)
+
+    def attention_net(self, lstm_outputs):
+        M = torch.tanh(self.dense_1(lstm_outputs))
+        wM_output = self.dense_2(M).squeeze()
+        a = self.softmax(wM_output)
+        c = lstm_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
+        att_output = torch.tanh(c)
+
+        return att_output
+
+    def sentiment_net(self, lstm_outputs):
+        result = self.word_dense(lstm_outputs)
+        sig_output = self.softmax(result)
+        argmax_result = torch.argmax(sig_output,dim=-1)
+        emb_result = self.sentiment_embedding(argmax_result)
+        senti_output = lstm_outputs * emb_result
+        return senti_output
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        # embedding
+        emb_output = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+
+        sentiment_outputs = self.sentiment_net(emb_output[0])
+
+        outputs, _ = self.lstm(sentiment_outputs)
+
+        # attention
+        attention_outputs = self.attention_net(outputs)
+
+        outputs = self.dropout(attention_outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss = loss_fct(outputs.view(-1, 2), labels.view(-1))
+
+        result = (loss, outputs)
+
+        return result
+
+class EMB_CLS_LSTM_ATT(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
         super(EMB_ATT_LSTM_ATT, self).__init__()
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
@@ -1674,5 +1731,6 @@ MODEL_LIST = {
     "EMB2_LSTM": EMB2_LSTM,
     "EMB1_LSTM2": EMB1_LSTM2,
 
-    "EMB_ATT_LSTM_ATT": EMB_ATT_LSTM_ATT
+    "EMB_ATT_LSTM_ATT": EMB_ATT_LSTM_ATT,
+    "EMB_CLS_LSTM_ATT": EMB_CLS_LSTM_ATT
 }

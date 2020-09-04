@@ -367,5 +367,6 @@ DATASET_LIST = {
     "EMB2_LSTM": BaseDataset,
     "EMB1_LSTM2" : BaseDataset,
 
-    "EMB_ATT_LSTM_ATT": BaseDataset
+    "EMB_ATT_LSTM_ATT": BaseDataset,
+    "EMB_CLS_LSTM_ATT": BaseDataset
 }
