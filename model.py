@@ -412,6 +412,86 @@ class BASEELECTRA_COS2_STAR_NEG(nn.Module):
 
         return result
 
+class BASEELECTRA_COS2_STAR_NEG_EMB(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(BASEELECTRA_COS2_STAR_NEG, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2, inplace=False)
+        self.out_proj = nn.Linear(768, 2)
+        self.star_emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        # print(input_ids)
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        embs = outputs[0]
+        batch_size, seq_len, w2v_dim = embs.shape
+
+        outputs = self.dense(outputs[0][:, -1, :])
+        outputs = self.dropout(outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss1 = loss_fct(outputs.view(-1, 2), labels.view(-1))
+
+        labels_2 = labels.type(torch.FloatTensor).cuda()
+        for i in range(len(labels_2)):
+            labels_2[i] = labels_2[i].double() * 2 - 1
+        p_idx = (labels_2 == 1).nonzero().cuda()
+        n_idx = (labels_2 == -1).nonzero().cuda()
+
+        x1 = embs[:, 0, :].squeeze()
+        x1_p = x1[p_idx]
+        x1_n = x1[n_idx]
+        len_p = len(x1_p)
+        len_n = len(x1_n)
+
+        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=-0.5)
+        if len_p != 0 and len_n != 0:
+            x1_p = x1_p.squeeze()
+            x1_p = x1_p.repeat(1, len_n)
+            x1_p = x1_p.view(-1, w2v_dim)
+            x1_n = x1_n.squeeze().repeat(len_p, 1)
+
+            y = -torch.ones(len_p * len_n).type(torch.FloatTensor).cuda()
+
+            loss2 = loss_fn(x1_p.view(-1, w2v_dim),
+                            x1_n.view(-1, w2v_dim),
+                            y.view(-1))
+        if len_p > 1:
+            star_p = torch.zeros(len_p, 2).cuda()
+            star_p[range(len_p), 1] = 1
+            star_p = self.star_emb(star_p)
+            loss3_p = loss_fn(x1[p_idx].squeeze(),
+                              star_p,
+                              -torch.ones(len_p).cuda())
+        if len_n > 1:
+            star_n = torch.zeros(len_n, 2).cuda()
+            star_n[range(len_n), 0] = 1
+            star_n = self.star_emb(star_n)
+            loss3_n = loss_fn(x1[n_idx].squeeze(),
+                              star_n,
+                              -torch.ones(len_n).cuda())
+        if len_p <= 1 and len_n > 1:
+            if len_p == 0:
+                result = ((loss1, torch.tensor(0), torch.tensor(0), 0.5 * loss3_n), outputs)
+            else:
+                result = ((loss1, torch.tensor(0), torch.tensor(0), 0.5 * loss3_n), outputs)
+        elif len_p > 1 and len_n <= 1:
+            if len_n == 0:
+                result = ((loss1, torch.tensor(0), 0.5 * loss3_p, torch.tensor(0)), outputs)
+            else:
+                result = ((loss1, torch.tensor(0), 0.5 * loss3_p, torch.tensor(0)), outputs)
+        else:
+            result = ((loss1, 0.5 * loss2,
+                       float(len_p) / (len_p + len_n) / 2 * loss3_p, float(len_n) / (len_p + len_n) / 2 * loss3_n),
+                      outputs)
+
+        return result
 
 class LSTM(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
@@ -1768,6 +1848,7 @@ MODEL_LIST = {
     "BASEELECTRA_COS2_LSTM": BASEELECTRA_COS2_LSTM,
     "BASEELECTRA_COS2_NEG": BASEELECTRA_COS2_NEG,
     "BASEELECTRA_COS2_STAR_NEG": BASEELECTRA_COS2_STAR_NEG,
+    "BASEELECTRA_COS2_STAR_NEG_EMB": BASEELECTRA_COS2_STAR_NEG_EMB,
 
     "LSTM": LSTM,
     "LSTM_ATT": LSTM_ATT,
