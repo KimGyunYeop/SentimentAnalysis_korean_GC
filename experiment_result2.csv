@@ -1,7 +1,1 @@
 모델이름,성능,step,ckpt,consoloutput,설명,날짜,참조,비고,사용 모델 명,서버
-,,,,,,,,,,
-koELECTRA+LSTM,0.9269,6000,koelectra-lstm-cls,electra-lstm.txt,koELECTRA embedding에 one direcitonal LSTM후 마지막 hidden state의 classification,7월 29일,,,model.LSTM,218
-KoELECTRA + LSTM + ATT,0.9269,6000,koelectra-lstm-att-cls ,electra-lstm-att.txt,KOELECTRA embedding에 one direcitonal LSTM후 Attention layer의 classification,7월 29일,,,model.LSTM_ATT,218
-KoELECTRA + LSTM + DOTATT,0.9276,4000,koeletra-lstm-att-cls,electra-lstm-dot-att.txt,KOELECTRA embedding에 one direcitonal LSTM후 마지막 hidden과 seq hidden의 DotProduct Attention layer의 classification,7월 29일,,,model.LSTM_ATT_DOT,217
-,,,,,,,,,,
-koELECTRA + LSTM + ATTv2,0.9273,8000,koelectra-lstm-att-v2-cls ,electra-lstm-att-v2.txt,KoELECTRA embedding에 one direcitonal LSTM후 v2의 Attention layer의 classification,7월 29일,,,model.LSTM_ATT_v2,225
