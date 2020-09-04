@@ -1672,7 +1672,7 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         batch_size, max_len, _=sig_output.shape
         zeros = torch.zeros(batch_size, max_len, dtype=torch.long).to(self.config.device)
         ones = torch.ones(batch_size, max_len, dtype=torch.long).to(self.config.device)
-        emb_result = self.sentiment_embedding(zeros) * sig_output[:,:,0] + self.sentiment_embedding(ones) * sig_output[:,:,1]
+        emb_result = self.sentiment_embedding(zeros) * sig_output[:,:,0].repeat(1,1,768) + self.sentiment_embedding(ones) * sig_output[:,:,1].repeat(1,1,768)
         senti_output = lstm_outputs + emb_result
         return senti_output
 
