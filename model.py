@@ -1593,7 +1593,6 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         self.dense_2 = nn.Linear(100, 1)
         self.softmax = nn.Softmax(dim=-1)
 
-        self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
 
@@ -1624,7 +1623,6 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         # attention
         attention_outputs = self.attention_net(sentiment_outputs)
 
-        outputs = self.dense(attention_outputs)
         outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
 
