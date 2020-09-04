@@ -1734,8 +1734,9 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         self.softmax = nn.Softmax(dim=-1)
 
         self.dense = nn.Linear(768, 768)
-        self.dropout = nn.Dropout(0.2)
+        self.dropout = nn.Dropout(0.1)
         self.out_proj = nn.Linear(768, 2)
+        self.gelu = nn.GELU()
 
     def attention_net(self, lstm_outputs):
         M = torch.tanh(self.dense_1(lstm_outputs))
@@ -1767,7 +1768,9 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         # attention
         attention_outputs = self.attention_net(outputs)
 
-        outputs = self.dense(attention_outputs)
+        outputs = self.dropout(attention_outputs)
+        outputs = self.dense(outputs)
+        outputs = self.gelu(outputs)
         outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
 
