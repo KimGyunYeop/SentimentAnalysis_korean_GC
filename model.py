@@ -399,7 +399,6 @@ class BASEELECTRA_COS2_NEG_EMB(nn.Module):
         star = torch.zeros(batch_size, 2).cuda()
         star[range(batch_size), labels] = 1
         star = self.star_emb(star)
-        star = self.tanh(star)
 
         loss3 = loss_fn(embs[:, 0, :].squeeze(),
                         star,
