@@ -8,7 +8,6 @@ import numpy as np
 import torch
 import torch.nn.functional as F
 from torch import nn
-from gensim.models import Word2Vec
 from torch.utils.data import DataLoader, RandomSampler, SequentialSampler
 from fastprogress.fastprogress import master_bar, progress_bar
 from attrdict import AttrDict
