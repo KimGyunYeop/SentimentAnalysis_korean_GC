@@ -1623,7 +1623,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         # attention
         attention_outputs = self.attention_net(sentiment_outputs)
 
-        outputs = self.dropout(outputs)
+        outputs = self.dropout(attention_outputs)
         outputs = self.out_proj(outputs)
 
         loss_fct = nn.CrossEntropyLoss()
