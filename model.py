@@ -1587,7 +1587,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
 
         #sentiment module
         self.word_dense = nn.Linear(self.maxlen-2, 2)
-        self.sentiment_embedding = nn.Embedding(2, 50)
+        self.sentiment_embedding = nn.Embedding(2, self.maxlen-2)
 
         # attention module
         self.dense_1 = nn.Linear(768, 100)
