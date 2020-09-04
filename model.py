@@ -1728,8 +1728,7 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         self.softmax = nn.Softmax(dim=-1)
 
         # attention module
-        self.att_w1 = nn.Parameter(torch.randn(1, 768, 10))
-        self.att_w2 = nn.Parameter(torch.randn(1, 10, 1))
+        self.att_w = nn.Parameter(torch.randn(1, 768, 1))
 
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.1)
@@ -1739,11 +1738,6 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
     def attention_net(self, lstm_output, final_h, input):
         batch_size, seq_len = input.shape
 
-        final_h = final_h.squeeze()
-
-        # final_h.size() = (batch_size, hidden_size)
-        # output.size() = (batch_size, num_seq, hidden_size)
-        # lstm_output(batch_size, seq_len, lstm_dir_dim)
         att = torch.bmm(torch.tanh(lstm_output),
                         self.att_w.repeat(batch_size, 1, 1))
         att = F.softmax(att, dim=1)  # att(batch_size, seq_len, 1)
