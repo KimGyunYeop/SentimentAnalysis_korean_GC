@@ -140,7 +140,7 @@ def train(args,
 
                 if args.save_steps > 0 and global_step % args.save_steps == 0:
                     # Save model checkpoint
-                    output_dir = os.path.join(args.output_dir, "checkpoints-best")
+                    output_dir = os.path.join(args.output_dir, "checkpoint-best")
 
                     if float(best_acc) <= float(acc):
                         if not os.path.exists(output_dir):
