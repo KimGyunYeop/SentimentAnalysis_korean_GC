@@ -1729,9 +1729,8 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         self.sentiment_embedding = nn.Embedding(2, 768)
 
         # attention module
-        self.dense_1 = nn.Linear(768, 100)
-        self.dense_2 = nn.Linear(100, 1)
-        self.softmax = nn.Softmax(dim=-1)
+        self.att_w1 = nn.Parameter(torch.randn(1, 768, 10))
+        self.att_w2 = nn.Parameter(torch.randn(1, 10, 1))
 
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.1)
