@@ -1635,9 +1635,9 @@ class EMB_ATT_LSTM_ATT(nn.Module):
 
         return result
 
-class EMB_ATT_LSTM_ATT_2(nn.Module):
+class EMB_ATT_LSTM_ATT_ver2(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
-        super(EMB_ATT_LSTM_ATT, self).__init__()
+        super(EMB_ATT_LSTM_ATT_ver2, self).__init__()
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
@@ -1700,7 +1700,7 @@ class EMB_ATT_LSTM_ATT_2(nn.Module):
 
 class EMB_CLS_LSTM_ATT(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
-        super(EMB_ATT_LSTM_ATT, self).__init__()
+        super(EMB_CLS_LSTM_ATT, self).__init__()
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
@@ -1797,6 +1797,6 @@ MODEL_LIST = {
     "EMB1_LSTM2": EMB1_LSTM2,
 
     "EMB_ATT_LSTM_ATT": EMB_ATT_LSTM_ATT,
-    "EMB_ATT_LSTM_ATT_2": EMB_ATT_LSTM_ATT_2,
+    "EMB_ATT_LSTM_ATT_ver2": EMB_ATT_LSTM_ATT_ver2,
     "EMB_CLS_LSTM_ATT": EMB_CLS_LSTM_ATT
 }
