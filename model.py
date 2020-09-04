@@ -285,7 +285,7 @@ class BASEELECTRA_COS2_NEG(nn.Module):
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2, inplace=False)
         self.out_proj = nn.Linear(768, 2)
-        self.star_emb = nn.Embedding(2, 768)
+        self.star_emb = nn.Linear(2, 768)
         self.gelu = nn.GELU()
         self.tanh = nn.Tanh()
 
@@ -353,7 +353,7 @@ class BASEELECTRA_COS2_NEG_EMB(nn.Module):
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2, inplace=False)
         self.out_proj = nn.Linear(768, 2)
-        self.star_emb = nn.Linear(2, 768)
+        self.star_emb = nn.Embedding(2, 768)
         self.gelu = nn.GELU()
         self.tanh = nn.Tanh()
 
