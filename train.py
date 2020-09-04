@@ -258,14 +258,15 @@ def main(cli_args):
     logger.info("Training/evaluation parameters {}".format(args))
     logger.info("cliargs parameters {}".format(cli_args))
 
+
+    args.output_dir = os.path.join(args.ckpt_dir, cli_args.result_dir)
+    args.model_mode = cli_args.model_mode
+
     if cli_args.small == True:
         args.ckpt_dir = args.ckpt_dir + "_small"
     else:
         if os.path.exists(args.output_dir):
             raise ValueError("result path is already exist(path = %s)" % args.output_dir)
-
-    args.output_dir = os.path.join(args.ckpt_dir, cli_args.result_dir)
-    args.model_mode = cli_args.model_mode
 
     init_logger()
     set_seed(args)
