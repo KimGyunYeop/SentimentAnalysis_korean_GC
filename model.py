@@ -1617,7 +1617,7 @@ class EMB_ATT_LSTM_ATT(nn.Module):
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # embedding
         emb_output = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        CLS_output = emb_output[0][:,0,:].squeeze().repeat(1,1,self.maxlen-2)
+        CLS_output = emb_output[0][:,0,:].repeat(1,self.maxlen-2,1)
         print(emb_output[0][:,0,:].squeeze().shape)
         print(CLS_output.shape)
         print(emb_output[0][:,1:-1,:].shape)
