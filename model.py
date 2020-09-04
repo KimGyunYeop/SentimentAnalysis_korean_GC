@@ -1736,7 +1736,7 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.1)
         self.out_proj = nn.Linear(768, 2)
-        self.gelu = nn.GELU()
+        self.gelu = nn.ReLU()
 
     def attention_net(self, lstm_output, final_h, input):
         batch_size, seq_len = input.shape
