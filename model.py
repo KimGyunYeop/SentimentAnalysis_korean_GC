@@ -1583,10 +1583,10 @@ class EMB_ATT_LSTM_ATT(nn.Module):
             model_name_or_path,
             config=config)
         self.maxlen = 50
-        self.lstm = nn.LSTM(50, 768, batch_first=True, bidirectional=False, dropout=0.2)
+        self.lstm = nn.LSTM(self.maxlen-2, 768, batch_first=True, bidirectional=False, dropout=0.2)
 
         #sentiment module
-        self.word_dense = nn.Linear(50, 2)
+        self.word_dense = nn.Linear(self.maxlen-2, 2)
         self.sentiment_embedding = nn.Embedding(2, 50)
 
         # attention module
@@ -1618,9 +1618,6 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         # embedding
         emb_output = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
         CLS_output = emb_output[0][:,0,:].unsqueeze(-1).repeat(1,1,self.maxlen-2)
-        print(emb_output[0][:,0,:].shape)
-        print(CLS_output.shape)
-        print(emb_output[0][:,1:-1,:].shape)
         emb_total_output = emb_output[0][:,1:-1,:].bmm(CLS_output)
 
         sentiment_outputs = self.sentiment_net(emb_total_output)
