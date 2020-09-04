@@ -414,16 +414,14 @@ class BASEELECTRA_COS2_STAR_NEG(nn.Module):
 
 class BASEELECTRA_COS2_STAR_NEG_EMB(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
-        super(BASEELECTRA_COS2_STAR_NEG, self).__init__()
+        super(BASEELECTRA_COS2_STAR_NEG_EMB, self).__init__()
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2, inplace=False)
         self.out_proj = nn.Linear(768, 2)
-        self.star_emb = MODEL_ORIGINER[model_type].from_pretrained(
-            model_name_or_path,
-            config=config)
+        self.star_emb = nn.Embedding(2, 768)
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # print(input_ids)
@@ -464,15 +462,17 @@ class BASEELECTRA_COS2_STAR_NEG_EMB(nn.Module):
                             y.view(-1))
         if len_p > 1:
             star_p = torch.zeros(len_p, 2).cuda()
-            star_p[range(len_p), 1] = 1
-            star_p = self.star_emb(star_p)
+            star_p[range(batch_size), 1] = 1
+            star_p = self.star_emb(star_p.type(torch.LongTensor).cuda())
+            star_p = star_p[:len_p]
             loss3_p = loss_fn(x1[p_idx].squeeze(),
                               star_p,
                               -torch.ones(len_p).cuda())
         if len_n > 1:
             star_n = torch.zeros(len_n, 2).cuda()
-            star_n[range(len_n), 0] = 1
-            star_n = self.star_emb(star_n)
+            star_n[range(batch_size), 0] = 1
+            star_n = self.star_emb(star_n.type(torch.LongTensor).cuda())
+            star_n = star_n[:len_n]
             loss3_n = loss_fn(x1[n_idx].squeeze(),
                               star_n,
                               -torch.ones(len_n).cuda())
