@@ -461,20 +461,18 @@ class BASEELECTRA_COS2_STAR_NEG_EMB(nn.Module):
                             x1_n.view(-1, w2v_dim),
                             y.view(-1))
         if len_p > 1:
-            star_p = torch.zeros(len_p, 2).cuda()
-            star_p[range(batch_size), 1] = 1
-            star_p = self.star_emb(star_p.type(torch.LongTensor).cuda())
-            star_p = star_p[:len_p]
+            star_p = torch.zeros(len_p, 2).type(torch.LongTensor).cuda()
+            star_p[range(len_p), 1] = 1
+            star_p = self.star_emb(star_p)[:,0,:].squeeze()
             loss3_p = loss_fn(x1[p_idx].squeeze(),
-                              star_p,
+                              star_p.cuda(),
                               -torch.ones(len_p).cuda())
         if len_n > 1:
-            star_n = torch.zeros(len_n, 2).cuda()
-            star_n[range(batch_size), 0] = 1
-            star_n = self.star_emb(star_n.type(torch.LongTensor).cuda())
-            star_n = star_n[:len_n]
+            star_n = torch.zeros(len_n, 2).type(torch.LongTensor).cuda()
+            star_n[range(len_n), 0] = 1
+            star_n = self.star_emb(star_n)[:,0,:].squeeze()
             loss3_n = loss_fn(x1[n_idx].squeeze(),
-                              star_n,
+                              star_n.cuda(),
                               -torch.ones(len_n).cuda())
         if len_p <= 1 and len_n > 1:
             if len_p == 0:
