@@ -1582,11 +1582,12 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
-        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
+        self.maxlen = config.max_len
+        self.lstm = nn.LSTM(50, 768, batch_first=True, bidirectional=False, dropout=0.2)
 
         #sentiment module
-        self.word_dense = nn.Linear(768, 2)
-        self.sentiment_embedding = nn.Embedding(2, 768)
+        self.word_dense = nn.Linear(50, 2)
+        self.sentiment_embedding = nn.Embedding(2, 50)
 
         # attention module
         self.dense_1 = nn.Linear(768, 100)
@@ -1616,12 +1617,15 @@ class EMB_ATT_LSTM_ATT(nn.Module):
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # embedding
         emb_output = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        outputs, _ = self.lstm(emb_output[0])
+        CLS_output = emb_output[0][:,0,:].squeeze().repeat(1,1,self.maxlen-2)
+        emb_total_output = emb_output[0][:,1:-1,:].bmm(CLS_output)
 
-        sentiment_outputs = self.sentiment_net(outputs)
+        sentiment_outputs = self.sentiment_net(emb_total_output)
+
+        outputs, _ = self.lstm(sentiment_outputs)
 
         # attention
-        attention_outputs = self.attention_net(sentiment_outputs)
+        attention_outputs = self.attention_net(outputs)
 
         outputs = self.dropout(attention_outputs)
         outputs = self.out_proj(outputs)
