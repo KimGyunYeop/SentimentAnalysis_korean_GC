@@ -30,6 +30,7 @@ from src import (
     set_seed,
     compute_metrics
 )
+import inspect
 
 logger = logging.getLogger(__name__)
 
@@ -147,6 +148,9 @@ def train(args,
                             os.makedirs(output_dir)
                         torch.save(model.state_dict(), os.path.join(output_dir, "training_model.bin"))
                         torch.save(args, os.path.join(output_dir, "training_args.bin"))
+                        with open(os.path.join(output_dir,"model_code.txt"),"w") as fp:
+                            fp.writelines(inspect.getsource(model))
+
                         logger.info("Saving model checkpoint to {}".format(output_dir))
                         temp = acc
 
