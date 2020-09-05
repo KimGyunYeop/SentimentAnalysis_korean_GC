@@ -149,7 +149,7 @@ def train(args,
                         torch.save(model.state_dict(), os.path.join(output_dir, "training_model.bin"))
                         torch.save(args, os.path.join(output_dir, "training_args.bin"))
                         with open(os.path.join(output_dir,"model_code.txt"),"w") as fp:
-                            fp.writelines(inspect.getsource(model))
+                            fp.writelines(inspect.getsource(MODEL_LIST[args.model_mode]))
 
                         logger.info("Saving model checkpoint to {}".format(output_dir))
                         temp = acc
@@ -296,6 +296,7 @@ def main(cli_args):
     # GPU or CPU
     args.device = "cuda:{}".format(cli_args.gpu) if torch.cuda.is_available() and not args.no_cuda else "cpu"
     config.device = args.device
+    args.model_mode = cli_args.model_mode
 
     model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
     model.to(args.device)
