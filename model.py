@@ -546,7 +546,7 @@ class BASEELECTRA_COS2_STAR_NEG_EMB(nn.Module):
         if len_p > 1:
             star_p = torch.ones(len_p).type(torch.LongTensor).cuda()
             star_p = self.star_emb(star_p).squeeze()
-            star_n = self.tanh(star_p)
+            star_p = self.tanh(star_p)
             loss3_p = loss_fn(x1[p_idx].squeeze(),
                               star_p.cuda(),
                               -torch.ones(len_p).cuda())
