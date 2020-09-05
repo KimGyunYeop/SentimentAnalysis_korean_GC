@@ -9,6 +9,9 @@ args.add_argument("--result_dir", type=str, required=True)
 
 args = args.parse_args()
 
+if "ckpt/" in args.result_dir:
+    args.result_dir = args.result_dir[5:]
+
 result_path = os.path.join("ckpt", args.result_dir, "test")
 epoch_list = os.listdir(result_path)
 
