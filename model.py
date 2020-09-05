@@ -1822,7 +1822,7 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         return attn_output
 
     def sentiment_net(self, lstm_outputs):
-        result = self.word_dense(torch.tanh(lstm_outputs))
+        result = self.word_dense(lstm_outputs)
         sig_output = self.softmax(result)
         batch_size, max_len, _=sig_output.shape
         zeros = torch.zeros(batch_size, max_len, dtype=torch.long).to(self.config.device)
