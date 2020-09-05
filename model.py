@@ -209,7 +209,6 @@ class BASEELECTRA_COS2(nn.Module):
         star = torch.zeros(batch_size, 2).cuda()
         star[range(batch_size), labels] = 1
         star = self.star_emb(star)
-        star = self.tanh(star)
 
         loss3 = loss_fn(embs[:, 0, :].squeeze(),
                         star,
@@ -232,7 +231,6 @@ class BASEELECTRA_COS2_LSTM(nn.Module):
         self.out_proj = nn.Linear(768, 2)
         self.star_emb = nn.Linear(2, 768)
         self.gelu = nn.GELU()
-        self.tanh = nn.Tanh()
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # print(input_ids)
@@ -265,7 +263,6 @@ class BASEELECTRA_COS2_LSTM(nn.Module):
         star = torch.zeros(batch_size, 2).cuda()
         star[range(batch_size), labels] = 1
         star = self.star_emb(star)
-        star = self.tanh(star)
 
         loss3 = loss_fn(outputs[:, -1, :].squeeze(),
                         star,
@@ -287,7 +284,6 @@ class BASEELECTRA_COS2_NEG(nn.Module):
         self.out_proj = nn.Linear(768, 2)
         self.star_emb = nn.Linear(2, 768)
         self.gelu = nn.GELU()
-        self.tanh = nn.Tanh()
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # print(input_ids)
@@ -331,7 +327,6 @@ class BASEELECTRA_COS2_NEG(nn.Module):
         star = torch.zeros(batch_size, 2).cuda()
         star[range(batch_size), labels] = 1
         star = self.star_emb(star)
-        star = self.tanh(star)
 
         loss3 = loss_fn(embs[:, 0, :].squeeze(),
                         star,
@@ -419,7 +414,6 @@ class BASEELECTRA_COS2_STAR_NEG(nn.Module):
         self.out_proj = nn.Linear(768, 2)
         self.gelu = nn.GELU()
         self.star_emb = nn.Linear(2, 768)
-        self.tanh = nn.Tanh()
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # print(input_ids)
@@ -463,7 +457,6 @@ class BASEELECTRA_COS2_STAR_NEG(nn.Module):
             star_p = torch.zeros(len_p, 2).cuda()
             star_p[range(len_p), 1] = 1
             star_p = self.star_emb(star_p)
-            star_p = self.tanh(star_p)
             loss3_p = loss_fn(x1[p_idx].squeeze(),
                               star_p,
                               -torch.ones(len_p).cuda())
@@ -471,7 +464,6 @@ class BASEELECTRA_COS2_STAR_NEG(nn.Module):
             star_n = torch.zeros(len_n, 2).cuda()
             star_n[range(len_n), 0] = 1
             star_n = self.star_emb(star_n)
-            star_n = self.tanh(star_n)
             loss3_n = loss_fn(x1[n_idx].squeeze(),
                               star_n,
                               -torch.ones(len_n).cuda())
@@ -502,7 +494,6 @@ class BASEELECTRA_COS2_STAR_NEG_EMB(nn.Module):
         self.dropout = nn.Dropout(0.2, inplace=False)
         self.out_proj = nn.Linear(768, 2)
         self.star_emb = nn.Embedding(2, 768)
-        self.tanh = nn.Tanh()
         self.gelu = nn.GELU()
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
@@ -546,14 +537,12 @@ class BASEELECTRA_COS2_STAR_NEG_EMB(nn.Module):
         if len_p > 1:
             star_p = torch.ones(len_p).type(torch.LongTensor).cuda()
             star_p = self.star_emb(star_p).squeeze()
-            star_p = self.tanh(star_p)
             loss3_p = loss_fn(x1[p_idx].squeeze(),
                               star_p.cuda(),
                               -torch.ones(len_p).cuda())
         if len_n > 1:
             star_n = torch.zeros(len_n).type(torch.LongTensor).cuda()
             star_n = self.star_emb(star_n).squeeze()
-            star_n = self.tanh(star_n)
             loss3_n = loss_fn(x1[n_idx].squeeze(),
                               star_n.cuda(),
                               -torch.ones(len_n).cuda())
