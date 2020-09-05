@@ -525,11 +525,16 @@ class BASEELECTRA_COS2_STAR_NEG_EMB(nn.Module):
         p_idx = (labels_2 == 1).nonzero().cuda()
         n_idx = (labels_2 == -1).nonzero().cuda()
 
+        print("label","\tlen=",len(labels),"\tsum=",sum(labels))
+
         x1 = embs[:, 0, :].squeeze()
         x1_p = x1[p_idx]
         x1_n = x1[n_idx]
         len_p = len(x1_p)
         len_n = len(x1_n)
+
+        print("pos shape= ",x1[p_idx].shape)
+        print("neg shape= ",x1[n_idx].shape)
 
         loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=-0.5)
         if len_p != 0 and len_n != 0:
