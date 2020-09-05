@@ -1816,7 +1816,7 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         self.att_w = nn.Parameter(torch.randn(1, 768, 1))
 
         self.dense = nn.Linear(768, 768)
-        self.dropout = nn.Dropout(0.1)
+        self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
         self.gelu = nn.GELU()
 
@@ -1851,7 +1851,6 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         # attention
         attention_outputs = self.attention_net(outputs,input_ids)
 
-        outputs = self.dropout(attention_outputs)
         outputs = self.dense(outputs)
         outputs = self.gelu(outputs)
         outputs = self.dropout(outputs)
