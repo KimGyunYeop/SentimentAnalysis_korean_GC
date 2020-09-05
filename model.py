@@ -1756,22 +1756,24 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
+        self.gelu = nn.GELU()
 
-    def attention_net(self, lstm_outputs):
-        M = torch.tanh(self.dense_1(lstm_outputs))
-        wM_output = self.dense_2(M).squeeze()
-        a = self.softmax(wM_output)
-        c = lstm_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
-        att_output = torch.tanh(c)
+    def attention_net(self, lstm_output, input):
+        batch_size, seq_len = input.shape
 
-        return att_output
+        att = torch.bmm(torch.tanh(lstm_output),
+                        self.att_w.repeat(batch_size, 1, 1))
+        att = F.softmax(att, dim=1)  # att(batch_size, seq_len, 1)
+        att = torch.bmm(lstm_output.transpose(1, 2), att).squeeze(2)
+        attn_output = torch.tanh(att)  # attn_output(batch_size, lstm_dir_dim)
+        return attn_output
 
     def sentiment_net(self, lstm_outputs):
-        result = self.word_dense(lstm_outputs)
+        result = self.word_dense(torch.tanh(lstm_outputs))
         sig_output = self.softmax(result)
         argmax_result = torch.argmax(sig_output,dim=-1)
         emb_result = self.sentiment_embedding(argmax_result)
-        senti_output = lstm_outputs * emb_result
+        senti_output = self.gelu(lstm_outputs + emb_result)
         return senti_output
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
@@ -1783,9 +1785,10 @@ class EMB_ATT_LSTM_ATT(nn.Module):
         outputs, _ = self.lstm(sentiment_outputs)
 
         # attention
-        attention_outputs = self.attention_net(outputs)
+        attention_outputs = self.attention_net(outputs,input_ids)
 
         outputs = self.dense(attention_outputs)
+        outputs = self.gelu(outputs)
         outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
 
