@@ -22,7 +22,7 @@ for i in epoch_list:
 
 acc_dict = sorted(acc_dict.items())
 
-print('epoch\t\t\tacc')
+print('epoch\tacc')
 for (file, acc) in acc_dict:
     print('{}\t{}'.format(file, acc))
 

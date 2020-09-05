@@ -616,6 +616,7 @@ class LSTM_ATT(nn.Module):
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
+        self.gelu = nn.GELU()
 
         self.att_w = nn.Parameter(torch.randn(1, 768, 1))
 
@@ -658,6 +659,7 @@ class LSTM_ATT(nn.Module):
         attn_output = self.re_attention(outputs, h, input_ids)
 
         outputs = self.dense(attn_output)
+        outputs = self.gelu(outputs)
         outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
 
