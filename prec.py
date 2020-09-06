@@ -120,4 +120,5 @@ import inspect
 
 #model = MODEL_LIST["BASEELECTRA"](args.model_type, args.model_name_or_path, config)
 
-print(inspect.getsource(MODEL_LIST["BASEELECTRA"]))
+print(torch.load(os.path.join("training_args_1.bin")))
+print(torch.load(os.path.join("training_args.bin")))

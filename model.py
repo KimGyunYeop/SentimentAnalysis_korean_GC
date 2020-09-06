@@ -494,6 +494,7 @@ class BASEELECTRA_COS2_STAR_NEG_EMB(nn.Module):
         self.dropout = nn.Dropout(0.2, inplace=False)
         self.out_proj = nn.Linear(768, 2)
         self.star_emb = nn.Embedding(2, 768)
+        self.tanh = nn.Tanh()
         self.gelu = nn.GELU()
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
