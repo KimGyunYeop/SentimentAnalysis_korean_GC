@@ -370,5 +370,6 @@ DATASET_LIST = {
 
     "EMB_ATT_LSTM_ATT": BaseDataset,
     "EMB_ATT_LSTM_ATT_ver2": BaseDataset,
+    "EMB_ATT_LSTM_ATT_ver2_NEG": BaseDataset,
     "BASEELECTRA_COS2_NEG_EMB": BaseDataset
 }
