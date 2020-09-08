@@ -96,7 +96,7 @@ class BASEELECTRA_COS(nn.Module):
         x2 = x2.unsqueeze(0)
         x2 = x2.repeat(batch_size, 1, 1)
 
-        y = labels.unsqueeze(0).repeat(batch_size, 1).type(torch.FloatTensor).to(self.config.device)
+        y = labels.unsqueeze(0).repeat(batch_size, 1).type(torch.FloatTensor).cuda()
         for i, t in enumerate(y):
             y[i] = (t == t[i]).double() * 2 - 1
         loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=1)
