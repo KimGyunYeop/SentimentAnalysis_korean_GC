@@ -198,7 +198,7 @@ class BASEELECTRA_COS2(nn.Module):
         x2 = embs[:, 0, :].squeeze()
         x2 = x2.unsqueeze(0)
         x2 = x2.repeat(batch_size, 1, 1)
-        y = labels.unsqueeze(0).repeat(batch_size, 1).type(torch.FloatTensor).to(self.config.device)
+        y = labels.unsqueeze(0).repeat(batch_size, 1).type(torch.FloatTensor).cuda()
         for i, t in enumerate(y):
             y[i] = (t == t[i]).double() * 2 - 1
         loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=-0.5)
@@ -206,13 +206,13 @@ class BASEELECTRA_COS2(nn.Module):
                         x2.view(-1, w2v_dim),
                         y.view(-1))
 
-        star = torch.zeros(batch_size, 2).to(self.config.device)
+        star = torch.zeros(batch_size, 2).cuda()
         star[range(batch_size), labels] = 1
         star = self.star_emb(star)
 
         loss3 = loss_fn(embs[:, 0, :].squeeze(),
                         star,
-                        torch.ones(batch_size).to(self.config.device))
+                        torch.ones(batch_size).cuda())
 
         result = ((loss1, 0.5 * loss2, 0.5 * loss3), outputs)
 
