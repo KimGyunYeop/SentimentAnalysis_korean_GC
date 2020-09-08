@@ -1,0 +1,21 @@
+﻿model,성능,st2st,st2star,star2star,설명,날짜,비고,서버,BATCH,EPOCH,LR,MARGIN,DELTA_1,DELTA_2,DELTA_3
+BASE,0.90102,none,none,none,100에폭까지 돌려서 30까지만 보고 최댓값 씀,09월 08일,base_final.out/BASEELETRA_final,218,128,30,5.00E-05,none,none,none,none
+LSTM_ATT,,none,none,none,BASEELECTRA_COS,09월 08일,cos_30.txt/BASEELECTRA_COS_30,217,128,30,5.00E-05,none,none,none,none
+,,neg,neg,none,,,,,128,30,5.00E-05,0.5,0.5,0.5,none
+,,all,all,none,BASEELECTRA_COS2,,cos2_30.txt/BASEELECTRA_COS2_30,225,128,30,5.00E-05,0.5,0.5,0.5,none
+,,pos,pos,none,,,,,128,30,5.00E-05,0.5,0.5,0.5,none
+,,none,pos,neg,,,,,128,30,5.00E-05,0.5,none,0.5,0.5
+,,all,none,none,BASEELECTRA_COS_NEG,09월 08일,cos_neg_30.txt/BASEELECTRA_COS_NEG_30,217,128,30,5.00E-05,0.5,0.5,none,none
+,,pos,none,none,,,,,128,30,5.00E-05,0.5,0.5,none,none
+,,neg,none,none,,,,,128,30,5.00E-05,0.5,0.5,none,none
+BEST,,,,,,,,,128,30,5.00E-05,0.5,0.5,0.5,none
+,,,,,,,,,128,30,5.00E-05,-0.5,0.5,0.5,none
+,,,,,,,,,128,30,5.00E-05,0,0.5,0.5,none
+,,,,,,,,,128,30,5.00E-05,-1,0.5,0.5,none
+BEST,,,,,,,,,128,30,5.00E-05,,0.1,0.1,none
+,,,,,,,,,,,,,1,1,none
+BEST,,,,,,,,,512,100,5.00E-05,,,,
+,,,,,,,,,,,,,,,
+SENTIMENT_ATT_LSTM_ATT,,,,,,,,,128,100,5.00E-05,,,,
+,,,,,,,,,,,,,,,
+BEST + SENTIMENT_ATT,,,,,,,,,512,100,5.00E-05,,,,
