@@ -181,8 +181,9 @@ def main(cli_args):
     logger.info("Testing model checkpoint to {}".format(max_checkpoint))
     global_step = max_checkpoint.split("-")[-1]
     model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
-    model.load_state_dict(torch.load(os.path.join("ckpt", cli_args.result_dir, max_checkpoint, "training_model.bin")))
     print(args.device)
+    model.load_state_dict(torch.load(os.path.join("ckpt", cli_args.result_dir, max_checkpoint, "training_model.bin")))
+
     model.to(args.device)
 
     if "KOSAC" in args.model_mode:
