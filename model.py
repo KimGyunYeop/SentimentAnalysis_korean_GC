@@ -134,11 +134,11 @@ class BASEELECTRA_COS_NEG(nn.Module):
         loss_fct = nn.CrossEntropyLoss()
         loss1 = loss_fct(outputs.view(-1, 2), labels.view(-1))
 
-        labels_2 = labels.type(torch.FloatTensor).to(self.config.device)
+        labels_2 = labels.type(torch.FloatTensor).cuda()
         for i in range(len(labels_2)):
             labels_2[i] = labels_2[i].double() * 2 - 1
-        p_idx = (labels_2 == 1).nonzero().to(self.config.device)
-        n_idx = (labels_2 == -1).nonzero().to(self.config.device)
+        p_idx = (labels_2 == 1).nonzero().cuda()
+        n_idx = (labels_2 == -1).nonzero().cuda()
 
         x1 = embs[:, 0, :].squeeze()
         x1_p = x1[p_idx]
@@ -154,7 +154,7 @@ class BASEELECTRA_COS_NEG(nn.Module):
             x1_p = x1_p.view(-1, w2v_dim)
             x1_n = x1_n.squeeze().repeat(len_p, 1)
 
-            y = -torch.ones(len_p * len_n).type(torch.FloatTensor).to(self.config.device)
+            y = -torch.ones(len_p * len_n).type(torch.FloatTensor).cuda()
 
             loss2 = loss_fn(x1_p.view(-1, w2v_dim),
                             x1_n.view(-1, w2v_dim),
