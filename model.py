@@ -1903,11 +1903,11 @@ class EMB_ATT_LSTM_ATT_ver2_NEG(nn.Module):
         # embedding
         emb_output = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
 
+
         sentiment_outputs = self.sentiment_net(emb_output[0])
 
         outputs, (h,_) = self.lstm(sentiment_outputs)
-        embs = outputs
-        batch_size, seq_len, w2v_dim = embs.shape
+        batch_size, seq_len, w2v_dim = outputs.shape
         # attention
         attention_outputs = self.attention_net(outputs,input_ids)
 
@@ -1925,7 +1925,7 @@ class EMB_ATT_LSTM_ATT_ver2_NEG(nn.Module):
         p_idx = (labels_2 == 1).nonzero().to(self.config.device)
         n_idx = (labels_2 == -1).nonzero().to(self.config.device)
 
-        x1 = embs[:, -1, :].squeeze()
+        x1 = emb_output[:, 0, :].squeeze()
         x1_p = x1[p_idx]
         x1_n = x1[n_idx]
         len_p = len(x1_p)
