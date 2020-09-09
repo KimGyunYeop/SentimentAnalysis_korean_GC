@@ -15,8 +15,9 @@ if "ckpt/" in args.result_dir:
 
 setting_path = os.path.join("ckpt", args.result_dir, "checkpoint-best")
 setting = torch.load(os.path.join(setting_path, "training_args.bin"))
-for i in setting:
-    print(i)
+print("setting")
+for i,j in setting:
+    print(i,j)
 
 result_path = os.path.join("ckpt", args.result_dir, "test")
 epoch_list = os.listdir(result_path)
