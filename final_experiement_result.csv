@@ -1,5 +1,5 @@
 ﻿model,성능,st2st,st2star,star2star,설명,날짜,비고,서버,BATCH,EPOCH,LR,MARGIN,DELTA_1,DELTA_2,DELTA_3
-BASE,,none,none,none,BASEELECTRA,09월 09일,base_30_2.txt/BASEELECTRA_30_2,218,128,30,5.00E-05,none,none,none,none
+BASE,0.9024,none,none,none,BASEELECTRA,09월 09일,base_30_2.txt/BASEELECTRA_30_2,218,128,30,5.00E-05,none,none,none,none
 LSTM_ATT,,none,none,none,,,,,128,30,5.00E-05,none,none,none,none
 ,0.90054,neg,neg,none,BASEELECTRA_COS2_STAR_NEG_EMB,09월 09일,star_neg_30.txt/BASEELECTRA_COS2_STAR_NEG_EMB,218,128,30,5.00E-05,-0.5,0.5,0.5,none
 ,,all,neg,none,BASEELECTRA_COS2_ALL_NEG,09월 10일,all_neg_30.out/BASEELECTRA_COS2_ALL_NEG_30,217,128,30,5.00E-05,-0.5,0.5,0.5,none
@@ -10,6 +10,7 @@ LSTM_ATT,,none,none,none,,,,,128,30,5.00E-05,none,none,none,none
 ,0.90087,all,none,none,BASEELECTRA_COS,09월 09일,cos_30_05.txt/BASEELECTRA_COS_30_05,217,128,30,5.00E-05,-0.5,0.5,none,none
 ,,pos,none,none,BASEELECTRA_COS2_POS,09월 10일,pos_30.out/BASEELECTRA_COS2_POS_30,218,128,30,5.00E-05,0.5,0.5,none,none
 ,0.9011,neg,none,none,BASEELECTRA_COS_NEG,09월 08일,cos_neg_30.txt/BASEELECTRA_COS_NEG_30,217,128,30,5.00E-05,-0.5,0.5,none,none
+,0.90246,neg,pos,none,BASEELECTRA_COS2_NEG_EMB,09월 09일,cos2_neg_emb_30.txt/BASEELECTRA_COS2_NEG_EMB_30,218,128,30,5.00E-05,-0.5,0.5,none,none
 BEST,,,,,,,,,128,30,5.00E-05,0.5,0.5,0.5,none
 ,,,,,,,,,128,30,5.00E-05,-0.5,0.5,0.5,none
 ,,,,,,,,,128,30,5.00E-05,0,0.5,0.5,none
