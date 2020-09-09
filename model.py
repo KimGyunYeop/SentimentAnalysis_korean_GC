@@ -41,6 +41,7 @@ class BASEELECTRA(nn.Module):
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
+        self.config = config
         self.gelu = nn.GELU()
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
@@ -73,6 +74,7 @@ class BASEELECTRA_COS(nn.Module):
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
+        self.config = config
         self.gelu = nn.GELU()
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
@@ -118,6 +120,7 @@ class BASEELECTRA_COS_NEG(nn.Module):
         self.dense = nn.Linear(768, 768)
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
+        self.config = config
         self.gelu = nn.GELU()
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
@@ -175,6 +178,7 @@ class BASEELECTRA_COS2(nn.Module):
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
         self.star_emb = nn.Linear(2, 768)
+        self.config = config
         self.gelu = nn.GELU()
         self.tanh = nn.Tanh()
 
@@ -228,6 +232,7 @@ class BASEELECTRA_COS2_EMB(nn.Module):
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
         self.star_emb = nn.Embedding(2, 768)
+        self.config = config
         self.gelu = nn.GELU()
         self.tanh = nn.Tanh()
 
@@ -279,6 +284,7 @@ class BASEELECTRA_COS2_POS_POS(nn.Module):
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
         self.star_emb = nn.Embedding(2, 768)
+        self.config = config
         self.gelu = nn.GELU()
         self.tanh = nn.Tanh()
 
@@ -333,6 +339,7 @@ class BASEELECTRA_COS2_POS(nn.Module):
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
         self.star_emb = nn.Embedding(2, 768)
+        self.config = config
         self.gelu = nn.GELU()
         self.tanh = nn.Tanh()
 
@@ -382,6 +389,7 @@ class BASEELECTRA_COS2_ALL_ALL(nn.Module):
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
         self.star_emb = nn.Embedding(2, 768)
+        self.config = config
         self.gelu = nn.GELU()
         self.tanh = nn.Tanh()
 
@@ -443,6 +451,7 @@ class BASEELECTRA_COS2_ALL_NEG(nn.Module):
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
         self.star_emb = nn.Embedding(2, 768)
+        self.config = config
         self.gelu = nn.GELU()
         self.tanh = nn.Tanh()
 
@@ -496,6 +505,7 @@ class BASEELECTRA_COS2_LSTM(nn.Module):
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
         self.out_proj = nn.Linear(768, 2)
         self.star_emb = nn.Linear(2, 768)
+        self.config = config
         self.gelu = nn.GELU()
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
