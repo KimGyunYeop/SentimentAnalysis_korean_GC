@@ -529,8 +529,8 @@ class BASEELECTRA_COS2_NONE_POS_NEG(nn.Module):
                         star,
                         torch.ones(batch_size).to(self.config.device))
 
-        pos_star = self.star_emb(torch.ones(1).to(self.config.device))
-        neg_star = self.star_emb(torch.zeros(1).to(self.config.device))
+        pos_star = self.star_emb(torch.ones(1,dtype=torch.long).to(self.config.device))
+        neg_star = self.star_emb(torch.zeros(1,dtype=torch.long).to(self.config.device))
 
         loss3 = loss_fn(pos_star,
                         neg_star,
