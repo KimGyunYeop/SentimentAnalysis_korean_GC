@@ -16,8 +16,7 @@ if "ckpt/" in args.result_dir:
 setting_path = os.path.join("ckpt", args.result_dir, "checkpoint-best")
 setting = torch.load(os.path.join(setting_path, "training_args.bin"))
 print("setting")
-for i,j in setting:
-    print(i,j)
+print(setting)
 
 result_path = os.path.join("ckpt", args.result_dir, "test")
 epoch_list = os.listdir(result_path)
@@ -27,10 +26,10 @@ for i in epoch_list:
     with open(os.path.join(result_path,i),"r") as fp:
         acc_dict[int(i[5:-4])] = float(fp.readline().split()[-1])
 
-reversed_dict = { x:y for x,y in acc_dict.items()}
+reversed_dict = { y:x for x,y in acc_dict.items()}
 acc_dict = sorted(acc_dict.items())
 
-print('epoch\tacc')
+print('\n\n\tacc')
 for (file, acc) in acc_dict:
     print('{}\t{}'.format(file, acc))
 
