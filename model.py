@@ -259,7 +259,6 @@ class BASEELECTRA_COS2_EMB(nn.Module):
                         x2.view(-1, w2v_dim),
                         y.view(-1))
 
-        star = torch.zeros(batch_size, 2).cuda()
         star = self.star_emb(labels)
 
         loss3 = loss_fn(embs[:, 0, :].squeeze(),
