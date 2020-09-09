@@ -421,9 +421,6 @@ class BASEELECTRA_COS2_ALL_ALL(nn.Module):
                         x2.view(-1, w2v_dim),
                         y.view(-1))
 
-        len_p = (labels == 1).sum(())
-        len_n = (labels == 0).sum(())
-        loss2 = loss2 / (len_p * len_p + len_n * len_n)
         star_same = self.star_emb(labels)
 
         loss_p = loss_fn(embs[:, 0, :].squeeze(),
@@ -436,6 +433,195 @@ class BASEELECTRA_COS2_ALL_ALL(nn.Module):
                         -torch.ones(batch_size).to(self.config.device))
 
         loss3 = (loss_p + loss_n)/2
+
+        result = ((loss1, 0.5 * loss2, 0.5 * loss3), outputs)
+
+        return result
+
+class BASEELECTRA_COS2_NEG_ALL(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(BASEELECTRA_COS2_NEG_ALL, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 2)
+        self.star_emb = nn.Embedding(2, 768)
+        self.config = config
+        self.gelu = nn.GELU()
+        self.tanh = nn.Tanh()
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        # print(input_ids)
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        embs = outputs[0]
+        batch_size, seq_len, w2v_dim = embs.shape
+
+        outputs = self.dense(embs[:, 0, :])
+        outputs = self.gelu(outputs)
+        outputs = self.dropout(outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss1 = loss_fct(outputs.view(-1, 2), labels.view(-1))
+
+        labels_2 = labels.type(torch.FloatTensor).cuda()
+        for i in range(len(labels_2)):
+            labels_2[i] = labels_2[i].double() * 2 - 1
+        p_idx = (labels_2 == 1).nonzero().cuda()
+        n_idx = (labels_2 == -1).nonzero().cuda()
+
+        x1 = embs[:, 0, :].squeeze()
+        x1_p = x1[p_idx]
+        x1_n = x1[n_idx]
+        len_p = len(x1_p)
+        len_n = len(x1_n)
+        loss2 = 0
+
+        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=-0.5)
+        if len_p != 0 and len_n != 0:
+            x1_p = x1_p.squeeze()
+            x1_p = x1_p.repeat(1, len_n)
+            x1_p = x1_p.view(-1, w2v_dim)
+            x1_n = x1_n.squeeze().repeat(len_p, 1)
+
+            y = -torch.ones(len_p * len_n).type(torch.FloatTensor).cuda()
+
+            loss2 = loss_fn(x1_p.view(-1, w2v_dim),
+                            x1_n.view(-1, w2v_dim),
+                            y.view(-1))
+
+        star_same = self.star_emb(labels)
+
+        loss_p = loss_fn(embs[:, 0, :].squeeze(),
+                        star_same,
+                        torch.ones(batch_size).to(self.config.device))
+
+        star_dif = self.star_emb(-labels+1)
+        loss_n = loss_fn(embs[:, 0, :].squeeze(),
+                        star_dif,
+                        -torch.ones(batch_size).to(self.config.device))
+
+        loss3 = (loss_p + loss_n)/2
+
+        result = ((loss1, 0.5 * loss2, 0.5 * loss3), outputs)
+
+        return result
+
+class BASEELECTRA_COS2_POS_ALL(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(BASEELECTRA_COS2_POS_ALL, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 2)
+        self.star_emb = nn.Embedding(2, 768)
+        self.config = config
+        self.gelu = nn.GELU()
+        self.tanh = nn.Tanh()
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        # print(input_ids)
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        embs = outputs[0]
+        batch_size, seq_len, w2v_dim = embs.shape
+
+        outputs = self.dense(embs[:, 0, :])
+        outputs = self.gelu(outputs)
+        outputs = self.dropout(outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss1 = loss_fct(outputs.view(-1, 2), labels.view(-1))
+
+        x1 = embs[:, 0, :].squeeze()
+        x1 = x1.repeat(1, batch_size)
+        x1 = x1.view(batch_size, batch_size, w2v_dim)
+        x2 = embs[:, 0, :].squeeze()
+        x2 = x2.unsqueeze(0)
+        x2 = x2.repeat(batch_size, 1, 1)
+        y = labels.unsqueeze(0).repeat(batch_size, 1).type(torch.FloatTensor).to(self.config.device)
+        for i, t in enumerate(y):
+            y[i] = (t == t[i]).double() * 2 - 1
+        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='sum', margin=1)
+        loss2 = loss_fn(x1.view(-1, w2v_dim),
+                        x2.view(-1, w2v_dim),
+                        y.view(-1))
+
+        len_p = (labels == 1).sum(())
+        len_n = (labels == 0).sum(())
+        loss2 = loss2 / (len_p * len_p + len_n * len_n)
+
+        star_same = self.star_emb(labels)
+
+        loss_p = loss_fn(embs[:, 0, :].squeeze(),
+                        star_same,
+                        torch.ones(batch_size).to(self.config.device))
+
+        star_dif = self.star_emb(-labels+1)
+        loss_n = loss_fn(embs[:, 0, :].squeeze(),
+                        star_dif,
+                        -torch.ones(batch_size).to(self.config.device))
+
+        loss3 = (loss_p + loss_n)/2
+
+        result = ((loss1, 0.5 * loss2, 0.5 * loss3), outputs)
+
+        return result
+
+class BASEELECTRA_COS2_POS_NEG(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(BASEELECTRA_COS2_POS_NEG, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 2)
+        self.star_emb = nn.Embedding(2, 768)
+        self.config = config
+        self.gelu = nn.GELU()
+        self.tanh = nn.Tanh()
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        # print(input_ids)
+        outputs = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+        embs = outputs[0]
+        batch_size, seq_len, w2v_dim = embs.shape
+
+        outputs = self.dense(embs[:, 0, :])
+        outputs = self.gelu(outputs)
+        outputs = self.dropout(outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss1 = loss_fct(outputs.view(-1, 2), labels.view(-1))
+
+        x1 = embs[:, 0, :].squeeze()
+        x1 = x1.repeat(1, batch_size)
+        x1 = x1.view(batch_size, batch_size, w2v_dim)
+        x2 = embs[:, 0, :].squeeze()
+        x2 = x2.unsqueeze(0)
+        x2 = x2.repeat(batch_size, 1, 1)
+        y = labels.unsqueeze(0).repeat(batch_size, 1).type(torch.FloatTensor).to(self.config.device)
+        for i, t in enumerate(y):
+            y[i] = (t == t[i]).double() * 2 - 1
+        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='sum', margin=1)
+        loss2 = loss_fn(x1.view(-1, w2v_dim),
+                        x2.view(-1, w2v_dim),
+                        y.view(-1))
+
+        len_p = (labels == 1).sum(())
+        len_n = (labels == 0).sum(())
+        loss2 = loss2 / (len_p * len_p + len_n * len_n)
+
+        star_dif = self.star_emb(-labels+1)
+        loss3 = loss_fn(embs[:, 0, :].squeeze(),
+                        star_dif,
+                        -torch.ones(batch_size).to(self.config.device))
 
         result = ((loss1, 0.5 * loss2, 0.5 * loss3), outputs)
 
