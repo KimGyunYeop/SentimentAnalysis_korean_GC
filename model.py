@@ -375,7 +375,7 @@ class BASEELECTRA_COS2_POS(nn.Module):
         len_n = (labels==0).sum(())
         loss2 = loss2/(len_p*len_p+len_n*len_n)
 
-        result = ((loss1, 0.5 * loss2), outputs)
+        result = ((loss1, loss2), outputs)
 
         return result
 
