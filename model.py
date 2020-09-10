@@ -2487,7 +2487,7 @@ class LSTM_ATT_NEG(nn.Module):
         p_idx = (labels_2 == 1).nonzero().to(self.config.device)
         n_idx = (labels_2 == -1).nonzero().to(self.config.device)
 
-        x1 = emb_output[:, 0, :].squeeze()
+        x1 = emb_output[0][:, 0, :].squeeze()
         x1_p = x1[p_idx]
         x1_n = x1[n_idx]
         len_p = len(x1_p)
