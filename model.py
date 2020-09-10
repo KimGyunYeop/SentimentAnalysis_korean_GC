@@ -2464,24 +2464,11 @@ class LSTM_ATT_NEG(nn.Module):
         attn_output = torch.tanh(att)  # attn_output(batch_size, lstm_dir_dim)
         return attn_output
 
-    def sentiment_net(self, lstm_outputs):
-        result = self.word_dense(lstm_outputs)
-        sig_output = self.softmax(result)
-        batch_size, max_len, _=sig_output.shape
-        zeros = torch.zeros(batch_size, max_len, dtype=torch.long).to(self.config.device)
-        ones = torch.ones(batch_size, max_len, dtype=torch.long).to(self.config.device)
-        emb_result = self.sentiment_embedding(zeros) * sig_output[:,:,0].unsqueeze(-1).repeat(1,1,768) + self.sentiment_embedding(ones) * sig_output[:,:,1].unsqueeze(-1).repeat(1,1,768)
-        senti_output = self.gelu(lstm_outputs + emb_result)
-        return senti_output
-
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # embedding
         emb_output = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
 
-
-        sentiment_outputs = self.sentiment_net(emb_output[0])
-
-        outputs, (h,_) = self.lstm(sentiment_outputs)
+        outputs, (h,_) = self.lstm(emb_output[0])
         batch_size, seq_len, w2v_dim = outputs.shape
         # attention
         attention_outputs = self.attention_net(outputs,input_ids)
