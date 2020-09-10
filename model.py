@@ -2431,9 +2431,9 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
 
         return result
 
-class EMB_ATT_LSTM_ATT_ver2_NEG(nn.Module):
+class LSTM_ATT_NEG(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
-        super(EMB_ATT_LSTM_ATT_ver2_NEG, self).__init__()
+        super(LSTM_ATT_NEG, self).__init__()
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
@@ -2485,6 +2485,111 @@ class EMB_ATT_LSTM_ATT_ver2_NEG(nn.Module):
         batch_size, seq_len, w2v_dim = outputs.shape
         # attention
         attention_outputs = self.attention_net(outputs,input_ids)
+
+        outputs = self.dense(attention_outputs)
+        outputs = self.gelu(outputs)
+        outputs = self.dropout(outputs)
+        outputs = self.out_proj(outputs)
+
+        loss_fct = nn.CrossEntropyLoss()
+        loss1 = loss_fct(outputs.view(-1, 2), labels.view(-1))
+
+        labels_2 = labels.type(torch.FloatTensor).to(self.config.device)
+        for i in range(len(labels_2)):
+            labels_2[i] = labels_2[i].double() * 2 - 1
+        p_idx = (labels_2 == 1).nonzero().to(self.config.device)
+        n_idx = (labels_2 == -1).nonzero().to(self.config.device)
+
+        x1 = emb_output[:, 0, :].squeeze()
+        x1_p = x1[p_idx]
+        x1_n = x1[n_idx]
+        len_p = len(x1_p)
+        len_n = len(x1_n)
+
+        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=-0.5)
+        if len_p != 0 and len_n != 0:
+            x1_p = x1_p.squeeze()
+            x1_p = x1_p.repeat(1, len_n)
+            x1_p = x1_p.view(-1, w2v_dim)
+            x1_n = x1_n.squeeze().repeat(len_p, 1)
+
+            y = -torch.ones(len_p * len_n).type(torch.FloatTensor).to(self.config.device)
+
+            loss2 = loss_fn(x1_p.view(-1, w2v_dim),
+                            x1_n.view(-1, w2v_dim),
+                            y.view(-1))
+        if len_p > 1:
+            star_p = torch.zeros(len_p, 2).to(self.config.device)
+            star_p[range(len_p), 1] = 1
+            star_p = self.star_emb(star_p)
+            loss3_p = loss_fn(x1[p_idx].squeeze(),
+                              star_p,
+                              -torch.ones(len_p).to(self.config.device))
+        if len_n > 1:
+            star_n = torch.zeros(len_n, 2).to(self.config.device)
+            star_n[range(len_n), 0] = 1
+            star_n = self.star_emb(star_n)
+            loss3_n = loss_fn(x1[n_idx].squeeze(),
+                              star_n,
+                              -torch.ones(len_n).to(self.config.device))
+        if len_p <= 1 and len_n > 1:
+            if len_p == 0:
+                result = ((loss1, torch.tensor(0), torch.tensor(0), 0.5 * loss3_n), outputs)
+            else:
+                result = ((loss1, torch.tensor(0), torch.tensor(0), 0.5 * loss3_n), outputs)
+        elif len_p > 1 and len_n <= 1:
+            if len_n == 0:
+                result = ((loss1, torch.tensor(0), 0.5 * loss3_p, torch.tensor(0)), outputs)
+            else:
+                result = ((loss1, torch.tensor(0), 0.5 * loss3_p, torch.tensor(0)), outputs)
+        else:
+            result = ((loss1, 0.5 * loss2,
+                       float(len_p) / (len_p + len_n) / 2 * loss3_p, float(len_n) / (len_p + len_n) / 2 * loss3_n),
+                      outputs)
+
+        return result
+
+class EMB_ATT_LSTM_ATT_ver2_NEG(nn.Module):
+    def __init__(self, model_type, model_name_or_path, config):
+        super(EMB_ATT_LSTM_ATT_ver2_NEG, self).__init__()
+        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
+            model_name_or_path,
+            config=config)
+        self.config = config
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
+
+        # sentiment module
+        self.word_dense = nn.Linear(768, 2)
+        self.sentiment_embedding = nn.Embedding(2, 768)
+        self.softmax = nn.Softmax(dim=-1)
+
+        # attention module
+        self.att_w = nn.Parameter(torch.randn(1, 768, 1))
+
+        self.dense = nn.Linear(768, 768)
+        self.dropout = nn.Dropout(0.2)
+        self.out_proj = nn.Linear(768, 2)
+        self.gelu = nn.GELU()
+        self.star_emb = nn.Linear(2, 768)
+
+    def attention_net(self, lstm_output, input):
+        batch_size, seq_len = input.shape
+
+        att = torch.bmm(torch.tanh(lstm_output),
+                        self.att_w.repeat(batch_size, 1, 1))
+        att = F.softmax(att, dim=1)  # att(batch_size, seq_len, 1)
+        att = torch.bmm(lstm_output.transpose(1, 2), att).squeeze(2)
+        attn_output = torch.tanh(att)  # attn_output(batch_size, lstm_dir_dim)
+        return attn_output
+
+    def forward(self, input_ids, attention_mask, labels, token_type_ids):
+        # embedding
+        emb_output = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
+
+        outputs, (h, _) = self.lstm(emb_output[0])
+        batch_size, seq_len, w2v_dim = outputs.shape
+        # attention
+        attention_outputs = self.attention_net(outputs, input_ids)
 
         outputs = self.dense(attention_outputs)
         outputs = self.gelu(outputs)
@@ -2660,6 +2765,7 @@ MODEL_LIST = {
 
     "EMB2_LSTM": EMB2_LSTM,
     "EMB1_LSTM2": EMB1_LSTM2,
+    "LSTM_ATT_NEG": LSTM_ATT_NEG,
 
     "EMB_ATT_LSTM_ATT": EMB_ATT_LSTM_ATT,
     "EMB_ATT_LSTM_ATT_ver2": EMB_ATT_LSTM_ATT_ver2,
