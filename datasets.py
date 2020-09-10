@@ -117,8 +117,8 @@ class KOSACDataset(Dataset):
         return new_ids
 
     def get_sentiment_data(self, dataset):
-        tkn2pol = pickle.load(open(os.path.join(self.args.data_dir, self.args.task,'sentiment_data','kosac_polarity.pkl'), 'rb'))
-        tkn2int = pickle.load(open(os.path.join(self.args.data_dir, self.args.task,'sentiment_data','kosac_intensity.pkl'), 'rb'))
+        tkn2pol = pickle.load(open(os.path.join('lexicon','kosac_polarity.pkl'), 'rb'))
+        tkn2int = pickle.load(open(os.path.join('lexicon','kosac_intensity.pkl'), 'rb'))
         polarities = []
         intensities = []
 
