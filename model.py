@@ -2373,7 +2373,7 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
             model_name_or_path,
             config=config)
         self.config = config
-        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
 
         #sentiment module
         self.word_dense = nn.Linear(768, 2)
