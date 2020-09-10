@@ -2378,6 +2378,7 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         #sentiment module
         self.word_dense = nn.Linear(768, 2)
         self.sentiment_embedding = nn.Embedding(2, 768)
+        torch.nn.init.xavier_uniform(self.sentiment_embedding.weight)
         self.softmax = nn.Softmax(dim=-1)
         # attention module
         self.att_w = nn.Parameter(torch.randn(1, 768, 1))
@@ -2404,12 +2405,6 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         zeros = torch.zeros(batch_size, max_len, dtype=torch.long).to(self.config.device)
         ones = torch.ones(batch_size, max_len, dtype=torch.long).to(self.config.device)
         emb_result = self.sentiment_embedding(zeros) * sig_output[:,:,0].unsqueeze(-1).repeat(1,1,768) + self.sentiment_embedding(ones) * sig_output[:,:,1].unsqueeze(-1).repeat(1,1,768)
-        print(torch.max(lstm_outputs))
-        print(torch.mean(lstm_outputs))
-        print(torch.min(lstm_outputs))
-        print(torch.max(emb_result))
-        print(torch.mean(emb_result))
-        print(torch.min(emb_result))
         senti_output = self.gelu(lstm_outputs + emb_result)
         return senti_output
 
