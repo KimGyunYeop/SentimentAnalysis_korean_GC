@@ -2411,6 +2411,7 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         print(torch.max(emb_result))
         print(torch.mean(emb_result))
         print(torch.min(emb_result))
+        print(sig_output)
         print(lstm_outputs)
         print(emb_result)
         senti_output = self.gelu(lstm_outputs + emb_result)
