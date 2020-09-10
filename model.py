@@ -2378,7 +2378,7 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         #sentiment module
         self.word_dense = nn.Linear(768, 2)
         self.sentiment_embedding = nn.Embedding(2, 768)
-        self.sentiment_embedding.weight.data.uniform_(-10.0, 10.0)
+        #self.sentiment_embedding.weight.data.uniform_(-10.0, 10.0)
         self.softmax = nn.Softmax(dim=-1)
         # attention module
         self.att_w = nn.Parameter(torch.randn(1, 768, 1))
