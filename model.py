@@ -1730,12 +1730,11 @@ class KOSAC_LSTM_ATT(nn.Module):
         polarity_emb_result = self.polarity_embedding(polarity_ids)
         intensity_emb_result = self.intensity_embedding(intensity_ids)
 
-        embedding_result = input_emb_result
+        embedding_result = input_emb_result + polarity_emb_result / 100 + intensity_emb_result / 100
 
         outputs = self.emb(input_ids=None, attention_mask=attention_mask, token_type_ids=token_type_ids,
                            inputs_embeds=embedding_result)
-        outputs = outputs[0] + polarity_emb_result / 100 + intensity_emb_result / 100
-        outputs, (h, c) = self.lstm(outputs)
+        outputs, (h, c) = self.lstm(outputs[0])
 
         attn_output = self.re_attention(outputs, h, input_ids)
 
