@@ -2493,7 +2493,7 @@ class LSTM_ATT_NEG(nn.Module):
         len_p = len(x1_p)
         len_n = len(x1_n)
 
-        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=1)
+        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=-0.5)
         if len_p != 0 and len_n != 0:
             x1_p = x1_p.squeeze()
             x1_p = x1_p.repeat(1, len_n)
