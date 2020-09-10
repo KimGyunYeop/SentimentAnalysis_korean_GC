@@ -52,7 +52,7 @@ def train(args,
     no_decay = ['bias', 'LayerNorm.weight']
     weight_decay_change = ['sentiment_embedding.weight']
     optimizer_grouped_parameters = [
-        {'params': [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay)],
+        {'params': [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay) and not (nk in n for nk in weight_decay_change)],
          'weight_decay': args.weight_decay},
         {'params': [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay) and not (nk in n for nk in weight_decay_change)], 'weight_decay': 0.0},
         {'params': [p for n, p in model.named_parameters() if nd in n for nd in weight_decay_change], 'weight_decay': 0.3}
