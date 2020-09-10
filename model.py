@@ -2404,6 +2404,8 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
         zeros = torch.zeros(batch_size, max_len, dtype=torch.long).to(self.config.device)
         ones = torch.ones(batch_size, max_len, dtype=torch.long).to(self.config.device)
         emb_result = self.sentiment_embedding(zeros) * sig_output[:,:,0].unsqueeze(-1).repeat(1,1,768) + self.sentiment_embedding(ones) * sig_output[:,:,1].unsqueeze(-1).repeat(1,1,768)
+        print(lstm_outputs)
+        print(emb_result)
         senti_output = self.gelu(lstm_outputs + emb_result)
         return senti_output
 
