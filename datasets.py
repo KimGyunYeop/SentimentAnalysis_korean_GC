@@ -361,7 +361,7 @@ DATASET_LIST = {
     "LSTM_ATT_MIX_NEG": BaseDataset,
 
     "LSTM_KOSAC": KOSACDataset,
-    "LSTM_ATT_KOSAC": KOSACDataset,
+    "KOSAC_LSTM_ATT": KOSACDataset,
     "LSTM_ATT_v2_KOSAC": KOSACDataset,
     "LSTM_ATT_DOT_KOSAC": KOSACDataset,
 
