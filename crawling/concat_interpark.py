@@ -23,10 +23,6 @@ def convertFormat(pos, neg, start, idx_idx, f1):
             if len(sp[-1]) == 3 or len(sp[-1]) == 4:
                 new_lines.append(s + lines[i])
                 s = ''
-                if sp[1] == '1':
-                    pos+=1
-                else:
-                    neg+=1
             else:
                 lines[i] = lines[i].replace('\n', ' ')
                 s+=lines[i]
@@ -49,6 +45,8 @@ def convertFormat(pos, neg, start, idx_idx, f1):
     for i in range(len(list_ip)):
         arr_ip.append(str(list_ip[i][0])+'\t'+str(list_ip[i][1])+'\t'+str(list_ip[i][2])+'\n')
     print('interpark length', len(arr_ip))
+    pos += len(dk_df[dk_df['rating'] == 1])
+    neg += len(dk_df[dk_df['rating'] == 0])
     return pos, neg, idx_idx, arr_ip
 
 f = open("all_ip.txt", 'w', encoding='utf-8-sig')
