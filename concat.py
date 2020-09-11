@@ -81,7 +81,6 @@ lines = ip_f.readlines()
 # concat sentence of same review
 new_lines = []
 print(len(lines))
-check_loc = 0 # 1: line done, 0: line continue
 s =''
 
 for i in range(1, len(lines)):
