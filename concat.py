@@ -189,7 +189,7 @@ n16_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
 lines = n16_f.readlines()
 for i in range(1, len(lines)):
     sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : 1}
+    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : sp[2][0]}
     idx_idx += 1
     n16_df = n16_df.append(a, ignore_index=True)
 print(len(n16_df))
@@ -207,7 +207,7 @@ n17_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
 lines = n17_f.readlines()
 for i in range(1, len(lines)):
     sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : 1}
+    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : sp[2][0]}
     idx_idx += 1
     n17_df = n17_df.append(a, ignore_index=True)
 print(len(n17_df))
@@ -225,7 +225,7 @@ n18_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
 lines = n18_f.readlines()
 for i in range(1, len(lines)):
     sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : 1}
+    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : sp[2][0]}
     idx_idx += 1
     n18_df = n18_df.append(a, ignore_index=True)
 print(len(n18_df))
@@ -243,7 +243,7 @@ n19_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
 lines = n19_f.readlines()
 for i in range(1, len(lines)):
     sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : 1}
+    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : sp[2][0]}
     idx_idx += 1
     n19_df = n19_df.append(a, ignore_index=True)
 print(len(n19_df))
