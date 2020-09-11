@@ -9,6 +9,10 @@ ani_f =  open('../crawling/RA/aniplus_Reviews.txt', encoding='utf-8-sig')
 yn_f = open('../crawling/RA/youtube_comments_negative.txt', encoding='utf-8-sig')
 yp_f = open('../crawling/RA/youtube_comments_positive.txt', encoding='utf-8-sig')
 daum_f = open('../crawling/daumMovie_Reviews.txt', encoding='utf-8-sig')
+n16_f = open('../crawling/naverMovie_Reviews_2016.txt', encoding='utf-8-sig')
+n17_f = open('../crawling/naverMovie_Reviews_2017.txt', encoding='utf-8-sig')
+n18_f = open('../crawling/naverMovie_Reviews_2018.txt', encoding='utf-8-sig')
+n19_f = open('../crawling/naverMovie_Reviews_2019.txt', encoding='utf-8-sig')
 
 list_all = base_f.readlines()
 print('len all', len(list_all))
@@ -181,8 +185,80 @@ for i in range(len(list_daum)):
     arr_daum.append(str(list_daum[i][0])+'\t'+str(list_daum[i][1])+'\t'+str(list_daum[i][2])+'\n')
 print('daum movie length', len(list_daum))
 
+# remove duplications from 'naverMovie_Reviews_2016.txt' and convert to string list
+n16_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
+lines = n16_f.readlines()
+for i in range(1, len(lines)):
+    sp = lines[i].split('\t')
+    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : 1}
+    idx_idx += 1
+    n16_df = n16_df.append(a, ignore_index=True)
+print(len(n16_df))
+n16_df = n16_df.drop_duplicates(subset = ['review'])
+print(len(n16_df))
+# list to array
+list_n16 = n16_df.values.tolist()
+arr_n16 = []
+for i in range(len(list_n16)):
+    arr_n16.append(str(list_n16[i][0])+'\t'+str(list_n16[i][1])+'\t'+str(list_n16[i][2])+'\n')
+print('naver 2016 length', len(list_n16))
+
+# remove duplications from 'naverMovie_Reviews_2017.txt' and convert to string list
+n17_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
+lines = n17_f.readlines()
+for i in range(1, len(lines)):
+    sp = lines[i].split('\t')
+    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : 1}
+    idx_idx += 1
+    n17_df = n17_df.append(a, ignore_index=True)
+print(len(n17_df))
+n17_df = n17_df.drop_duplicates(subset = ['review'])
+print(len(n17_df))
+# list to array
+list_n17 = n17_df.values.tolist()
+arr_n17 = []
+for i in range(len(list_n17)):
+    arr_n17.append(str(list_n17[i][0])+'\t'+str(list_n17[i][1])+'\t'+str(list_n17[i][2])+'\n')
+print('naver 2017 length', len(list_n17))
+
+# remove duplications from 'naverMovie_Reviews_2018.txt' and convert to string list
+n18_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
+lines = n18_f.readlines()
+for i in range(1, len(lines)):
+    sp = lines[i].split('\t')
+    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : 1}
+    idx_idx += 1
+    n18_df = n18_df.append(a, ignore_index=True)
+print(len(n18_df))
+n18_df = n18_df.drop_duplicates(subset = ['review'])
+print(len(n18_df))
+# list to array
+list_n18 = n18_df.values.tolist()
+arr_n18 = []
+for i in range(len(list_n18)):
+    arr_n18.append(str(list_n18[i][0])+'\t'+str(list_n18[i][1])+'\t'+str(list_n18[i][2])+'\n')
+print('naver 2018 length', len(list_n18))
+
+# remove duplications from 'naverMovie_Reviews_2019.txt' and convert to string list
+n19_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
+lines = n19_f.readlines()
+for i in range(1, len(lines)):
+    sp = lines[i].split('\t')
+    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : 1}
+    idx_idx += 1
+    n19_df = n19_df.append(a, ignore_index=True)
+print(len(n19_df))
+n19_df = n19_df.drop_duplicates(subset = ['review'])
+print(len(n19_df))
+# list to array
+list_n19 = n19_df.values.tolist()
+arr_n19 = []
+for i in range(len(list_n19)):
+    arr_n19.append(str(list_n19[i][0])+'\t'+str(list_n19[i][1])+'\t'+str(list_n19[i][2])+'\n')
+print('naver 2019 length', len(list_n19))
+
 # append nsmc, 4flix,kino, watcha, interpark, aniplus list, youtube neg, pos, daum movie
-list_all = list_all + arr_f4 + arr_kino + arr_wc + arr_ip + arr_ani + arr_yn +  arr_yp + arr_daum
+list_all = list_all + arr_f4 + arr_kino + arr_wc + arr_ip + arr_ani + arr_yn +  arr_yp + arr_daum + arr_n16 + arr_n17 + arr_n18 + arr_n19
 print(len(list_all))
 f = open("all_Reviews.txt", 'w', encoding='utf-8-sig')
 for i in range(len(list_all)):
@@ -198,3 +274,7 @@ ani_f.close()
 yn_f.close()
 yp_f.close()
 daum_f.close()
+n16_f.close()
+n17_f.close()
+n18_f.close()
+n19_f.close()
