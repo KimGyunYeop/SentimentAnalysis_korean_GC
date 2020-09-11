@@ -7,7 +7,7 @@ import time
 
 chromeDriver = "C:\\Users\\parksoyoung\\Downloads\\chromedriver_win32\\chromedriver.exe"
 driver = webdriver.Chrome(chromeDriver)
-driver.get('https://mobileticket.interpark.com/Goods/GoodsInfo/info?GoodsCode=20001874&is1=ticket&is2=product')
+driver.get('https://mobileticket.interpark.com/goods/19004016?app_tapbar_state=hide&')
 time.sleep(3)
 
 driver.find_element_by_xpath('//*[@id="root"]/div[@class="contents"]/div[@class="productsInformation"]/div[@class="productsTabWrap"]'
@@ -18,10 +18,10 @@ elem = driver.find_element_by_tag_name("body")
 last_height = driver.execute_script("return document.body.scrollHeight")
 
 while True:
-    for i in range(10):
+    for i in range(1):
         # Scroll down to bottom
         driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        time.sleep(30)
+        time.sleep(15)
 
     # Calculate new scroll height and compare with last scroll height
     new_height = driver.execute_script("return document.body.scrollHeight")
@@ -73,4 +73,4 @@ result['review'] = reviews
 result['label'] = labels
 result['rating'] = rates
 
-result.to_csv('sports_auc.txt', encoding="utf8", sep="\t")
+result.to_csv('sports_auc_2.txt', encoding="utf8", sep="\t")
