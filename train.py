@@ -34,7 +34,6 @@ import inspect
 
 logger = logging.getLogger(__name__)
 
-
 def train(args,
           model,
           train_dataset,
