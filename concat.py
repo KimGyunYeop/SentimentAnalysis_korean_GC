@@ -8,6 +8,7 @@ watcha_f = open('../crawling/watcha_Reviews.txt', encoding='utf-8-sig')
 ani_f =  open('../crawling/RA/aniplus_Reviews.txt', encoding='utf-8-sig')
 yn_f = open('../crawling/RA/youtube_comments_negative.txt', encoding='utf-8-sig')
 yp_f = open('../crawling/RA/youtube_comments_positive.txt', encoding='utf-8-sig')
+daum_f = open('../crawling/daumMovie_Reviews.txt', encoding='utf-8-sig')
 
 list_all = base_f.readlines()
 print('len all', len(list_all))
@@ -162,8 +163,26 @@ for i in range(len(list_yp)):
     arr_yp.append(str(list_yp[i][0])+'\t'+str(list_yp[i][1])+'\t'+str(list_yp[i][2])+'\n')
 print('youtube positive length', len(list_yp))
 
-# append nsmc, 4flix,kino, watcha, interpark, aniplus list
-list_all = list_all + arr_f4 + arr_kino + arr_wc + arr_ip + arr_ani + arr_yn +  arr_yp
+# remove duplications from 'daummovie_Reviews.txt' and convert to string list
+daum_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
+lines = daum_f.readlines()
+for i in range(1, len(lines)):
+    sp = lines[i].split('\t')
+    a = {"review_id" : start + idx_idx, "review" : sp[2], "rating" : int(sp[1])}
+    idx_idx += 1
+    daum_df = daum_df.append(a, ignore_index=True)
+print(len(daum_df))
+daum_df = daum_df.drop_duplicates(subset = ['review'])
+print(len(daum_df))
+# list to array
+list_daum = daum_df.values.tolist()
+arr_daum = []
+for i in range(len(list_daum)):
+    arr_daum.append(str(list_daum[i][0])+'\t'+str(list_daum[i][1])+'\t'+str(list_daum[i][2])+'\n')
+print('daum movie length', len(list_daum))
+
+# append nsmc, 4flix,kino, watcha, interpark, aniplus list, youtube neg, pos, daum movie
+list_all = list_all + arr_f4 + arr_kino + arr_wc + arr_ip + arr_ani + arr_yn +  arr_yp + arr_daum
 print(len(list_all))
 f = open("all_Reviews.txt", 'w', encoding='utf-8-sig')
 for i in range(len(list_all)):
@@ -178,3 +197,4 @@ watcha_f.close()
 ani_f.close()
 yn_f.close()
 yp_f.close()
+daum_f.close()
