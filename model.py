@@ -434,7 +434,7 @@ class BASEELECTRA_COS2_ALL_ALL(nn.Module):
 
         loss3 = (loss_p + loss_n)/2
 
-        result = ((loss1, 0.5 * loss2, 0.5 * loss3), outputs)
+        result = ((loss1, 0.5 * loss2, 0.5 * loss3), outputs)]]
 
         return result
 
