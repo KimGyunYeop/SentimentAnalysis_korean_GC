@@ -1,5 +1,5 @@
 ﻿model,성능,st2st,st2star,star2star,설명,날짜,비고,서버,BATCH,EPOCH,LR,MARGIN,DELTA_1,DELTA_2,DELTA_3,검토1,검토2,검토3,
-BASE,0.9024,none,none,none,BASEELECTRA,09월 09일,base_30_2.txt/BASEELECTRA_30_2,218,128,30,5.00E-05,none,none,none,none,,,,
+BASE,0.9021,none,none,none,BASEELECTRA,09월 09일,base_30_2.txt/BASEELECTRA_30_2,218,128,30,5.00E-05,none,none,none,none,,,,
 LSTM_ATT,0.90402,none,none,none,,,,218,128,30,5.00E-05,none,none,none,none,,,,
 ,0.90054,neg,neg,none,BASEELECTRA_COS2_STAR_NEG_EMB,09월 09일,star_neg_30.txt/BASEELECTRA_COS2_STAR_NEG_EMB_30,218,128,30,5.00E-05,-0.5,0.5,0.5,none,,,,
 ,0.8984,all,neg,none,BASEELECTRA_COS2_ALL_NEG,09월 10일,all_neg_30.out/BASEELECTRA_COS2_ALL_NEG_30,217,128,30,5.00E-05,-0.5,0.5,0.5,none,,,,
