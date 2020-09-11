@@ -6,7 +6,7 @@ f3 = open("../crawling/sports_auc_basketball.txt", encoding='utf-8-sig')
 f4 = open("../crawling/sports_auc_football.txt", encoding='utf-8-sig')
 f5 = open("../crawling/sports_auc_football_2.txt", encoding='utf-8-sig')
 f6 = open("../crawling/sports_auc_golf.txt", encoding='utf-8-sig')
-
+f7 = open("../crawling/sports_interpark_Reviews.txt", encoding='utf-8-sig')
 # convert format of sportsReview
 def convertFormat(pos, neg, start, idx_idx, f1):
     dk_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
@@ -66,7 +66,10 @@ pos, neg, idx_idx, arr_ip5 = convertFormat(pos, neg, 0, idx_idx, f5)
 f5.close()
 pos, neg, idx_idx, arr_ip6 = convertFormat(pos, neg, 0, idx_idx, f6)
 f6.close()
-list = arr_ip + arr_ip2 + arr_ip3 + arr_ip4 + arr_ip5 + arr_ip6
+pos, neg, idx_idx, arr_ip7 = convertFormat(pos, neg, 0, idx_idx, f7)
+f7.close()
+list = arr_ip + arr_ip2 + arr_ip3 + arr_ip4 + arr_ip5 + arr_ip6 + arr_ip7
+print(len(list))
 for i in range(len(list)):
     f.write(str(list[i]))
 f.close()
