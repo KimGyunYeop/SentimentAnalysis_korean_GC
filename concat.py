@@ -1,279 +1,87 @@
+# concat sampled naver, daum movie review + tv(4flix, watcha, kinolights, aniplus), interpark, youtube, samsung lions
 import pandas as pd
-
-base_f = open('./data/nsmc/ratings_train.txt', encoding='utf-8-sig')
-f4_f = open('./crawling/4flix_Reviews.txt', encoding='utf-8-sig')
-kino_f = open('./crawling/kinolights_Reviews.txt', encoding='utf-8-sig')
-ip_f = open('./crawling/sports_interpark_Reviews.txt', encoding='utf-8-sig')
-watcha_f = open('./crawling/watcha_Reviews.txt', encoding='utf-8-sig')
-ani_f =  open('./crawling/RA/aniplus_Reviews.txt', encoding='utf-8-sig')
-yn_f = open('./crawling/RA/youtube_comments_negative.txt', encoding='utf-8-sig')
-yp_f = open('./crawling/RA/youtube_comments_positive.txt', encoding='utf-8-sig')
-daum_f = open('./crawling/daumMovie_Reviews.txt', encoding='utf-8-sig')
-n16_f = open('./crawling/naverMovie_Reviews_2016.txt', encoding='utf-8-sig')
-n17_f = open('./crawling/naverMovie_Reviews_2017.txt', encoding='utf-8-sig')
-n18_f = open('./crawling/naverMovie_Reviews_2018.txt', encoding='utf-8-sig')
-n19_f = open('./crawling/naverMovie_Reviews_2019.txt', encoding='utf-8-sig')
-
-list_all = base_f.readlines()
-print('len all', len(list_all))
-
-start = 20000000
-idx_idx = 0
-# remove duplications from '4flix_Reviews.txt' and convert to string list
-f4_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
-lines = f4_f.readlines()
-for i in range(1, len(lines)):
-    sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : int(sp[2])}
-    idx_idx+=1
-    f4_df = f4_df.append(a, ignore_index=True)
-print(len(f4_df))
+n_df_neg = pd.read_csv('./crawling/naver_negSample.txt', sep=',')
+n_df_pos = pd.read_csv('./crawling/naver_posSample.txt', sep=',')
+n_df_pos = n_df_pos.replace(',' ,' ')
+n_df_pos = n_df_pos.drop(columns=['Unnamed: 0', 'Unnamed: 0.1'])
+n_df_neg = n_df_neg.drop(columns=['Unnamed: 0', 'Unnamed: 0.1'])
+n_df = n_df_neg.append(n_df_pos)
+print(len(n_df_neg), len(n_df_pos), len(n_df))
+n_df = n_df.rename(columns={'label':'rating', 'reviews' : 'review'})
+n_df = n_df.drop_duplicates(subset = ['review'])
+d_df_neg = pd.read_csv('./crawling/daum_negSample.txt', sep=',')
+d_df_pos = pd.read_csv('./crawling/daum_posSample.txt', sep=',')
+d_df_pos = d_df_pos.drop(columns=['Unnamed: 0', 'Unnamed: 0.1'])
+d_df_neg = d_df_neg.drop(columns=['Unnamed: 0', 'Unnamed: 0.1'])
+d_df = d_df_neg.append(n_df_pos)
+print(len(d_df_neg), len(d_df_pos), len(d_df))
+d_df = d_df.rename(columns={'label':'rating', 'reviews' : 'review'})
+d_df = d_df.drop_duplicates(subset = ['review'])
+all_df = n_df.append(d_df)
+print(len(all_df))
+f4_df = pd.read_csv('./crawling/4flix_Reviews.txt', sep='\t')
+f4_df = f4_df.drop(columns=['Unnamed: 0'])
+f4_df = f4_df.rename(columns={'label':'rating', 'reviews' : 'review'})
 f4_df = f4_df.drop_duplicates(subset = ['review'])
-print(len(f4_df))
-# list to array
-list_f4 = f4_df.values.tolist()
-arr_f4 = []
-for i in range(len(list_f4)):
-    arr_f4.append(str(list_f4[i][0])+'\t'+str(list_f4[i][1])+'\t'+str(list_f4[i][2])+'\n')
-print('f4  length', len(arr_f4))
-
-# remove duplications from 'kinolights_Reviews.txt' and convert to string list
-kino_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
-lines = kino_f.readlines()
-for i in range(1, len(lines)):
-    sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[2], "rating" : int(sp[3])}
-    idx_idx += 1
-    kino_df = kino_df.append(a, ignore_index=True)
-print(len(kino_df))
+all_df = all_df.append(f4_df)
+print(len(all_df))
+wc_df = pd.read_csv('./crawling/watcha_Reviews.txt', sep='\t')
+wc_df = wc_df.drop(columns=['Unnamed: 0', 'id'])
+wc_df = wc_df.rename(columns={'label':'rating', 'reviews' : 'review'})
+wc_df = wc_df.drop_duplicates(subset = ['review'])
+all_df = all_df.append(wc_df)
+print(len(all_df))
+kino_df = pd.read_csv('./crawling/kinolights_Reviews.txt', sep='\t')
+kino_df = kino_df.drop(columns=['Unnamed: 0', 'id'])
+kino_df = kino_df.rename(columns={'label':'rating', 'reviews' : 'review'})
 kino_df = kino_df.drop_duplicates(subset = ['review'])
-print(len(kino_df))
-# list to array
-list_kino = kino_df.values.tolist()
-arr_kino = []
-for i in range(len(list_kino)):
-    arr_kino.append(str(list_kino[i][0])+'\t'+str(list_kino[i][1])+'\t'+str(list_kino[i][2])+'\n')
-print('kino length', len(arr_kino))
-
-# remove duplications from 'watcha_Reviews.txt' and convert to string list
-watcha_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
-lines = watcha_f.readlines()
-for i in range(1, len(lines)):
-    sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[2], "rating" : int(sp[3])}
-    idx_idx += 1
-    watcha_df = watcha_df.append(a, ignore_index=True)
-print(len(watcha_df))
-watcha_df = watcha_df.drop_duplicates(subset = ['review'])
-print(len(watcha_df))
-# list to array
-list_wc = watcha_df.values.tolist()
-arr_wc = []
-for i in range(len(list_wc)):
-    arr_wc.append(str(list_wc[i][0])+'\t'+str(list_wc[i][1])+'\t'+str(list_wc[i][2])+'\n')
-print('watcha length', len(arr_wc))
-
-# convert format of sportsReview
-ip_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
-lines = ip_f.readlines()
-#new_l = ['\t' if lines=='\n' else line for line in lines]
-
-# concat sentence of same review
-new_lines = []
-print(len(lines))
-s =''
-
-for i in range(1, len(lines)):
-    sp = lines[i].split('\t')
-    if sp[-1][0] == '0' or sp[-1][0] == '1' or sp[-1][0] == '2' or sp[-1][0] == '3' or sp[-1][0] == '4' or sp[-1][0] == '5' or sp[-1][0] == '6' or sp[-1][0] == '7' or sp[-1][0] == '8' or sp[-1][0] == '9' or sp[-1][0] == '10' :
-        if len(sp[-1]) == 3 or len(sp[-1]) == 4:
-            new_lines.append(s + lines[i])
-            s = ''
-        else:
-            lines[i] = lines[i].replace('\n', ' ')
-            s+=lines[i]
-    else:
-        lines[i] = lines[i].replace('\n', ' ')
-        s += lines[i]
-print('new', len(new_lines))
-
-for i in range(1, len(new_lines)):
-    sp = new_lines[i].split('\t')
-    a = {"review_id": start + idx_idx, "review": sp[2], "rating": int(sp[3])}
-    idx_idx += 1
-    ip_df = ip_df.append(a, ignore_index=True)
-print(len(ip_df))
-ip_df = ip_df.drop_duplicates(subset = ['review'])
-print(len(ip_df))
-# list to array
-list_ip = ip_df.values.tolist()
-arr_ip = []
-for i in range(len(list_ip)):
-    arr_ip.append(str(list_ip[i][0])+'\t'+str(list_ip[i][1])+'\t'+str(list_ip[i][2])+'\n')
-print('interpark length', len(arr_ip))
-
-# remove duplications from 'RA/aniplus_Reviews.txt' and convert to string list
-ani_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
-lines = ani_f.readlines()
-for i in range(1, len(lines)):
-    sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : int(sp[2])}
-    idx_idx += 1
-    ani_df = ani_df.append(a, ignore_index=True)
-print(len(ani_df))
+all_df = all_df.append(kino_df)
+print(len(all_df))
+ani_df = pd.read_csv('./crawling/RA/aniplus_Reviews.txt', sep='\t')
+ani_df = ani_df.drop(columns=['Unnamed: 0'])
+ani_df =ani_df.rename(columns={'label':'rating', 'reviews' : 'review'})
 ani_df = ani_df.drop_duplicates(subset = ['review'])
-print(len(ani_df))
-# list to array
-list_ani = ani_df.values.tolist()
-arr_ani = []
-for i in range(len(list_ani)):
-    arr_ani.append(str(list_ani[i][0])+'\t'+str(list_ani[i][1])+'\t'+str(list_ani[i][2])+'\n')
-print('aniplus length', len(arr_ani))
-
-# remove duplications from 'RA/youtube_comments_negative.txt' and convert to string list
-yn_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
-lines = yn_f.readlines()
-for i in range(1, len(lines)):
-    sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : 0}
-    idx_idx += 1
-    yn_df = yn_df.append(a, ignore_index=True)
-print(len(yn_df))
-yn_df = yn_df.drop_duplicates(subset = ['review'])
-print(len(yn_df))
-# list to array
-list_yn = yn_df.values.tolist()
-arr_yn = []
-for i in range(len(list_yn)):
-    arr_yn.append(str(list_yn[i][0])+'\t'+str(list_yn[i][1])+'\t'+str(list_yn[i][2])+'\n')
-print('youtube negative length', len(list_yn))
-
-# remove duplications from 'RA/youtube_comments_positive.txt' and convert to string list
-yp_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
-lines = yp_f.readlines()
-for i in range(1, len(lines)):
-    sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : 1}
-    idx_idx += 1
-    yp_df = yp_df.append(a, ignore_index=True)
-print(len(yp_df))
+all_df = all_df.append(ani_df)
+print(len(all_df))
+yp_df = pd.read_csv('./crawling/RA/youtube_comments_positive.txt', sep='\t')
+yp_df = yp_df.drop(columns = ['Unnamed: 0'])
+yp_df = yp_df.rename(columns={'label' : 'rating'})
 yp_df = yp_df.drop_duplicates(subset = ['review'])
-print(len(yp_df))
-# list to array
-list_yp = yp_df.values.tolist()
-arr_yp = []
-for i in range(len(list_yp)):
-    arr_yp.append(str(list_yp[i][0])+'\t'+str(list_yp[i][1])+'\t'+str(list_yp[i][2])+'\n')
-print('youtube positive length', len(list_yp))
+all_df = all_df.append(yp_df)
+print(all_df.columns)
+print(yp_df.columns)
+print(len(all_df))
+yn_df = pd.read_csv('./crawling/RA/youtube_comments_negative.txt', sep='\t')
+yn_df = yn_df.drop(columns = ['Unnamed: 0'])
+yn_df = yn_df.rename(columns={'label' : 'rating'})
+yn_df = yn_df.drop_duplicates(subset = ['review'])
+all_df = all_df.append(yn_df)
+print(len(all_df))
+sl_df = pd.read_csv('./crawling/RA/samsungLions_Reviews.txt', sep='\t')
+sl_df = sl_df.drop(columns= ['Unnamed: 0', 'date', 'time', 'titles'])
+sl_df = sl_df.rename(columns= {'win' : 'rating', 'reviews' : 'review'})
+sl_df = sl_df.drop_duplicates(subset = ['review'])
+# use only negative data
+print(len(sl_df))
+sl_df = sl_df[sl_df['rating']==0]
+print('negative', len(sl_df))
+all_df = all_df.append(sl_df)
+print(len(all_df))
+print('drop', len(all_df))
 
-# remove duplications from 'daummovie_Reviews.txt' and convert to string list
-daum_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
-lines = daum_f.readlines()
-for i in range(1, len(lines)):
-    sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[2], "rating" : int(sp[1])}
-    idx_idx += 1
-    daum_df = daum_df.append(a, ignore_index=True)
-print(len(daum_df))
-daum_df = daum_df.drop_duplicates(subset = ['review'])
-print(len(daum_df))
-# list to array
-list_daum = daum_df.values.tolist()
-arr_daum = []
-for i in range(len(list_daum)):
-    arr_daum.append(str(list_daum[i][0])+'\t'+str(list_daum[i][1])+'\t'+str(list_daum[i][2])+'\n')
-print('daum movie length', len(list_daum))
+list = all_df.values.tolist()
+arr = []
+idx = 0
+ip_f = open("./crawling/all_ip.txt", encoding='utf-8-sig')
+arr_ip = ip_f.readlines()
+for i in range(len(list)):
+    arr.append(str(len(arr_ip) + idx) + '\t' + str(list[i][0])+ '\t' + str(list[i][1]) + '\n')
+    idx+=1
+print(len(arr_ip))
+arr = arr + arr_ip
+print(len(arr))
+f = open("final.txt", 'w', encoding='utf-8-sig')
+f.writelines(arr)
+f.close()
 
-# remove duplications from 'naverMovie_Reviews_2016.txt' and convert to string list
-n16_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
-lines = n16_f.readlines()
-for i in range(1, len(lines)):
-    sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : sp[2][0]}
-    idx_idx += 1
-    n16_df = n16_df.append(a, ignore_index=True)
-print(len(n16_df))
-n16_df = n16_df.drop_duplicates(subset = ['review'])
-print(len(n16_df))
-# list to array
-list_n16 = n16_df.values.tolist()
-arr_n16 = []
-for i in range(len(list_n16)):
-    arr_n16.append(str(list_n16[i][0])+'\t'+str(list_n16[i][1])+'\t'+str(list_n16[i][2])+'\n')
-print('naver 2016 length', len(list_n16))
 
-# remove duplications from 'naverMovie_Reviews_2017.txt' and convert to string list
-n17_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
-lines = n17_f.readlines()
-for i in range(1, len(lines)):
-    sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : sp[2][0]}
-    idx_idx += 1
-    n17_df = n17_df.append(a, ignore_index=True)
-print(len(n17_df))
-n17_df = n17_df.drop_duplicates(subset = ['review'])
-print(len(n17_df))
-# list to array
-list_n17 = n17_df.values.tolist()
-arr_n17 = []
-for i in range(len(list_n17)):
-    arr_n17.append(str(list_n17[i][0])+'\t'+str(list_n17[i][1])+'\t'+str(list_n17[i][2])+'\n')
-print('naver 2017 length', len(list_n17))
-
-# remove duplications from 'naverMovie_Reviews_2018.txt' and convert to string list
-n18_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
-lines = n18_f.readlines()
-for i in range(1, len(lines)):
-    sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : sp[2][0]}
-    idx_idx += 1
-    n18_df = n18_df.append(a, ignore_index=True)
-print(len(n18_df))
-n18_df = n18_df.drop_duplicates(subset = ['review'])
-print(len(n18_df))
-# list to array
-list_n18 = n18_df.values.tolist()
-arr_n18 = []
-for i in range(len(list_n18)):
-    arr_n18.append(str(list_n18[i][0])+'\t'+str(list_n18[i][1])+'\t'+str(list_n18[i][2])+'\n')
-print('naver 2018 length', len(list_n18))
-
-# remove duplications from 'naverMovie_Reviews_2019.txt' and convert to string list
-n19_df = pd.DataFrame(columns = ['review_id', 'review', 'rating'])
-lines = n19_f.readlines()
-for i in range(1, len(lines)):
-    sp = lines[i].split('\t')
-    a = {"review_id" : start + idx_idx, "review" : sp[1], "rating" : sp[2][0]}
-    idx_idx += 1
-    n19_df = n19_df.append(a, ignore_index=True)
-print(len(n19_df))
-n19_df = n19_df.drop_duplicates(subset = ['review'])
-print(len(n19_df))
-# list to array
-list_n19 = n19_df.values.tolist()
-arr_n19 = []
-for i in range(len(list_n19)):
-    arr_n19.append(str(list_n19[i][0])+'\t'+str(list_n19[i][1])+'\t'+str(list_n19[i][2])+'\n')
-print('naver 2019 length', len(list_n19))
-
-# append nsmc, 4flix,kino, watcha, interpark, aniplus list, youtube neg, pos, daum movie
-list_all = list_all + arr_f4 + arr_kino + arr_wc + arr_ip + arr_ani + arr_yn +  arr_yp + arr_daum + arr_n16 + arr_n17 + arr_n18 + arr_n19
-print(len(list_all))
-f = open("all_Reviews.txt", 'w', encoding='utf-8-sig')
-for i in range(len(list_all)):
-    f.write(str(list_all[i]))
-
-# file close
-base_f.close()
-f4_f.close()
-kino_f.close()
-ip_f.close()
-watcha_f.close()
-ani_f.close()
-yn_f.close()
-yp_f.close()
-daum_f.close()
-n16_f.close()
-n17_f.close()
-n18_f.close()
-n19_f.close()
