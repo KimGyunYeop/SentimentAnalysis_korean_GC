@@ -6,7 +6,7 @@ print('daum pos', len(pos))
 neg = df[df['label']==0]
 print('daum neg', len(neg))
 
-pos_sample = pos.sample(n=10000)
+pos_sample = pos.sample(n=15000)
 print(len(pos_sample))
 neg_sample = neg.sample(n=10000)
 print(len(neg_sample))
@@ -42,7 +42,7 @@ print(len(pos))
 neg = all_df[all_df['label']==0]
 print(len(neg))
 
-pos_sample = pos.sample(n=10000)
+pos_sample = pos.sample(n=15000)
 print(len(pos_sample))
 neg_sample = neg.sample(n=10000)
 print(len(neg_sample))
