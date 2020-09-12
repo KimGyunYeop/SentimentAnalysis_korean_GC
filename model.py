@@ -2480,11 +2480,14 @@ class LSTM_ATT_NEG(nn.Module):
         loss_fct = nn.CrossEntropyLoss()
         loss1 = loss_fct(outputs.view(-1, 2), labels.view(-1))
 
-        labels_2 = labels.type(torch.FloatTensor).to(self.config.device)
+        loss_fct = nn.CrossEntropyLoss()
+        loss1 = loss_fct(outputs.view(-1, 2), labels.view(-1))
+
+        labels_2 = labels.type(torch.FloatTensor).cuda()
         for i in range(len(labels_2)):
             labels_2[i] = labels_2[i].double() * 2 - 1
-        p_idx = (labels_2 == 1).nonzero().to(self.config.device)
-        n_idx = (labels_2 == -1).nonzero().to(self.config.device)
+        p_idx = (labels_2 == 1).nonzero().cuda()
+        n_idx = (labels_2 == -1).nonzero().cuda()
 
         x1 = emb_output[0][:, 0, :].squeeze()
         x1_p = x1[p_idx]
@@ -2492,32 +2495,30 @@ class LSTM_ATT_NEG(nn.Module):
         len_p = len(x1_p)
         len_n = len(x1_n)
 
-        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=-0.5)
+        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=0)
         if len_p != 0 and len_n != 0:
             x1_p = x1_p.squeeze()
             x1_p = x1_p.repeat(1, len_n)
             x1_p = x1_p.view(-1, w2v_dim)
             x1_n = x1_n.squeeze().repeat(len_p, 1)
 
-            y = -torch.ones(len_p * len_n).type(torch.FloatTensor).to(self.config.device)
+            y = -torch.ones(len_p * len_n).type(torch.FloatTensor).cuda()
 
             loss2 = loss_fn(x1_p.view(-1, w2v_dim),
                             x1_n.view(-1, w2v_dim),
                             y.view(-1))
         if len_p > 1:
-            star_p = torch.zeros(len_p, 2).to(self.config.device)
-            star_p[range(len_p), 1] = 1
-            star_p = self.star_emb(star_p)
+            star_p = torch.ones(len_p).type(torch.LongTensor).cuda()
+            star_p = self.star_emb(star_p).squeeze()
             loss3_p = loss_fn(x1[p_idx].squeeze(),
-                              star_p,
-                              -torch.ones(len_p).to(self.config.device))
+                              star_p.cuda(),
+                              -torch.ones(len_p).cuda())
         if len_n > 1:
-            star_n = torch.zeros(len_n, 2).to(self.config.device)
-            star_n[range(len_n), 0] = 1
-            star_n = self.star_emb(star_n)
+            star_n = torch.zeros(len_n).type(torch.LongTensor).cuda()
+            star_n = self.star_emb(star_n).squeeze()
             loss3_n = loss_fn(x1[n_idx].squeeze(),
-                              star_n,
-                              -torch.ones(len_n).to(self.config.device))
+                              star_n.cuda(),
+                              -torch.ones(len_n).cuda())
         if len_p <= 1 and len_n > 1:
             if len_p == 0:
                 result = ((loss1, torch.tensor(0), torch.tensor(0), 0.5 * loss3_n), outputs)
