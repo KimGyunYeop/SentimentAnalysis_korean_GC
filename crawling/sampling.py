@@ -50,3 +50,4 @@ print(len(neg_sample))
 pos_sample.to_csv('naver_posSample.txt')
 neg_sample.to_csv('naver_negSample.txt')
 
+

@@ -1,3 +1,4 @@
+'''
 # concat sampled naver, daum movie review + tv(4flix, watcha, kinolights, aniplus), interpark, youtube, samsung lions
 import pandas as pd
 n_df_neg = pd.read_csv('./crawling/naver_negSample.txt', sep=',')
@@ -9,7 +10,6 @@ n_df = n_df_neg.append(n_df_pos)
 print(len(n_df_neg), len(n_df_pos), len(n_df))
 n_df = n_df.rename(columns={'label':'rating', 'reviews' : 'review'})
 #n_df = n_df.drop_duplicates(subset = ['review'])
-'''
 d_df_neg = pd.read_csv('./crawling/daum_negSample.txt', sep=',')
 d_df_pos = pd.read_csv('./crawling/daum_posSample.txt', sep=',')
 d_df_pos = d_df_pos.drop(columns=['Unnamed: 0', 'Unnamed: 0.1'])
@@ -19,7 +19,6 @@ print(len(d_df_neg), len(d_df_pos), len(d_df))
 d_df = d_df.rename(columns={'label':'rating', 'reviews' : 'review'})
 #d_df = d_df.drop_duplicates(subset = ['review'])
 all_df = n_df.append(d_df)
-'''
 all_df = n_df
 print(len(all_df))
 f4_df = pd.read_csv('./crawling/4flix_Reviews.txt', sep='\t')
@@ -134,5 +133,12 @@ print(len(arr))
 f = open("./data/nsmc/final.txt", 'w', encoding='utf-8-sig')
 f.writelines(arr)
 f.close()
+'''
+import pandas as pd
+ori_f = pd.read_csv('./data/nsmc/ratings_train.txt', sep='\t')
+#ori_f = open("./data/nsmc/ratings_train.txt", encoding='utf-8-sig')
+#print(ori_f)
 
-
+print(ori_f.columns)
+print(len(ori_f[ori_f['rating']==0]))
+print(len(ori_f[ori_f['rating']==1]))
