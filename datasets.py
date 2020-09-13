@@ -55,8 +55,8 @@ class AugmentBaseDataset(Dataset):
             self.dataset = self.dataset[:10000]
 
         lexicon_path = os.path.join(args.data_dir, "korean_lexicon", "AugData.csv")
-        self.lexicon = pd.read_csv(lexicon_path, encoding="utf8", sep=",")
-        self.lexicon = self.lexicon[self.lexicon["type"] in ["비슷한말","상위어","하위어"]]
+        self.lexicon = pd.read_csv(lexicon_path, encoding="cp949", sep=",")
+        self.lexicon = self.lexicon[self.lexicon["type"].isin(["비슷한말","상위어","하위어"])]
 
         self.lexicon_dic = self.get_lexicon2dic(self.lexicon)
         print(self.lexicon_dic)
@@ -65,9 +65,9 @@ class AugmentBaseDataset(Dataset):
 
     def get_lexicon2dic(self,lexicon):
         lexicon_dic = {}
-        for index in range(lexicon):
-            word1 = lexicon[index]["word1"]
-            word2 = lexicon[index]["word2"]
+        for index in range(len(lexicon)):
+            word1 = lexicon.iloc[index]["word1"]
+            word2 = lexicon.iloc[index]["word2"]
             if word1 in lexicon_dic.keys() and word2 in lexicon_dic.keys():
                 total = lexicon_dic[word1] + lexicon_dic[word2]
                 lexicon_dic[word1] = total
@@ -477,7 +477,7 @@ DATASET_LIST = {
     "EMB1_LSTM2" : BaseDataset,
 
     "EMB_ATT_LSTM_ATT": BaseDataset,
-    "EMB_ATT_LSTM_ATT_ver2": BaseDataset,
+    "EMB_ATT_LSTM_ATT_ver2": AugmentBaseDataset,
     "EMB_ATT_LSTM_ATT_ver2_NEG": BaseDataset,
     "BASEELECTRA_COS2_NEG_EMB": BaseDataset
 }
