@@ -90,10 +90,9 @@ class AugmentBaseDataset(Dataset):
 
     def __getitem__(self, idx):
         txt = str(self.dataset.at[idx,"review"])
-        lexicon_words= self.re_compile_words.findall(txt)
+        lexicon_words= list(set(self.re_compile_words.findall(txt)))
         if "좋" in txt:
             print(txt)
-            print(lexicon_words)
         for word in lexicon_words:
             txt = re.sub(word,random.choice(self.lexicon_dic[word]),txt)
         if "좋" in txt:
