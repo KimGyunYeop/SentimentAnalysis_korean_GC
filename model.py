@@ -1133,8 +1133,8 @@ class BASEELECTRA_COS2_STAR_NEG_EMB(nn.Module):
             else:
                 result = ((loss1, torch.tensor(0), 0.5 * loss3_p, torch.tensor(0)), outputs)
         else:
-            result = ((loss1, 0.5 * loss2,
-                       float(len_p) / (len_p + len_n) / 2 * loss3_p, float(len_n) / (len_p + len_n) / 2 * loss3_n),
+            result = ((loss1, loss2,
+                       float(len_p) / (len_p + len_n)  * loss3_p, float(len_n) / (len_p + len_n) * loss3_n),
                       outputs)
 
         return result
