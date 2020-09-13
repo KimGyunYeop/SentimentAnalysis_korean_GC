@@ -76,8 +76,8 @@ class AugmentBaseDataset(Dataset):
             elif word2 in lexicon_dic.keys() and not word1 in lexicon_dic.keys():
                 lexicon_dic[word1] = lexicon_dic[word2]
             else:
-                lexicon_dic[word1] = []
-                lexicon_dic[word2] = []
+                lexicon_dic[word1] = [word1]
+                lexicon_dic[word2] = [word2]
 
             lexicon_dic[word1].append(word2)
             lexicon_dic[word2].append(word1)
