@@ -69,7 +69,7 @@ class AugmentBaseDataset(Dataset):
             word1 = lexicon.iloc[index]["word1"]
             word2 = lexicon.iloc[index]["word2"]
             if word1 in lexicon_dic.keys() and word2 in lexicon_dic.keys():
-                total = lexicon_dic[word1] + lexicon_dic[word2]
+                total = list(set(lexicon_dic[word1] + lexicon_dic[word2]))
                 lexicon_dic[word1] = total
                 lexicon_dic[word2] = total
             elif word1 in lexicon_dic.keys() and not word2 in lexicon_dic.keys():
