@@ -93,6 +93,7 @@ class AugmentBaseDataset(Dataset):
         lexicon_words= self.re_compile_words.findall(txt)
         if "좋" in txt:
             print(txt)
+            print(lexicon_words)
         for word in lexicon_words:
             txt = re.sub(word,random.choice(self.lexicon_dic[word]),txt)
         if "좋" in txt:
