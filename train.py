@@ -49,12 +49,12 @@ def train(args,
 
     # Prepare optimizer and schedule (linear warmup and decay)
     no_decay = ['bias', 'LayerNorm.weight']
-    weight_decay_change = 'sentiment_embedding.weight'
+    weight_decay_change = ['sentiment_embedding.weight','star_emb.weight']
     optimizer_grouped_parameters = [
-        {'params': [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay) and not n in weight_decay_change],
+        {'params': [p for n, p in model.named_parameters() if not any(nd in n for nd in no_decay) and not any(n in a for a in weight_decay_change)],
          'weight_decay': args.weight_decay},
-        {'params': [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay) and not n in weight_decay_change], 'weight_decay': 0.0},
-        {'params': [p for n, p in model.named_parameters() if n in weight_decay_change], 'weight_decay': 0.3}
+        {'params': [p for n, p in model.named_parameters() if any(nd in n for nd in no_decay) and not any(n in a for a in weight_decay_change)], 'weight_decay': 0.0},
+        {'params': [p for n, p in model.named_parameters() if any(n in a for a in weight_decay_change)], 'weight_decay': 0.3}
     ]
     optimizer = AdamW(optimizer_grouped_parameters, lr=args.learning_rate, eps=args.adam_epsilon)
     scheduler = get_linear_schedule_with_warmup(optimizer, num_warmup_steps=args.warmup_steps,
