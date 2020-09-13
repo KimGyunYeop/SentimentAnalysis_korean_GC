@@ -2668,6 +2668,7 @@ class EMB_CLS_LSTM_ATT(nn.Module):
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
+        self.config = config
         self.maxlen = 50
         self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
 
