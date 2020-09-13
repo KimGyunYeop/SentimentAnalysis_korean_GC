@@ -59,7 +59,7 @@ class AugmentBaseDataset(Dataset):
         self.lexicon = self.lexicon[self.lexicon["type"].isin(["비슷한말","상위어","하위어"])]
 
         self.lexicon_dic = self.get_lexicon2dic(self.lexicon)
-        print(self.lexicon_dic)
+
         print(self.lexicon_dic.keys)
         self.re_compile_words = re.compile(r"\b(" + "|".join(self.lexicon_dic.keys) + ")\\W", re.I)
 
@@ -70,7 +70,6 @@ class AugmentBaseDataset(Dataset):
             word2 = lexicon.iloc[index]["word2"]
             if word1 in lexicon_dic.keys() and word2 in lexicon_dic.keys():
                 total = lexicon_dic[word1] + lexicon_dic[word2]
-                print(total)
                 lexicon_dic[word1] = total
                 lexicon_dic[word2] = total
             elif word1 in lexicon_dic.keys() and not word2 in lexicon_dic.keys():
