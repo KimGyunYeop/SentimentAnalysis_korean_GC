@@ -44,7 +44,7 @@ print(len(neg))
 
 pos_sample = pos.sample(n=20000)
 print(len(pos_sample))
-neg_sample = neg.sample(n=20000)
+neg_sample = neg.sample(n=25000)
 print(len(neg_sample))
 
 pos_sample.to_csv('naver_posSample.txt')
