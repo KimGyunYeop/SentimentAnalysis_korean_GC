@@ -7,6 +7,8 @@ import pickle
 import numpy as np
 from konlpy.tag import Twitter
 from tqdm import tqdm
+import re
+import random
 
 class BaseDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
@@ -28,6 +30,68 @@ class BaseDataset(Dataset):
 
     def __getitem__(self, idx):
         txt = str(self.dataset.at[idx,"review"])
+        data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
+        input_ids = torch.LongTensor(data["input_ids"])
+        token_type_ids = torch.LongTensor(data["token_type_ids"])
+        attention_mask = torch.LongTensor(data["attention_mask"])
+        label = self.dataset.at[idx,"rating"]
+
+        return (input_ids, token_type_ids, attention_mask, label),txt
+
+class AugmentBaseDataset(Dataset):
+    def __init__(self, args, tokenizer, mode):
+        super(BaseDataset,self).__init__()
+        self.tokenizer = tokenizer
+        self.maxlen = args.max_seq_len
+        if "train" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.train_file)
+        elif "dev" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.dev_file)
+        elif "test" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.test_file)
+        self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
+        if "small" in mode:
+            self.dataset = self.dataset[:10000]
+
+        lexicon_path = os.path.join(args.data_dir, "korean_lexicon", "AugData.csv")
+        self.lexicon = pd.read_csv(lexicon_path, encoding="utf8", sep=",")
+        self.lexicon = self.lexicon[self.lexicon["type"] in ["비슷한말","상위어","하위어"]]
+
+        self.lexicon_dic = self.get_lexicon2dic(self.lexicon)
+        print(self.lexicon_dic)
+
+        self.re_compile_words = re.compile(r"\b(" + "|".join(self.lexicon_dic.keys) + ")\\W", re.I)
+
+    def get_lexicon2dic(self,lexicon):
+        lexicon_dic = {}
+        for index in range(lexicon):
+            word1 = lexicon[index]["word1"]
+            word2 = lexicon[index]["word2"]
+            if word1 in lexicon_dic.keys() and word2 in lexicon_dic.keys():
+                total = lexicon_dic[word1] + lexicon_dic[word2]
+                lexicon_dic[word1] = total
+                lexicon_dic[word2] = total
+            elif word1 in lexicon_dic.keys() and not word2 in lexicon_dic.keys():
+                lexicon_dic[word2] = lexicon_dic[word1]
+            elif word2 in lexicon_dic.keys() and not word1 in lexicon_dic.keys():
+                lexicon_dic[word1] = lexicon_dic[word2]
+            else:
+                lexicon_dic[word1] = []
+                lexicon_dic[word2] = []
+
+            lexicon_dic[word1].append(word2)
+            lexicon_dic[word2].append(word1)
+        return lexicon_dic
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        txt = str(self.dataset.at[idx,"review"])
+        lexicon_words= self.re_compile_words.findall(txt)
+        for word in lexicon_words:
+            txt = re.sub(word,random.choice(self.lexicon_dic[word]),txt)
+        print(txt)
         data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
         input_ids = torch.LongTensor(data["input_ids"])
         token_type_ids = torch.LongTensor(data["token_type_ids"])
@@ -66,6 +130,38 @@ class CharBaseDataset(Dataset):
         label = self.dataset.at[idx,"rating"]
 
         return (input_ids, attention_mask,token_type_ids, label),[txt, char_token, word_token]
+
+class CharBaseDataset(Dataset):
+    def __init__(self, args, tokenizer, mode):
+        super(CharBaseDataset,self).__init__()
+        self.tokenizer = tokenizer
+        self.word_tokenizer = Twitter()
+        self.maxlen = 128
+        if "train" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.train_file)
+        elif "dev" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.dev_file)
+        elif "test" in mode:
+            data_path = os.path.join(args.data_dir, args.task, args.test_file)
+        self.dataset = pd.read_csv(data_path, encoding="utf8", sep="\t")
+        if "small" in mode:
+            self.dataset = self.dataset[:10000]
+
+    def __len__(self):
+        return len(self.dataset)
+
+    def __getitem__(self, idx):
+        txt = str(self.dataset.at[idx,"review"])
+        data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
+        char_token = self.tokenizer._tokenize(txt)
+        word_token = self.word_tokenizer.morphs(txt)
+        input_ids = torch.LongTensor(data["input_ids"])
+        token_type_ids = torch.LongTensor(data["token_type_ids"])
+        attention_mask = torch.LongTensor(data["attention_mask"])
+        label = self.dataset.at[idx,"rating"]
+
+        return (input_ids, attention_mask,token_type_ids, label),[txt, char_token, word_token]
+
 
 class KOSACDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
@@ -380,7 +476,7 @@ DATASET_LIST = {
     "EMB1_LSTM2" : BaseDataset,
 
     "EMB_ATT_LSTM_ATT": BaseDataset,
-    "EMB_ATT_LSTM_ATT_ver2": BaseDataset,
+    "EMB_ATT_LSTM_ATT_ver2": AugmentBaseDataset,
     "EMB_ATT_LSTM_ATT_ver2_NEG": BaseDataset,
     "BASEELECTRA_COS2_NEG_EMB": BaseDataset
 }
