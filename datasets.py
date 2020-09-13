@@ -95,8 +95,8 @@ class AugmentBaseDataset(Dataset):
             print(txt)
         for word in lexicon_words:
             print(random.choice(self.lexicon_dic[word]))
-            txt = re.sub(word,random.choice(self.lexicon_dic[word]),txt)
-        if "좋" in txt:
+            txt = txt.replace(word, random.choice(self.lexicon_dic[word]))
+        if "기쁘" in txt:
             print(txt)
         data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
         input_ids = torch.LongTensor(data["input_ids"])
