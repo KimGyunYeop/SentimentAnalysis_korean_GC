@@ -65,7 +65,7 @@ class AugmentBaseDataset(Dataset):
 
     def get_lexicon2dic(self,lexicon):
         lexicon_dic = {}
-        for index in range(lexicon):
+        for index in range(len(lexicon)):
             word1 = lexicon[index]["word1"]
             word2 = lexicon[index]["word2"]
             if word1 in lexicon_dic.keys() and word2 in lexicon_dic.keys():
