@@ -41,7 +41,7 @@ class BaseDataset(Dataset):
 
 class AugmentBaseDataset(Dataset):
     def __init__(self, args, tokenizer, mode):
-        super(BaseDataset,self).__init__()
+        super(AugmentBaseDataset,self).__init__()
         self.tokenizer = tokenizer
         self.maxlen = args.max_seq_len
         if "train" in mode:
@@ -477,7 +477,7 @@ DATASET_LIST = {
     "EMB1_LSTM2" : BaseDataset,
 
     "EMB_ATT_LSTM_ATT": BaseDataset,
-    "EMB_ATT_LSTM_ATT_ver2": AugmentBaseDataset,
+    "EMB_ATT_LSTM_ATT_ver2": BaseDataset,
     "EMB_ATT_LSTM_ATT_ver2_NEG": BaseDataset,
     "BASEELECTRA_COS2_NEG_EMB": BaseDataset
 }
