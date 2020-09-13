@@ -60,7 +60,7 @@ class AugmentBaseDataset(Dataset):
 
         self.lexicon_dic = self.get_lexicon2dic(self.lexicon)
 
-        self.re_compile_words = re.compile(r"\b(" + "|".join(self.lexicon_dic.keys()) + ")\\W", re.I)
+        self.re_compile_words = re.compile(r"\b(" + "|".join(self.lexicon_dic.keys()) + ")\\W")
 
     def get_lexicon2dic(self,lexicon):
         lexicon_dic = {}
@@ -90,7 +90,7 @@ class AugmentBaseDataset(Dataset):
 
     def __getitem__(self, idx):
         txt = str(self.dataset.at[idx,"review"])
-        lexicon_words= self.re_compile_words.match(txt)
+        lexicon_words= self.re_compile_words.findall(txt)
         if "좋" in txt:
             print(txt)
             print(lexicon_words)
