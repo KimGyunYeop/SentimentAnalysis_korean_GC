@@ -2669,7 +2669,7 @@ class EMB_CLS_LSTM_ATT(nn.Module):
             model_name_or_path,
             config=config)
         self.maxlen = 50
-        self.lstm = nn.LSTM(self.maxlen-2, 768, batch_first=True, bidirectional=False, dropout=0.2)
+        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False, dropout=0.2)
 
         #sentiment module
         self.word_dense = nn.Linear(768, 2)
