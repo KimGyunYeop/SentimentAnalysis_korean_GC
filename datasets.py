@@ -83,7 +83,6 @@ class AugmentBaseDataset(Dataset):
             lexicon_dic[word2].append(word1)
             lexicon_dic[word1] = list(set(lexicon_dic[word1]))
             lexicon_dic[word2] = list(set(lexicon_dic[word2]))
-        print(lexicon_dic.keys())
         return lexicon_dic
 
     def __len__(self):
@@ -92,6 +91,7 @@ class AugmentBaseDataset(Dataset):
     def __getitem__(self, idx):
         txt = str(self.dataset.at[idx,"review"])
         lexicon_words= self.re_compile_words.findall(txt)
+        print(txt)
         for word in lexicon_words:
             txt = re.sub(word,random.choice(self.lexicon_dic[word]),txt)
         print(txt)
