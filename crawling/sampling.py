@@ -6,9 +6,9 @@ print('daum pos', len(pos))
 neg = df[df['label']==0]
 print('daum neg', len(neg))
 
-pos_sample = pos.sample(n=10000)
+pos_sample = pos.sample(n=20000)
 print(len(pos_sample))
-neg_sample = neg.sample(n=10000)
+neg_sample = neg.sample(n=20000)
 print(len(neg_sample))
 
 pos_sample.to_csv('daum_posSample.txt')
@@ -42,9 +42,9 @@ print(len(pos))
 neg = all_df[all_df['label']==0]
 print(len(neg))
 
-pos_sample = pos.sample(n=10000)
+pos_sample = pos.sample(n=20000)
 print(len(pos_sample))
-neg_sample = neg.sample(n=10000)
+neg_sample = neg.sample(n=20000)
 print(len(neg_sample))
 
 pos_sample.to_csv('naver_posSample.txt')
