@@ -270,7 +270,7 @@ class BASEELECTRA_COS2_EMB(nn.Module):
                         star,
                         torch.ones(batch_size).to(self.config.device))
 
-        result = ((loss1, 0.1 * loss2, 0.1 * loss3), outputs)
+        result = ((loss1,  loss2, loss3), outputs)
 
         return result
 
