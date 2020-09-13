@@ -131,7 +131,7 @@ for i in range(len(list)):
 print('ip', len(arr_ip))
 arr = arr + arr_ip
 print(len(arr))
-f = open("final.txt", 'w', encoding='utf-8-sig')
+f = open("./data/nsmc/final.txt", 'w', encoding='utf-8-sig')
 f.writelines(arr)
 f.close()
 
