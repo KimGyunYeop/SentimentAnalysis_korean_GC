@@ -2781,7 +2781,7 @@ class EMB_CLS_LSTM_ATT(nn.Module):
         emb_output = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
         CLS_output = emb_output[0][:,0,:].unsqueeze(1).repeat(1,self.maxlen-2,1)
         SEP_output = emb_output[0][:, -1, :].unsqueeze(1).repeat(1, self.maxlen - 2, 1)
-        emb_total_output = emb_output[0][:,1:-1,:] + CLS_output + SEP_output
+        emb_total_output = torch.tanh(emb_output[0][:,1:-1,:] + CLS_output + SEP_output)
 
         outputs, _ = self.lstm(emb_total_output)
 
