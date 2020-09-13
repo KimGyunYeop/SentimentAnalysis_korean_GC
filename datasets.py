@@ -60,7 +60,7 @@ class AugmentBaseDataset(Dataset):
 
         self.lexicon_dic = self.get_lexicon2dic(self.lexicon)
 
-        self.re_compile_words = re.compile(r"\b(" + "|".join(self.lexicon_dic.keys()) + ")\b")
+        self.re_compile_words = re.compile(r"(" + "|".join(self.lexicon_dic.keys()) + ")")
 
     def get_lexicon2dic(self,lexicon):
         lexicon_dic = {}
