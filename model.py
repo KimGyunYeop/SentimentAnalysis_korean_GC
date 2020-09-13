@@ -2662,16 +2662,16 @@ class LSTM_ATT_NEG(nn.Module):
 
         return result
 
-class EMB_ATT_LSTM_ATT_ver2_NEG(nn.Module):
+class EMB_CLS_LSTM_ATT(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
-        super(EMB_ATT_LSTM_ATT_ver2_NEG, self).__init__()
+        super(EMB_CLS_LSTM_ATT, self).__init__()
         self.emb = MODEL_ORIGINER[model_type].from_pretrained(
             model_name_or_path,
             config=config)
-        self.config = config
-        self.lstm = nn.LSTM(768, 768, batch_first=True, bidirectional=False)
+        self.maxlen = 50
+        self.lstm = nn.LSTM(self.maxlen-2, 768, batch_first=True, bidirectional=False, dropout=0.2)
 
-        # sentiment module
+        #sentiment module
         self.word_dense = nn.Linear(768, 2)
         self.sentiment_embedding = nn.Embedding(2, 768)
         self.softmax = nn.Softmax(dim=-1)
@@ -2683,7 +2683,7 @@ class EMB_ATT_LSTM_ATT_ver2_NEG(nn.Module):
         self.dropout = nn.Dropout(0.2)
         self.out_proj = nn.Linear(768, 2)
         self.gelu = nn.GELU()
-        self.star_emb = nn.Linear(2, 768)
+
 
     def attention_net(self, lstm_output, input):
         batch_size, seq_len = input.shape
@@ -2695,131 +2695,35 @@ class EMB_ATT_LSTM_ATT_ver2_NEG(nn.Module):
         attn_output = torch.tanh(att)  # attn_output(batch_size, lstm_dir_dim)
         return attn_output
 
-    def forward(self, input_ids, attention_mask, labels, token_type_ids):
-        # embedding
-        emb_output = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-
-        outputs, (h, _) = self.lstm(emb_output[0])
-        batch_size, seq_len, w2v_dim = outputs.shape
-        # attention
-        attention_outputs = self.attention_net(outputs, input_ids)
-
-        outputs = self.dense(attention_outputs)
-        outputs = self.gelu(outputs)
-        outputs = self.dropout(outputs)
-        outputs = self.out_proj(outputs)
-
-        loss_fct = nn.CrossEntropyLoss()
-        loss1 = loss_fct(outputs.view(-1, 2), labels.view(-1))
-
-        labels_2 = labels.type(torch.FloatTensor).to(self.config.device)
-        for i in range(len(labels_2)):
-            labels_2[i] = labels_2[i].double() * 2 - 1
-        p_idx = (labels_2 == 1).nonzero().to(self.config.device)
-        n_idx = (labels_2 == -1).nonzero().to(self.config.device)
-
-        x1 = emb_output[:, 0, :].squeeze()
-        x1_p = x1[p_idx]
-        x1_n = x1[n_idx]
-        len_p = len(x1_p)
-        len_n = len(x1_n)
-
-        loss_fn = torch.nn.CosineEmbeddingLoss(reduction='mean', margin=1)
-        if len_p != 0 and len_n != 0:
-            x1_p = x1_p.squeeze()
-            x1_p = x1_p.repeat(1, len_n)
-            x1_p = x1_p.view(-1, w2v_dim)
-            x1_n = x1_n.squeeze().repeat(len_p, 1)
-
-            y = -torch.ones(len_p * len_n).type(torch.FloatTensor).to(self.config.device)
-
-            loss2 = loss_fn(x1_p.view(-1, w2v_dim),
-                            x1_n.view(-1, w2v_dim),
-                            y.view(-1))
-        if len_p > 1:
-            star_p = torch.zeros(len_p, 2).to(self.config.device)
-            star_p[range(len_p), 1] = 1
-            star_p = self.star_emb(star_p)
-            loss3_p = loss_fn(x1[p_idx].squeeze(),
-                              star_p,
-                              -torch.ones(len_p).to(self.config.device))
-        if len_n > 1:
-            star_n = torch.zeros(len_n, 2).to(self.config.device)
-            star_n[range(len_n), 0] = 1
-            star_n = self.star_emb(star_n)
-            loss3_n = loss_fn(x1[n_idx].squeeze(),
-                              star_n,
-                              -torch.ones(len_n).to(self.config.device))
-        if len_p <= 1 and len_n > 1:
-            if len_p == 0:
-                result = ((loss1, torch.tensor(0), torch.tensor(0), 0.5 * loss3_n), outputs)
-            else:
-                result = ((loss1, torch.tensor(0), torch.tensor(0), 0.5 * loss3_n), outputs)
-        elif len_p > 1 and len_n <= 1:
-            if len_n == 0:
-                result = ((loss1, torch.tensor(0), 0.5 * loss3_p, torch.tensor(0)), outputs)
-            else:
-                result = ((loss1, torch.tensor(0), 0.5 * loss3_p, torch.tensor(0)), outputs)
-        else:
-            result = ((loss1, 0.5 * loss2,
-                       float(len_p) / (len_p + len_n) / 2 * loss3_p, float(len_n) / (len_p + len_n) / 2 * loss3_n),
-                      outputs)
-
-        return result
-
-class EMB_CLS_LSTM_ATT(nn.Module):
-    def __init__(self, model_type, model_name_or_path, config):
-        super(EMB_CLS_LSTM_ATT, self).__init__()
-        self.emb = MODEL_ORIGINER[model_type].from_pretrained(
-            model_name_or_path,
-            config=config)
-        self.maxlen = 50
-        self.lstm = nn.LSTM(self.maxlen-2, 768, batch_first=True, bidirectional=False, dropout=0.2)
-
-        #sentiment module
-
-        self.word_dense = nn.Linear(self.maxlen-2, 2)
-        self.sentiment_embedding = nn.Embedding(2, self.maxlen-2)
-
-        # attention module
-        self.dense_1 = nn.Linear(768, 100)
-        self.dense_2 = nn.Linear(100, 1)
-        self.softmax = nn.Softmax(dim=-1)
-
-        self.dropout = nn.Dropout(0.2)
-        self.out_proj = nn.Linear(768, 2)
-
-    def attention_net(self, lstm_outputs):
-        M = torch.tanh(self.dense_1(lstm_outputs))
-        wM_output = self.dense_2(M).squeeze()
-        a = self.softmax(wM_output)
-        c = lstm_outputs.transpose(1, 2).bmm(a.unsqueeze(-1)).squeeze()
-        att_output = torch.tanh(c)
-
-        return att_output
-
     def sentiment_net(self, lstm_outputs):
         result = self.word_dense(lstm_outputs)
         sig_output = self.softmax(result)
-        argmax_result = torch.argmax(sig_output,dim=-1)
-        emb_result = self.sentiment_embedding(argmax_result)
-        senti_output = lstm_outputs * emb_result
+        #for i, output in enumerate(sig_output.tolist()):
+        #    print("vector:",i,output)
+        batch_size, max_len, _=sig_output.shape
+        zeros = torch.zeros(batch_size, max_len, dtype=torch.long).to(self.config.device)
+        ones = torch.ones(batch_size, max_len, dtype=torch.long).to(self.config.device)
+        emb_result = self.sentiment_embedding(zeros) * sig_output[:,:,0].unsqueeze(-1).repeat(1,1,768) + self.sentiment_embedding(ones) * sig_output[:,:,1].unsqueeze(-1).repeat(1,1,768)
+        senti_output = self.gelu(lstm_outputs + emb_result)
         return senti_output
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # embedding
         emb_output = self.emb(input_ids=input_ids, attention_mask=attention_mask, token_type_ids=token_type_ids)
-        CLS_output = emb_output[0][:,0,:].unsqueeze(-1).repeat(1,1,self.maxlen-2)
-        emb_total_output = emb_output[0][:,1:-1,:].bmm(CLS_output)
+        CLS_output = emb_output[0][:,0,:].unsqueeze(1).repeat(1,self.maxlen-2,1)
+        SEP_output = emb_output[0][:, -1, :].unsqueeze(1).repeat(1, self.maxlen - 2, 1)
+        emb_total_output = emb_output[0][:,1:-1,:] + CLS_output + SEP_output
 
-        sentiment_outputs = self.sentiment_net(emb_total_output)
+        outputs, _ = self.lstm(emb_total_output)
 
-        outputs, _ = self.lstm(sentiment_outputs)
+        sentiment_outputs = self.sentiment_net(outputs)
 
         # attention
-        attention_outputs = self.attention_net(outputs)
+        attention_outputs = self.attention_net(sentiment_outputs, input_ids)
 
-        outputs = self.dropout(attention_outputs)
+        outputs = self.dense(attention_outputs)
+        outputs = self.gelu(outputs)
+        outputs = self.dropout(outputs)
         outputs = self.out_proj(outputs)
 
         loss_fct = nn.CrossEntropyLoss()
@@ -2883,7 +2787,6 @@ MODEL_LIST = {
 
     "EMB_ATT_LSTM_ATT": EMB_ATT_LSTM_ATT,
     "EMB_ATT_LSTM_ATT_ver2": EMB_ATT_LSTM_ATT_ver2,
-    "EMB_ATT_LSTM_ATT_ver2_NEG": EMB_ATT_LSTM_ATT_ver2_NEG,
     "EMB_CLS_LSTM_ATT": EMB_CLS_LSTM_ATT,
     "BASEELECTRA_COS2_NEG_EMB":BASEELECTRA_COS2_NEG_EMB
 }
