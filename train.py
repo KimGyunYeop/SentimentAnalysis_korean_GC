@@ -149,8 +149,6 @@ def train(args,
                             os.makedirs(output_dir)
                         torch.save(model.state_dict(), os.path.join(output_dir, "training_model.bin"))
                         torch.save(args, os.path.join(output_dir, "training_args.bin"))
-                        with open(os.path.join(output_dir,"model_code.txt"),"w") as fp:
-                            fp.writelines(inspect.getsource(MODEL_LIST[args.model_mode]))
 
                         logger.info("Saving model checkpoint to {}".format(output_dir))
                         temp = acc
@@ -301,6 +299,8 @@ def main(cli_args):
 
     model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
     model.to(args.device)
+    with open(os.path.join(args.output_dir,"model_code.txt"),"w") as fp:
+        fp.writelines(inspect.getsource(MODEL_LIST[args.model_mode]))
     if cli_args.small == False:
         # Load dataset
         train_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="train") if args.train_file else None
