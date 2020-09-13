@@ -299,8 +299,6 @@ def main(cli_args):
 
     model = MODEL_LIST[cli_args.model_mode](args.model_type, args.model_name_or_path, config)
     model.to(args.device)
-    with open(os.path.join(args.output_dir,"model_code.txt"),"w") as fp:
-        fp.writelines(inspect.getsource(MODEL_LIST[args.model_mode]))
     if cli_args.small == False:
         # Load dataset
         train_dataset = DATASET_LIST[cli_args.model_mode](args, tokenizer, mode="train") if args.train_file else None
@@ -315,6 +313,11 @@ def main(cli_args):
 
     args.logging_steps = int(len(train_dataset) / args.train_batch_size) + 2
     args.save_steps = args.logging_steps
+
+    if not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
+    with open(os.path.join(args.output_dir, "model_code.txt"), "w") as fp:
+        fp.writelines(inspect.getsource(MODEL_LIST[args.model_mode]))
 
     if dev_dataset == None:
         args.evaluate_test_during_training = True  # If there is no dev dataset, only use testset
