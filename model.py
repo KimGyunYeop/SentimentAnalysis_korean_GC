@@ -2524,7 +2524,7 @@ class EMB_ATT_LSTM_ATT_ver2(nn.Module):
     def sentiment_net(self, lstm_outputs):
         result = self.word_dense(lstm_outputs)
         sig_output = self.softmax(result)
-        print(sig_output.tolist())
+        print(sig_output.tolist()[0])
         batch_size, max_len, _=sig_output.shape
         zeros = torch.zeros(batch_size, max_len, dtype=torch.long).to(self.config.device)
         ones = torch.ones(batch_size, max_len, dtype=torch.long).to(self.config.device)
