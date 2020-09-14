@@ -95,10 +95,7 @@ class AugmentBaseDataset(Dataset):
         if "train" in self.mode:
             lexicon_words= list(set(self.re_compile_words.findall(txt)))
             for word in list(set(lexicon_words)):
-                print(word)
-                print(txt)
                 txt = txt.replace(word, random.choice(self.lexicon_dic[word]))
-                print(txt)
         data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
         input_ids = torch.LongTensor(data["input_ids"])
         token_type_ids = torch.LongTensor(data["token_type_ids"])
