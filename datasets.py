@@ -54,7 +54,7 @@ class AugmentBaseDataset(Dataset):
         if "small" in mode:
             self.dataset = self.dataset[:10000]
 
-        lexicon_path = os.path.join(args.data_dir, "korean_lexicon", "AugData.csv")
+        lexicon_path = os.path.join(args.data_dir, "korean_lexicon", "AugData.txt")
         self.lexicon = pd.read_csv(lexicon_path, encoding="cp949", sep=",")
         self.lexicon = self.lexicon[self.lexicon["type"].isin(["비슷한말","상위어","하위어"])]
 
