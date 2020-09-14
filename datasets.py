@@ -94,7 +94,7 @@ class AugmentBaseDataset(Dataset):
         txt = str(self.dataset.at[idx,"review"])
         if "train" in self.mode:
             lexicon_words= list(set(self.re_compile_words.findall(txt)))
-            for word in lexicon_words:
+            for word in list(set(lexicon_words)):
                 print(txt)
                 txt = txt.replace(word, random.choice(self.lexicon_dic[word]))
                 print(txt)
