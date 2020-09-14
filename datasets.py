@@ -44,6 +44,7 @@ class AugmentBaseDataset(Dataset):
         super(AugmentBaseDataset,self).__init__()
         self.tokenizer = tokenizer
         self.maxlen = args.max_seq_len
+        self.mode = mode
         if "train" in mode:
             data_path = os.path.join(args.data_dir, args.task, args.train_file)
         elif "dev" in mode:
@@ -91,9 +92,10 @@ class AugmentBaseDataset(Dataset):
 
     def __getitem__(self, idx):
         txt = str(self.dataset.at[idx,"review"])
-        lexicon_words= list(set(self.re_compile_words.findall(txt)))
-        for word in lexicon_words:
-            txt = txt.replace(word, random.choice(self.lexicon_dic[word]))
+        if "train" in self.mode:
+            lexicon_words= list(set(self.re_compile_words.findall(txt)))
+            for word in lexicon_words:
+                txt = txt.replace(word, random.choice(self.lexicon_dic[word]))
         data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
         input_ids = torch.LongTensor(data["input_ids"])
         token_type_ids = torch.LongTensor(data["token_type_ids"])
