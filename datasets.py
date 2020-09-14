@@ -56,6 +56,7 @@ class AugmentBaseDataset(Dataset):
 
         lexicon_path = os.path.join(args.data_dir, "korean_lexicon", "AugData.txt")
         self.lexicon = pd.read_csv(lexicon_path, encoding="utf8", sep=",")
+        print(self.lexicon)
         self.lexicon = self.lexicon[self.lexicon["type"].isin(["비슷한말","상위어","하위어"])]
 
         self.lexicon_dic = self.get_lexicon2dic(self.lexicon)
