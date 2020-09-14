@@ -451,7 +451,7 @@ DATASET_LIST = {
     "BASEELECTRA_COS2_POS_ALL" : BaseDataset,
     "BASEELECTRA_COS2_POS_NEG" : BaseDataset,
     "ENSEMBLE_MODEL":BaseDataset,
-    "ENSEMBLE_MODEL_last":BaseDataset,
+    "ENSEMBLE_MODEL_last":AugmentBaseDataset,
 
     "LSTM": BaseDataset,
     "LSTM_ATT": BaseDataset,
