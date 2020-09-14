@@ -1001,9 +1001,9 @@ class BASEELECTRA_COS2_STAR_NEG_EMB(nn.Module):
         self.dropout = nn.Dropout(0.2, inplace=False)
         self.out_proj = nn.Linear(768, 2)
         self.star_emb = nn.Embedding(2, 768)
-        self.config = config
         self.tanh = nn.Tanh()
         self.gelu = nn.GELU()
+        #test
 
     def forward(self, input_ids, attention_mask, labels, token_type_ids):
         # print(input_ids)
@@ -1019,11 +1019,11 @@ class BASEELECTRA_COS2_STAR_NEG_EMB(nn.Module):
         loss_fct = nn.CrossEntropyLoss()
         loss1 = loss_fct(outputs.view(-1, 2), labels.view(-1))
 
-        labels_2 = labels.type(torch.FloatTensor).to(self.config.device)
+        labels_2 = labels.type(torch.FloatTensor).cuda()
         for i in range(len(labels_2)):
             labels_2[i] = labels_2[i].double() * 2 - 1
-        p_idx = (labels_2 == 1).nonzero().to(self.config.device)
-        n_idx = (labels_2 == -1).nonzero().to(self.config.device)
+        p_idx = (labels_2 == 1).nonzero().cuda()
+        n_idx = (labels_2 == -1).nonzero().cuda()
 
         x1 = embs[:, 0, :].squeeze()
         x1_p = x1[p_idx]
@@ -1038,23 +1038,23 @@ class BASEELECTRA_COS2_STAR_NEG_EMB(nn.Module):
             x1_p = x1_p.view(-1, w2v_dim)
             x1_n = x1_n.squeeze().repeat(len_p, 1)
 
-            y = -torch.ones(len_p * len_n).type(torch.FloatTensor).to(self.config.device)
+            y = -torch.ones(len_p * len_n).type(torch.FloatTensor).cuda()
 
             loss2 = loss_fn(x1_p.view(-1, w2v_dim),
                             x1_n.view(-1, w2v_dim),
                             y.view(-1))
         if len_p > 1:
-            star_p = torch.ones(len_p).type(torch.LongTensor).to(self.config.device)
+            star_p = torch.ones(len_p).type(torch.LongTensor).cuda()
             star_p = self.star_emb(star_p).squeeze()
             loss3_p = loss_fn(x1[p_idx].squeeze(),
-                              star_p.to(self.config.device),
-                              -torch.ones(len_p).to(self.config.device))
+                              star_p.cuda(),
+                              -torch.ones(len_p).cuda())
         if len_n > 1:
-            star_n = torch.zeros(len_n).type(torch.LongTensor).to(self.config.device)
+            star_n = torch.zeros(len_n).type(torch.LongTensor).cuda()
             star_n = self.star_emb(star_n).squeeze()
             loss3_n = loss_fn(x1[n_idx].squeeze(),
-                              star_n.to(self.config.device),
-                              -torch.ones(len_n).to(self.config.device))
+                              star_n.cuda(),
+                              -torch.ones(len_n).cuda())
         if len_p <= 1 and len_n > 1:
             if len_p == 0:
                 result = ((loss1, torch.tensor(0), torch.tensor(0), 0.5 * loss3_n), outputs)
@@ -1062,15 +1062,16 @@ class BASEELECTRA_COS2_STAR_NEG_EMB(nn.Module):
                 result = ((loss1, torch.tensor(0), torch.tensor(0), 0.5 * loss3_n), outputs)
         elif len_p > 1 and len_n <= 1:
             if len_n == 0:
-                result = ((loss1, torch.tensor(0), 0.25 * loss3_p, torch.tensor(0)), outputs)
+                result = ((loss1, torch.tensor(0), 0.5 * loss3_p, torch.tensor(0)), outputs)
             else:
-                result = ((loss1, torch.tensor(0), 0.25 * loss3_p, torch.tensor(0)), outputs)
+                result = ((loss1, torch.tensor(0), 0.5 * loss3_p, torch.tensor(0)), outputs)
         else:
-            result = ((loss1, loss2 * 0.75,
-                       float(len_p) / (len_p + len_n) / 4 * loss3_p, float(len_n) / (len_p + len_n) / 4* loss3_n),
+            result = ((loss1, 0.5 * loss2,
+                       float(len_p) / (len_p + len_n) / 2 * loss3_p, float(len_n) / (len_p + len_n) / 2 * loss3_n),
                       outputs)
 
         return result
+
 
 class ENSEMBLE_MODEL(nn.Module):
     def __init__(self, model_type, model_name_or_path, config):
