@@ -429,7 +429,7 @@ class KNUDataset_ALL(Dataset):
         return (input_ids, attention_mask,token_type_ids, label, polarity_ids),txt
 
 DATASET_LIST = {
-    "BASEELECTRA": BaseDataset,
+    "BASEELECTRA": AugmentBaseDataset,
     "BASEELECTRA_COS": BaseDataset,
     "BASEELECTRA_COS_NEG" : BaseDataset,
     "BASEELECTRA_COS2": BaseDataset,
