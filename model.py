@@ -2684,12 +2684,14 @@ class EMB_CLS_LSTM_ATT(nn.Module):
         SEP_output = emb_output[0][:, -1, :].unsqueeze(1).repeat(1, self.maxlen - 2, 1)
         emb_total_output = torch.tanh(emb_output[0][:,1:-1,:] + CLS_output + SEP_output)
 
-        outputs, _ = self.lstm(emb_total_output)
+        sentiment_outputs = self.sentiment_net(emb_total_output)
 
-        sentiment_outputs = self.sentiment_net(outputs)
+        outputs, _ = self.lstm(sentiment_outputs)
+
+
 
         # attention
-        attention_outputs = self.attention_net(sentiment_outputs, input_ids)
+        attention_outputs = self.attention_net(outputs, input_ids)
 
         outputs = self.dense(attention_outputs)
         outputs = self.gelu(outputs)
@@ -2710,7 +2712,6 @@ MODEL_LIST = {
     "BASEELECTRA_COS_NEG": BASEELECTRA_COS_NEG,
     "BASEELECTRA_COS2": BASEELECTRA_COS2,
     "BASEELECTRA_COS2_LSTM": BASEELECTRA_COS2_LSTM,
-    "BASEELECTRA_COS2_NEG": BASEELECTRA_COS2_NEG,
     "BASEELECTRA_COS2_STAR_NEG": BASEELECTRA_COS2_STAR_NEG,
     "BASEELECTRA_COS2_STAR_NEG_EMB": BASEELECTRA_COS2_STAR_NEG_EMB,
     "BASEELECTRA_COS2_EMB" : BASEELECTRA_COS2_EMB,
