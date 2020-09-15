@@ -64,6 +64,9 @@ class AugmentBaseDataset(Dataset):
 
         self.re_compile_words = re.compile(r"\b(" + "|".join(self.lexicon_dic.keys()) + ")\\W", re.I)
 
+        if "train" in self.mode:
+            self.total_data = self.change_lexicon_word()
+
     def get_lexicon2dic(self,lexicon):
         lexicon_dic = {}
         for index in range(len(lexicon)):
@@ -87,15 +90,25 @@ class AugmentBaseDataset(Dataset):
             lexicon_dic[word2] = list(set(lexicon_dic[word2]))
         return lexicon_dic
 
+    def change_lexicon_word(self):
+        total_data = []
+        for idx in range(len(self.dataset)):
+            txt = str(self.dataset.at[idx, "review"])
+            lexicon_words = list(set(self.re_compile_words.findall(txt)))
+            for word in list(set(lexicon_words)):
+                txt = txt.replace(word, random.choice(self.lexicon_dic[word]))
+            total_data.append(txt)
+
+        return total_data
+
     def __len__(self):
         return len(self.dataset)
 
     def __getitem__(self, idx):
-        txt = str(self.dataset.at[idx,"review"])
         if "train" in self.mode:
-            lexicon_words= list(set(self.re_compile_words.findall(txt)))
-            for word in list(set(lexicon_words)):
-                txt = txt.replace(word, random.choice(self.lexicon_dic[word]))
+            txt = self.total_data[idx]
+        else:
+            txt = str(self.dataset.at[idx, "review"])
         data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
         input_ids = torch.LongTensor(data["input_ids"])
         token_type_ids = torch.LongTensor(data["token_type_ids"])
