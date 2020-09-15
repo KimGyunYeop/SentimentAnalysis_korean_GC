@@ -107,8 +107,9 @@ class AugmentBaseDataset(Dataset):
         txt = str(self.dataset.at[idx, "review"])
         if "train" in self.mode:
             lexicon_words = list(set(self.re_compile_words.findall(txt)))
-            word = random.choice(lexicon_words)
-            txt = txt.replace(word, random.choice(self.lexicon_dic[word]))
+            if len(lexicon_words)>0:
+                word = random.choice(lexicon_words)
+                txt = txt.replace(word, random.choice(self.lexicon_dic[word]))
         data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
         input_ids = torch.LongTensor(data["input_ids"])
         token_type_ids = torch.LongTensor(data["token_type_ids"])
