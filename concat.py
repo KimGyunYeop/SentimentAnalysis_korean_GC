@@ -120,7 +120,7 @@ for i in range(len(list_s)):
     arr_te.append(str(20000000+50001+ idx) + '\t' + str(list_s[i][0])+ '\t' + str(list_s[i][1]) + '\n')
     idx+=1
 print('concat', len(arr_te))
-final_te_f = open("./data/final_test.txt", 'w', encoding='utf-8-sig')
+final_te_f = open("./data/nsmc/final_test.txt", 'w', encoding='utf-8-sig')
 print(len(arr_te))
 final_te_f.writelines(arr_te)
 final_te_f.close()
@@ -137,7 +137,7 @@ for i in range(len(list)):
 print('ip', len(arr_ip))
 arr = arr + arr_ip
 print(len(arr))
-f = open("./data/final_train.txt", 'w', encoding='utf-8-sig')
+f = open("./data/nsmc/final_train.txt", 'w', encoding='utf-8-sig')
 f.writelines(arr)
 f.close()
 
