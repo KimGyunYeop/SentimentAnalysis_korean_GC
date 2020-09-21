@@ -52,10 +52,10 @@ print(len(pos))
 neg = all_df[all_df['label']==0]
 print(len(neg))
 
-pos_sample = pos.sample(n=34247)
+pos_sample = pos.sample(n=20000)
 print(len(pos_sample))
 print(len(neg))
-neg_sample = neg.sample(n=34247)
+neg_sample = neg.sample(n=25000)
 print(len(neg_sample))
 print('len neg; ', len(neg), 'len pos: ', len(pos))
 pos_sample.to_csv('naver_posSample.txt')

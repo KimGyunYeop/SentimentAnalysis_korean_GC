@@ -102,16 +102,33 @@ len_nc += len(nc_df)
 nc2_df = nc2_df.drop_duplicates(subset = ['review'])
 print('nc content', len_nc, len(nc2_df))
 fp_df = fp_df.append(nc2_df)
-fp_sample = fp_df.sample(n=2000)
+# sampling sports
+fp_sample = fp_df.sample(n=2500)
 print(len(fp_sample))
 print('fp', len(all_df))
-all_df = all_df.append(fp_sample)
+all_df = all_df.append(fp_sample[:2000])
+#all_df = all_df.append(fp_sample)
 print(len(all_df))
+
+ori_f = open("data/nsmc/ratings_train.txt", encoding='utf-8-sig')
+te_f = open("data/nsmc/ratings_test.txt", encoding='utf-8-sig')
+arr_te = te_f.readlines()
+print('test', len(arr_te))
+list_s = fp_sample[2000:].values.tolist()
+idx = 0
+for i in range(len(list_s)):
+    arr_te.append(str(20000000+50001+ idx) + '\t' + str(list_s[i][0])+ '\t' + str(list_s[i][1]) + '\n')
+    idx+=1
+print('concat', len(arr_te))
+final_te_f = open("./data/final_test.txt", 'w', encoding='utf-8-sig')
+print(len(arr_te))
+final_te_f.writelines(arr_te)
+final_te_f.close()
+
 list = all_df.values.tolist()
 arr = []
 idx = 0
 ip_f = open("./crawling/all_ip.txt", encoding='utf-8-sig')
-ori_f = open("data/nsmc/ratings_train.txt", encoding='utf-8-sig')
 arr = ori_f.readlines()
 arr_ip = ip_f.readlines()
 for i in range(len(list)):
