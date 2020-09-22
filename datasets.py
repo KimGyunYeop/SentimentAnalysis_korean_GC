@@ -57,7 +57,7 @@ class AugmentBaseDataset(Dataset):
 
         lexicon_path = os.path.join(args.data_dir, "korean_lexicon", "NIKLex_synonym.tsv")
         self.lexicon = pd.read_csv(lexicon_path, encoding="utf8", sep="\t")
-        print(self.lexicon)
+        #print(self.lexicon)
         self.lexicon = self.lexicon[self.lexicon["type"].isin(["비슷한말","상위어","하위어"])]
 
         self.lexicon_dic = self.get_lexicon2dic(self.lexicon)
@@ -108,10 +108,10 @@ class AugmentBaseDataset(Dataset):
         if "train" in self.mode:
             lexicon_words = list(set(self.re_compile_words.findall(txt)))
             if len(lexicon_words)>0:
-                print(txt)
+                #print(txt)
                 word = random.choice(lexicon_words)
                 txt = txt.replace(word, random.choice(self.lexicon_dic[word]))
-                print(txt)
+                #print(txt)
         data = self.tokenizer(txt, pad_to_max_length=True, max_length=self.maxlen, truncation=True)
         input_ids = torch.LongTensor(data["input_ids"])
         token_type_ids = torch.LongTensor(data["token_type_ids"])
