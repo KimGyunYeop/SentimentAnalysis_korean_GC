@@ -94,8 +94,8 @@ class AugmentBaseDataset(Dataset):
         for idx in range(len(self.dataset)):
             txt = str(self.dataset.at[idx, "review"])
             lexicon_words = list(set(self.re_compile_words.findall(txt)))
-            for word in list(set(lexicon_words)):
-                txt = txt.replace(word, random.choice(self.lexicon_dic[word]))
+            random_word = random.choice((set(lexicon_words)))
+            txt = txt.replace(random_word, random.choice(self.lexicon_dic[random_word]))
             total_data.append(txt)
 
         return total_data
