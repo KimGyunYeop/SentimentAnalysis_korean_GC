@@ -68,6 +68,7 @@ pos, neg, idx_idx, arr_ip7 = convertFormat(pos, neg, 20000000, idx_idx, f7)
 f7.close()
 list = arr_ip + arr_ip2 + arr_ip3 + arr_ip4 + arr_ip5 + arr_ip6 + arr_ip7
 print(len(list))
+f.write('review_id	review	rating\n')
 for i in range(len(list)):
     f.write(str(list[i]))
 f.close()
