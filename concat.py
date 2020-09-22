@@ -135,11 +135,17 @@ neg_te=ip_neg.drop(neg_tr.index)
 print(len(neg_tr), len(neg_te))
 all_tr = pd.concat([pos_tr, neg_tr])
 all_te = pd.concat([pos_te, neg_te])
+print(all_tr)
+all_tr = all_tr.drop(columns= ['review_id'])
+all_te = all_te.drop(columns= ['review_id'])
 print('final ip tr', len(all_tr))
 print('final ip te', len(all_te))
 
 list_ip = all_tr.values.tolist()
+#print(list_ip)
+print('\n\n')
 list = list + list_ip
+#print(list)
 
 #print(arr_ip)
 for i in range(len(list)):
