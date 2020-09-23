@@ -108,7 +108,8 @@ fp_df = fp_df.append(nc2_df)
 fp_sample = fp_df.sample(n=2500)
 print(len(fp_sample))
 print('fp', len(all_df))
-all_df = all_df.append(fp_sample[:2000])
+print(fp_sample)
+fp_sample_tr = fp_sample[:2000]
 #all_df = all_df.append(fp_sample)
 print(len(all_df))
 print('len prev', len(all_df))
@@ -150,17 +151,25 @@ list = list + list_ip
 for i in range(len(list)):
     arr.append(str(20000000+len(arr_ip) + idx) + '\t' + str(list[i][0])+ '\t' + str(list[i][1]) + '\n')
     idx+=1
+list_fp = fp_sample_tr.values.tolist()
+for i in range(len(list_fp)):
+    arr.append(str(20000000+len(arr_ip) + idx) + '\t' + str(list_fp[i][1])+ '\t' + str(list_fp[i][0]) + '\n')
+    idx+=1
 print('ip', len(arr_ip))
 #arr = arr + arr_ip
 
 te_f = open("data/nsmc/ratings_test.txt", encoding='utf-8-sig')
 arr_te = te_f.readlines()
-list_s_ip = all_te.values.tolist()
-list_s = fp_sample[2000:].values.tolist() + list_s_ip
+list_t_ip = all_te.values.tolist()
+list_t_fp = fp_sample[2000:].values.tolist()
 idx = 0
-for i in range(len(list_s)):
-    arr_te.append(str(20000000+50001+ idx) + '\t' + str(list_s[i][0])+ '\t' + str(list_s[i][1]) + '\n')
+for i in range(len(list_t_ip)):
+    arr_te.append(str(20000000+50001+ idx) + '\t' + str(list_t_ip[i][0])+ '\t' + str(list_t_ip[i][1]) + '\n')
     idx+=1
+for i in range(len(list_t_fp)):
+    arr_te.append(str(20000000+50001+ idx) + '\t' + str(list_t_fp[i][1])+ '\t' + str(list_t_fp[i][0]) + '\n')
+    idx+=1
+
 final_te_f = open("./data/nsmc/final_test.txt", 'w', encoding='utf-8-sig')
 print('FINAL TEST', len(arr_te))
 
