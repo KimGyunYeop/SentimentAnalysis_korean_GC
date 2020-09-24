@@ -110,6 +110,7 @@ print(len(fp_sample))
 print('fp', len(all_df))
 print(fp_sample)
 fp_sample_tr = fp_sample[:2000]
+
 #all_df = all_df.append(fp_sample)
 print(len(all_df))
 print('len prev', len(all_df))
@@ -125,6 +126,7 @@ arr_ip = ip_f.readlines()
 print('all ip' , len(arr_ip))
 # pos, neg
 ip_df = pd.read_csv('./crawling/all_ip.txt', sep='\t')
+
 ip_pos = ip_df[ip_df['rating']==1]
 ip_neg = ip_df[ip_df['rating']==0]
 print(len(ip_pos), len(ip_neg))
