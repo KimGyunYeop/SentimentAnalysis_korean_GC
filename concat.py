@@ -105,7 +105,6 @@ fp_df = fp_df.append(nc2_df)
 fp_sample = fp_df.sample(n=2000)
 print(len(fp_sample))
 print('fp', len(all_df))
-all_df = all_df.append(fp_sample)
 print(len(all_df))
 list = all_df.values.tolist()
 arr = []
@@ -114,8 +113,12 @@ ip_f = open("./crawling/all_ip.txt", encoding='utf-8-sig')
 ori_f = open("data/nsmc/ratings_train.txt", encoding='utf-8-sig')
 arr = ori_f.readlines()
 arr_ip = ip_f.readlines()
+list_fp = fp_sample.values.tolist()
 for i in range(len(list)):
     arr.append(str(20000000+len(arr_ip) + idx) + '\t' + str(list[i][0])+ '\t' + str(list[i][1]) + '\n')
+    idx+=1
+for i in range(len(list_fp)):
+    arr.append(str(20000000+len(arr_ip) + idx) + '\t' + str(list_fp[i][1])+ '\t' + str(list_fp[i][0]) + '\n')
     idx+=1
 print('ip', len(arr_ip))
 arr = arr + arr_ip
